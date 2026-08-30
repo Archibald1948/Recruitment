@@ -1,0 +1,222 @@
+import { Client } from "@notionhq/client";
+import type { ApplicationInput } from "./validation";
+import { serializeAnswers } from "./validation";
+import { positionById } from "@/config/site";
+
+/**
+ * Notion SDK v5는 API 2025-09-03을 사용한다.
+ * 이 버전부터 데이터베이스가 여러 data source를 가질 수 있어
+ * 조회/생성은 database_id가 아니라 data_source_id로 한다.
+ */
+
+export const PROP = {
+  name: "이름",
+  email: "이메일",
+  phone: "연락처",
+  position: "포지션",
+  status: "상태",
+  oneLiner: "한 줄 소개",
+  motivation: "지원 동기",
+  experience: "관련 경험",
+  answers: "포지션별 답변",
+  portfolio: "포트폴리오",
+  availability: "주간 참여 가능 시간",
+  ref: "유입 경로",
+  agree: "개인정보 동의",
+  tokenHash: "수정 토큰 해시",
+} as const;
+
+export const STATUS_FLOW = ["접수됨", "서류 검토", "커피챗", "합류", "보류"] as const;
+export type ApplicationStatus = (typeof STATUS_FLOW)[number];
+
+let client: Client | null = null;
+export function notion(): Client {
+  if (!client) {
+    const auth = process.env.NOTION_TOKEN;
+    if (!auth) throw new Error("NOTION_TOKEN 환경변수가 설정되지 않았습니다.");
+    client = new Client({ auth });
+  }
+  return client;
+}
+
+let dataSourceIdCache: string | null = null;
+
+/** 데이터베이스 id로부터 data source id를 한 번만 조회해 캐시한다. */
+export async function getDataSourceId(): Promise<string> {
+  if (dataSourceIdCache) return dataSourceIdCache;
+
+  const explicit = process.env.NOTION_DATA_SOURCE_ID;
+  if (explicit) {
+    dataSourceIdCache = explicit;
+    return explicit;
+  }
+
+  const databaseId = process.env.NOTION_DATABASE_ID;
+  if (!databaseId) throw new Error("NOTION_DATABASE_ID 환경변수가 설정되지 않았습니다.");
+
+  const db = (await notion().databases.retrieve({ database_id: databaseId })) as unknown as {
+    data_sources?: { id: string }[];
+  };
+  const id = db.data_sources?.[0]?.id;
+  if (!id) throw new Error("해당 데이터베이스에서 data source를 찾지 못했습니다.");
+
+  dataSourceIdCache = id;
+  return id;
+}
+
+/* ── 속성 헬퍼 ─────────────────────────────────────────────── */
+
+const text = (v?: string) => (v ? [{ type: "text" as const, text: { content: v.slice(0, 1900) } }] : []);
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function readText(prop: any): string {
+  if (!prop) return "";
+  const arr = prop.rich_text ?? prop.title;
+  if (!Array.isArray(arr)) return "";
+  return arr.map((t: any) => t.plain_text ?? "").join("");
+}
+
+function readSelect(prop: any): string {
+  return prop?.select?.name ?? "";
+}
+
+export interface ApplicationRecord {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  position: string;
+  status: string;
+  oneLiner: string;
+  motivation: string;
+  experience: string;
+  answersRaw: string;
+  portfolio: string;
+  availability: string;
+  ref: string;
+  tokenHash: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+function toRecord(page: any): ApplicationRecord {
+  const p = page.properties ?? {};
+  return {
+    id: page.id,
+    name: readText(p[PROP.name]),
+    email: p[PROP.email]?.email ?? "",
+    phone: p[PROP.phone]?.phone_number ?? "",
+    position: readSelect(p[PROP.position]),
+    status: readSelect(p[PROP.status]) || "접수됨",
+    oneLiner: readText(p[PROP.oneLiner]),
+    motivation: readText(p[PROP.motivation]),
+    experience: readText(p[PROP.experience]),
+    answersRaw: readText(p[PROP.answers]),
+    portfolio: p[PROP.portfolio]?.url ?? "",
+    availability: readSelect(p[PROP.availability]),
+    ref: readSelect(p[PROP.ref]),
+    tokenHash: readText(p[PROP.tokenHash]),
+    createdAt: page.created_time ?? "",
+    updatedAt: page.last_edited_time ?? "",
+  };
+}
+
+function buildProperties(input: ApplicationInput): Record<string, any> {
+  const position = positionById(input.position);
+  const props: Record<string, any> = {
+    [PROP.name]: { title: text(input.name) },
+    [PROP.email]: { email: input.email },
+    [PROP.oneLiner]: { rich_text: text(input.oneLiner) },
+    [PROP.motivation]: { rich_text: text(input.motivation) },
+    [PROP.experience]: { rich_text: text(input.experience) },
+    [PROP.answers]: { rich_text: text(serializeAnswers(input.position, input.answers)) },
+    [PROP.availability]: { select: { name: input.availability } },
+    [PROP.agree]: { checkbox: input.agree },
+  };
+
+  if (position) props[PROP.position] = { select: { name: position.title } };
+  props[PROP.phone] = input.phone ? { phone_number: input.phone } : { phone_number: null };
+  props[PROP.portfolio] = input.portfolio ? { url: input.portfolio } : { url: null };
+  if (input.ref) props[PROP.ref] = { select: { name: input.ref } };
+
+  return props;
+}
+
+/* ── 공개 API ──────────────────────────────────────────────── */
+
+export async function createApplication(input: ApplicationInput, tokenHash: string) {
+  const data_source_id = await getDataSourceId();
+  const page = await notion().pages.create({
+    parent: { type: "data_source_id", data_source_id } as any,
+    properties: {
+      ...buildProperties(input),
+      [PROP.status]: { select: { name: "접수됨" } },
+      [PROP.tokenHash]: { rich_text: text(tokenHash) },
+    } as any,
+  });
+  return page as any;
+}
+
+export async function getApplication(pageId: string): Promise<ApplicationRecord | null> {
+  try {
+    const page = await notion().pages.retrieve({ page_id: pageId });
+    if ((page as any).archived || (page as any).in_trash) return null;
+    return toRecord(page);
+  } catch {
+    return null;
+  }
+}
+
+export async function updateApplication(pageId: string, input: ApplicationInput) {
+  const props = buildProperties(input);
+  // 이메일은 계정 키라 수정 대상에서 제외한다.
+  delete props[PROP.email];
+  await notion().pages.update({ page_id: pageId, properties: props as any });
+}
+
+/** 수정 이력을 페이지 본문에 누적한다. */
+export async function appendHistory(pageId: string, line: string) {
+  try {
+    await notion().blocks.children.append({
+      block_id: pageId,
+      children: [
+        {
+          object: "block",
+          type: "paragraph",
+          paragraph: { rich_text: text(line) },
+        } as any,
+      ],
+    });
+  } catch {
+    // 이력 기록 실패가 수정 자체를 막지는 않는다.
+  }
+}
+
+export async function findByEmail(email: string): Promise<ApplicationRecord | null> {
+  const data_source_id = await getDataSourceId();
+  const res = (await notion().dataSources.query({
+    data_source_id,
+    filter: { property: PROP.email, email: { equals: email } } as any,
+    page_size: 1,
+  })) as any;
+  const first = res.results?.[0];
+  return first ? toRecord(first) : null;
+}
+
+export async function countApplications(): Promise<number> {
+  const data_source_id = await getDataSourceId();
+  let count = 0;
+  let cursor: string | undefined;
+
+  do {
+    const res = (await notion().dataSources.query({
+      data_source_id,
+      page_size: 100,
+      start_cursor: cursor,
+    })) as any;
+    count += res.results?.length ?? 0;
+    cursor = res.has_more ? res.next_cursor : undefined;
+  } while (cursor);
+
+  return count;
+}

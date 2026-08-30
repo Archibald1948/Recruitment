@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+/* ── 디자인 토큰 (docs/design-system.md) ─────────────────────── */
+:root {
+  --bg: #0c0c0c;
+  --surface-light: #ffffff;
+  --ink: #0c0c0c;
+  --text: #ffffff;
+  --text-dim: #d7e2ea;
+  --muted: #8e8e8e;
+  --line: rgba(215, 226, 234, 0.15);
+  --line-ink: rgba(12, 12, 12, 0.15);
+
+  --grad-heading: linear-gradient(180deg, #8b93a0 0%, #e2ecf3 100%);
+  --grad-cta: linear-gradient(123deg, #18011f 7%, #b600a8 37%, #7621b0 72%, #be4c00 100%);
+  --cta-shadow: 0 4px 4px rgba(181, 1, 167, 0.25), 4px 4px 12px #7721b1 inset;
+
+  --ease-hero: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-fade: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-dim: var(--text-dim);
+  --color-muted: var(--muted);
+  --font-display: var(--font-pixel), "Courier New", monospace;
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+::selection {
+  background: #b600a8;
+  color: #fff;
+}
+
+/* ── 타이포 ──────────────────────────────────────────────────── */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* 섹션 헤딩 그라디언트 (레퍼런스 B .hero-heading) */
+.grad-heading {
+  background: var(--grad-heading);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section-heading {
+  font-size: clamp(3rem, 12vw, 160px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.hero-headline {
+  font-size: clamp(2rem, 8.5vw, 7rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .hero-headline {
+    line-height: 1.05;
+    letter-spacing: -0.06em;
+  }
+}
+
+@media (max-width: 420px) {
+  .hero-headline {
+    letter-spacing: -0.08em;
+  }
+}
+
+.item-no {
+  font-size: clamp(3rem, 10vw, 140px);
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+}
+
+.item-name {
+  font-size: clamp(1rem, 2.2vw, 2.1rem);
+}
+
+.body-copy {
+  font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  line-height: 1.7;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 버튼 ────────────────────────────────────────────────────── */
+.btn-cta {
+  background: var(--grad-cta);
+  box-shadow: var(--cta-shadow);
+  outline: 2px solid #fff;
+  outline-offset: -3px;
+  color: #fff;
+  border-radius: 999px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: transform 0.25s var(--ease-hero), filter 0.25s var(--ease-hero);
+}
+
+.btn-cta:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.1);
+}
+
+.btn-cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  border: 2px solid var(--text-dim);
+  color: var(--text-dim);
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: background-color 0.2s;
+}
+
+.btn-ghost:hover {
+  background: rgba(215, 226, 234, 0.1);
+}
+
+/* ── 폼 ──────────────────────────────────────────────────────── */
+.field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.18s, background-color 0.18s;
+}
+
+.field::placeholder {
+  color: rgba(215, 226, 234, 0.32);
+}
+
+.field:focus {
+  outline: none;
+  border-color: rgba(182, 0, 168, 0.75);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.field[aria-invalid="true"] {
+  border-color: #ff6b6b;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+
+.field-error {
+  color: #ff8f8f;
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+/* ── 애니메이션 ──────────────────────────────────────────────── */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes headlineFade {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.98);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.anim-nav {
+  animation: slideDown 0.7s var(--ease-hero) both;
+}
+
+.anim-line {
+  opacity: 0;
+  animation: headlineFade 0.85s var(--ease-hero) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+.anim-reveal {
+  opacity: 0;
+  animation: reveal 0.85s var(--ease-hero) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .anim-line,
+  .anim-reveal {
+    opacity: 1;
+  }
+}
