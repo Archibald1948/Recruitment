@@ -44,15 +44,17 @@ export default function GlyphField() {
       cells = [];
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          // 전체를 채우지 않고 듬성듬성 — 노이즈가 아니라 텍스처로 읽히게
-          if (Math.random() > 0.42) continue;
+          // 레퍼런스처럼 위쪽은 격자가 거의 꽉 차고 아래로 갈수록 성겨진다.
+          const rowRatio = r / rows;
+          const density = 0.9 - Math.min(0.78, rowRatio * 1.7);
+          if (Math.random() > density) continue;
           cells.push({
             x: c * cell + cell / 2,
             y: r * cell + cell / 2,
             ch: GLYPHS[Math.floor(Math.random() * GLYPHS.length)],
             phase: Math.random() * Math.PI * 2,
             period: 4000 + Math.random() * 5000,
-            peak: 0.1 + Math.random() * 0.11,
+            peak: 0.16 + Math.random() * 0.2,
           });
         }
       }
@@ -69,14 +71,10 @@ export default function GlyphField() {
       for (const c of cells) {
         const wave = reduced ? 0.6 : (Math.sin((t / c.period) * Math.PI * 2 + c.phase) + 1) / 2;
         // 아래로 갈수록 사라지게 — 하단 검정 페이드와 겹쳐 지저분해지지 않도록
-        const depth = 1 - Math.min(1, Math.max(0, c.y / h - 0.08) / 0.62);
+        const depth = 1 - Math.min(1, Math.max(0, c.y / h - 0.05) / 0.45);
 
-        // 배경이 위쪽은 밝고 아래쪽은 어둡다. 흰색으로만 그리면 상단에서 아예 보이지 않으므로
-        // 밝은 구간에서는 어두운 글리프로 뒤집는다.
-        const t2 = Math.min(1, Math.max(0, (c.y / h - 0.16) / 0.22));
-        const ch = Math.round(74 + (255 - 74) * t2);
-        const alpha = c.peak * wave * depth * (t2 < 0.5 ? 1.45 : 1);
-        ctx.fillStyle = `rgba(${ch},${Math.round(58 + (255 - 58) * t2)},${Math.round(44 + (255 - 44) * t2)},${alpha.toFixed(4)})`;
+        // 배경 상단이 중간톤 페리윙클이라 흰 글자가 그대로 읽힌다.
+        ctx.fillStyle = `rgba(255,255,255,${(c.peak * wave * depth).toFixed(4)})`;
         ctx.fillText(c.ch, c.x, c.y);
       }
 
