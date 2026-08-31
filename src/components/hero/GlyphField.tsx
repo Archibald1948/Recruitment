@@ -37,7 +37,7 @@ export default function GlyphField() {
       canvas.height = Math.floor(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      cell = Math.max(14, Math.min(22, w * 0.016));
+      cell = Math.max(15, Math.min(24, w * 0.017));
       const cols = Math.ceil(w / cell);
       const rows = Math.ceil(h / cell);
 
@@ -45,14 +45,14 @@ export default function GlyphField() {
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           // 전체를 채우지 않고 듬성듬성 — 노이즈가 아니라 텍스처로 읽히게
-          if (Math.random() > 0.26) continue;
+          if (Math.random() > 0.42) continue;
           cells.push({
             x: c * cell + cell / 2,
             y: r * cell + cell / 2,
             ch: GLYPHS[Math.floor(Math.random() * GLYPHS.length)],
             phase: Math.random() * Math.PI * 2,
             period: 4000 + Math.random() * 5000,
-            peak: 0.035 + Math.random() * 0.05,
+            peak: 0.1 + Math.random() * 0.11,
           });
         }
       }
@@ -69,7 +69,7 @@ export default function GlyphField() {
       for (const c of cells) {
         const wave = reduced ? 0.6 : (Math.sin((t / c.period) * Math.PI * 2 + c.phase) + 1) / 2;
         // 아래로 갈수록 사라지게 — 하단 검정 페이드와 겹쳐 지저분해지지 않도록
-        const depth = 1 - Math.min(1, c.y / h / 0.55);
+        const depth = 1 - Math.min(1, Math.max(0, c.y / h - 0.08) / 0.62);
         ctx.fillStyle = `rgba(255,255,255,${(c.peak * wave * depth).toFixed(4)})`;
         ctx.fillText(c.ch, c.x, c.y);
       }
