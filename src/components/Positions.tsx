@@ -1,14 +1,38 @@
 import FadeIn from "@/components/ui/FadeIn";
+import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
+import { PixelDiamond, PixelGrid } from "@/components/decor/PixelOrnaments";
+import PositionApplyButton from "@/components/PositionApplyButton";
 import { positions, site } from "@/config/site";
+
+const ORNAMENTS: DecorItem[] = [
+  {
+    Shape: PixelGrid,
+    position: "top-[6%] left-[2%] md:left-[5%]",
+    size: "w-[110px] md:w-[170px]",
+    delay: 0.12,
+    from: "left",
+  },
+  {
+    Shape: PixelDiamond,
+    position: "bottom-[5%] right-[2%] md:right-[5%]",
+    size: "w-[120px] md:w-[190px]",
+    delay: 0.24,
+    from: "right",
+  },
+];
 
 export default function Positions() {
   return (
     <section
       id="positions"
-      className="relative z-0 rounded-t-[40px] bg-white px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
+      className="relative z-0 overflow-hidden rounded-t-[40px] bg-white px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
     >
+      <SectionDecor items={ORNAMENTS} tone="ink" opacity="opacity-25" />
+
       <FadeIn>
-        <h2 className="section-heading font-display text-center text-[#0c0c0c]">Positions</h2>
+        <h2 className="section-heading font-display relative z-10 text-center text-[#0c0c0c]">
+          Positions
+        </h2>
       </FadeIn>
 
       <FadeIn delay={0.05}>
@@ -84,12 +108,10 @@ export default function Positions() {
                 </ul>
 
                 {p.open && (
-                  <a
-                    href="#apply"
+                  <PositionApplyButton
+                    positionId={p.id}
                     className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#0c0c0c] px-6 py-3 text-xs font-medium tracking-widest text-white uppercase transition hover:-translate-y-px"
-                  >
-                    이 포지션 지원하기
-                  </a>
+                  />
                 )}
               </div>
             </article>

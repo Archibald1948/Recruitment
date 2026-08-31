@@ -3,7 +3,9 @@
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { openPositions, positionById, positions, site } from "@/config/site";
+import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
+import { captureRef, readRef } from "@/lib/ref";
 import { validateApplication } from "@/lib/validation";
 
 const DRAFT_KEY = "recruit:draft:v1";
@@ -88,6 +90,38 @@ export default function ApplyForm({
     return () => clearTimeout(t);
   }, [values, mode]);
 
+  /* ── 유입 경로 ────────────────────────────────────────────── */
+  useEffect(() => {
+    if (mode === "create") captureRef();
+  }, [mode]);
+
+  /* ── 포지션 카드에서 넘어온 선택 ─────────────────────────── */
+  useEffect(() => {
+    if (mode !== "create") return;
+
+    const apply = (id: string) => {
+      const target = positionById(id);
+      if (!target?.open) return;
+      setValues((v) => (v.position === id ? v : { ...v, position: id, answers: {} }));
+      setErrors((e) => {
+        if (!e.position) return e;
+        const next = { ...e };
+        delete next.position;
+        return next;
+      });
+    };
+
+    // 1) 포지션 카드 버튼 클릭
+    const onSelect = (e: Event) => apply((e as CustomEvent<string>).detail);
+    window.addEventListener(SELECT_POSITION_EVENT, onSelect);
+
+    // 2) 외부에서 들어온 딥링크 (?position=frontend)
+    const fromQuery = new URLSearchParams(window.location.search).get("position");
+    if (fromQuery) apply(fromQuery);
+
+    return () => window.removeEventListener(SELECT_POSITION_EVENT, onSelect);
+  }, [mode]);
+
   const set = useCallback(<K extends keyof FormValues>(key: K, val: FormValues[K]) => {
     setValues((v) => ({ ...v, [key]: val }));
     setErrors((e) => {
@@ -145,12 +179,9 @@ export default function ApplyForm({
     setNotice(null);
     setErrors({});
 
-    // 유입 경로는 제출 시점에 URL에서 직접 읽는다.
-    const ref = new URLSearchParams(window.location.search).get("ref")?.slice(0, 60);
-
     const payload = {
       ...values,
-      ref: ref || undefined,
+      ref: mode === "create" ? readRef() : undefined,
       company: honeypot.current?.value ?? "",
       ...(mode === "edit" ? { token } : {}),
     };
