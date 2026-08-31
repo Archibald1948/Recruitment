@@ -23,7 +23,7 @@
 | A안 BubbledotICG-FinePos (OnlineWebFonts) | 라이선스 출처 불명 | **Pixelify Sans** (Google Fonts, OFL) |
 | A안 "Trusted by 2000+ Enterprises" + MS/Amazon/Google 로고 | 허위 표시 | **실제 수치**(D-day / 지원자 수 / 파트 수 / 기간) |
 | B안 motionsites.ai GIF 21개 | 타인 에셋 핫링크 | **텍스트 배지 마퀴** (협업툴·기술 스택) |
-| B안 figma.site 3D 오브젝트 4개 | 타인 에셋 핫링크 | 제거 (여백 + 글리프 텍스처로 대체) |
+| B안 figma.site 3D 오브젝트 4개 | 타인 에셋 핫링크 | **자체 픽셀 SVG 오브젝트 4종** (§5.2) |
 | B안 higgs.ai 프로젝트 이미지 9개 | 타인 에셋 핫링크 | 프로세스 카드(이미지 없는 타이포 레이아웃) |
 | B안 Kanit 폰트 | 한글 미지원 | 영문 = Pixelify Sans / 한글 = Pretendard |
 
@@ -163,7 +163,9 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
 
 ---
 
-## 5. 글리프 텍스처 (자체 구현)
+## 5. 자체 제작 그래픽
+
+### 5.1 글리프 텍스처
 
 배경에 옅게 깔리는 `0 0 8 8 S S X X` 도트 글자 텍스처. 원본의 시그니처이자 우리 자산.
 
@@ -173,6 +175,20 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
 - `opacity: 0.06 ~ 0.12`, 개별 글자가 4~9초 주기로 매우 느리게 페이드
 - `pointer-events: none`, `aria-hidden="true"`
 - `prefers-reduced-motion: reduce` → 정적 렌더
+
+### 5.2 코너 픽셀 오브젝트
+
+About 섹션 양옆이 비어 허전해 보이는 문제를 채우는 장식. 레퍼런스의 3D 오브젝트
+4개는 전부 외부 사이트 핫링크라 쓸 수 없어, 히어로의 도트 언어와 같은 결로 직접 그렸다.
+
+- 이미지가 아니라 **SVG 사각형 격자**. 16×16 그리드에 수식으로 형태를 찍는다
+- 셀은 `0.86` 크기에 `rx 0.16` — 사이 간격이 도트 매트릭스처럼 읽힌다
+- 색은 라벤더 화이트 → 마젠타 → 딥 퍼플 3단 램프를 톤(0~1)으로 보간
+- 4종: **초승달**(원 − 어긋난 원) / **궤도 링과 위성**(도넛 + 점) /
+  **블록 격자**(3×3 덩어리) / **구체**(좌상단 광원 음영)
+- 배치는 네 모서리, `z-0`, `pointer-events: none`, `aria-hidden`
+- 진입은 좌우에서 밀려 들어옴(`x: ∓80`, `duration 0.9`, delay `0.1 / 0.15 / 0.25 / 0.3`)
+- 모바일에서는 본문과 겹쳐 지저분해지므로 `sm` 미만에서 숨긴다
 
 ---
 
