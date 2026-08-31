@@ -1,5 +1,6 @@
 import FadeIn from "@/components/ui/FadeIn";
 import AnimatedText from "@/components/AnimatedText";
+import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
 import {
   PixelBlocks,
   PixelMoon,
@@ -16,39 +17,35 @@ const STACKS = [
   { title: "Mobile (iOS)", items: ["Xcode", "SwiftUI", "UIKit"] },
 ];
 
-/** 코너를 채우는 장식 오브젝트. 내용 위로 올라오지 않도록 z-0에 둔다. */
-const ORNAMENTS = [
+/** 코너를 채우는 장식 오브젝트 */
+const ORNAMENTS: DecorItem[] = [
   {
-    key: "moon",
     Shape: PixelMoon,
     position: "top-[4%] left-[1%] sm:left-[2%] md:left-[4%]",
     size: "w-[120px] sm:w-[160px] md:w-[210px]",
     delay: 0.1,
-    x: -80,
+    from: "left",
   },
   {
-    key: "orbit",
     Shape: PixelOrbit,
     position: "bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%]",
     size: "w-[100px] sm:w-[140px] md:w-[180px]",
     delay: 0.25,
-    x: -80,
+    from: "left",
   },
   {
-    key: "blocks",
     Shape: PixelBlocks,
     position: "top-[4%] right-[1%] sm:right-[2%] md:right-[4%]",
     size: "w-[120px] sm:w-[160px] md:w-[210px]",
     delay: 0.15,
-    x: 80,
+    from: "right",
   },
   {
-    key: "sphere",
     Shape: PixelSphere,
     position: "bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%]",
     size: "w-[130px] sm:w-[170px] md:w-[220px]",
     delay: 0.3,
-    x: 80,
+    from: "right",
   },
 ];
 
@@ -58,18 +55,7 @@ export default function About() {
       id="about"
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-20 sm:px-8 md:px-10"
     >
-      {ORNAMENTS.map(({ key, Shape, position, size, delay, x }) => (
-        <FadeIn
-          key={key}
-          delay={delay}
-          duration={0.9}
-          x={x}
-          y={0}
-          className={`pointer-events-none absolute z-0 hidden sm:block ${position} ${size}`}
-        >
-          <Shape className="h-auto w-full opacity-70" />
-        </FadeIn>
-      ))}
+      <SectionDecor items={ORNAMENTS} opacity="opacity-70" />
 
       <div className="relative z-10 flex w-full max-w-4xl flex-col items-center gap-16 sm:gap-20 md:gap-24">
         <div className="flex flex-col items-center gap-10 sm:gap-14 md:gap-16">
