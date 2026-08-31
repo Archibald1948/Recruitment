@@ -1,4 +1,5 @@
 import { daysLeft, positions, site } from "@/config/site";
+import DotMatrixHeadline from "./DotMatrixHeadline";
 import GlyphField from "./GlyphField";
 import LiveStats from "./LiveStats";
 import MeshBackdrop from "./MeshBackdrop";
@@ -16,16 +17,8 @@ export default function Hero() {
       <GlyphField />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 text-center">
-        <h1 className="hero-headline font-display font-normal text-white">
-          {site.headline.map((line, i) => (
-            <span
-              key={line}
-              className="anim-line block"
-              style={{ ["--d" as string]: `${0.12 + i * 0.18}s` }}
-            >
-              {line}
-            </span>
-          ))}
+        <h1 className="w-full max-w-[1020px]">
+          <DotMatrixHeadline lines={[...site.headline]} />
         </h1>
 
         <p
