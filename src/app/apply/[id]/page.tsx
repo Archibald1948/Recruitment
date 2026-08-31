@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import ApplicationView from "@/components/ApplicationView";
+import DotMatrixHeadline from "@/components/hero/DotMatrixHeadline";
 
 export const metadata: Metadata = {
   title: "내 지원서 — 확인 및 수정",
@@ -26,9 +27,13 @@ export default async function ApplicationPage({
         >
           &lt; 모집 공고
         </Link>
-        <h1 className="section-heading grad-heading font-display mt-6 mb-12 text-[clamp(2.5rem,9vw,5rem)]">
-          My Application
-        </h1>
+        {/*
+          긴 단어를 고정 clamp로 키우면 컨테이너를 넘쳐 잘린다.
+          도트 헤드라인은 폭에 맞춰 격자를 계산하므로 항상 들어맞는다.
+        */}
+        <div className="mt-6 mb-12">
+          <DotMatrixHeadline lines={["My Application"]} capRows={12} gapRows={3} />
+        </div>
         <ApplicationView id={id} token={t ?? ""} />
       </div>
     </main>
