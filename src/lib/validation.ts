@@ -1,4 +1,5 @@
 import { positionById, positions, site } from "@/config/site";
+import { formatPhone, isPlausiblePhone, normalizeUrl } from "./format";
 
 export interface ApplicationInput {
   name: string;
@@ -34,12 +35,12 @@ export function validateApplication(
   const value: ApplicationInput = {
     name: str(body.name),
     email: str(body.email).toLowerCase(),
-    phone: str(body.phone) || undefined,
+    phone: formatPhone(str(body.phone)) || undefined,
     position: str(body.position),
     oneLiner: str(body.oneLiner),
     motivation: str(body.motivation),
     experience: str(body.experience) || undefined,
-    portfolio: str(body.portfolio) || undefined,
+    portfolio: normalizeUrl(str(body.portfolio)) || undefined,
     availability: str(body.availability),
     agree: body.agree === true || body.agree === "true",
     answers: {},
@@ -68,6 +69,9 @@ export function validateApplication(
 
   if (value.experience && value.experience.length > MAX.text)
     errors.experience = "너무 깁니다. 2000자 이내로 줄여주세요.";
+
+  if (value.phone && !isPlausiblePhone(value.phone))
+    errors.phone = "연락처 자릿수를 확인해 주세요.";
 
   if (value.portfolio) {
     if (value.portfolio.length > MAX.url) errors.portfolio = "링크가 너무 깁니다.";
