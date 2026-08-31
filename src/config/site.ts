@@ -28,14 +28,18 @@ export interface Position {
 }
 
 export const site = {
-  name: "Team Project Recruiting",
+  name: "Build It, Ship It Together",
   /** 히어로 헤드라인 — 영문 2줄 (도트 폰트는 한글을 렌더하지 못한다) */
   headline: ["Build It", "Ship It Together"],
   subhead:
     "기획부터 개발, 배포, 그리고 실제 사용자를 만나는 운영까지.\n하나의 서비스를 끝까지 완성할 팀원을 찾습니다.",
 
-  /** TODO: 실제 마감일로 교체. D-day 카운트 기준값 */
-  deadline: "2026-09-14T23:59:59+09:00",
+  /**
+   * 모집 마감. D-day 카운트와 접수 차단의 기준값.
+   * NEXT_PUBLIC_DEADLINE 환경변수로 덮어쓸 수 있어, 마감일만 바꿀 때는
+   * 코드를 고치지 않고 Vercel 환경변수만 수정하면 된다.
+   */
+  deadline: process.env.NEXT_PUBLIC_DEADLINE || "2026-09-14T23:59:59+09:00",
   startsAt: "2026년 9월",
   duration: "3개월 이상",
   meeting: "주 1회",
@@ -232,12 +236,20 @@ export const positions: Position[] = [
 export const openPositions = positions.filter((p) => p.open);
 export const positionById = (id: string) => positions.find((p) => p.id === id);
 
+function deadlineMs(): number {
+  const t = new Date(site.deadline).getTime();
+  // 날짜 문자열이 잘못되면 NaN이 되고, 모든 비교가 false가 되어
+  // 마감 판정이 조용히 깨진다. 그때는 마감이 없는 것으로 본다.
+  return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
+}
+
 /** 남은 일수. 마감일이 지났으면 0 */
 export function daysLeft(now: Date = new Date()): number {
-  const diff = new Date(site.deadline).getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / 86_400_000));
+  const ms = deadlineMs();
+  if (!Number.isFinite(ms)) return 0;
+  return Math.max(0, Math.ceil((ms - now.getTime()) / 86_400_000));
 }
 
 export function isClosed(now: Date = new Date()): boolean {
-  return new Date(site.deadline).getTime() < now.getTime();
+  return deadlineMs() < now.getTime();
 }
