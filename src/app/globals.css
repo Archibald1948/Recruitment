@@ -12,8 +12,8 @@
   --line-ink: rgba(12, 12, 12, 0.15);
 
   --grad-heading: linear-gradient(180deg, #8b93a0 0%, #e2ecf3 100%);
-  --grad-cta: linear-gradient(123deg, #18011f 7%, #b600a8 37%, #7621b0 72%, #be4c00 100%);
-  --cta-shadow: 0 4px 4px rgba(181, 1, 167, 0.25), 4px 4px 12px #7721b1 inset;
+  --grad-cta: linear-gradient(123deg, #2b0f02 7%, #b4460a 37%, #e2711d 72%, #f0a02a 100%);
+  --cta-shadow: 0 4px 4px rgba(226, 113, 29, 0.25), 4px 4px 12px #b4460a inset;
 
   --ease-hero: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-fade: cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -47,7 +47,7 @@ body {
 }
 
 ::selection {
-  background: #b600a8;
+  background: #c2600f;
   color: #fff;
 }
 
@@ -168,7 +168,7 @@ body {
 
 .field:focus {
   outline: none;
-  border-color: rgba(182, 0, 168, 0.75);
+  border-color: rgba(226, 113, 29, 0.75);
   background: rgba(255, 255, 255, 0.07);
 }
 

@@ -486,7 +486,7 @@ function Field({
     <label className="block">
       <span className="field-label">
         {label}
-        {required && <span className="ml-1 text-[#b600a8]">*</span>}
+        {required && <span className="ml-1 text-[#e2711d]">*</span>}
       </span>
       {children}
       {hint && !error && <span className="mt-2 block text-xs text-[var(--muted)]">{hint}</span>}
