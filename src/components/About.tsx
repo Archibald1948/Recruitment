@@ -9,12 +9,12 @@ import {
 } from "@/components/decor/PixelOrnaments";
 
 const LEAD_INTRO =
-  "10번 이상의 프로젝트, 3곳의 대학생 개발 연합동아리, 7회 이상의 대회·공모전. 백엔드부터 프론트엔드, iOS까지 풀스택으로 참여해 왔습니다. 이번에도 특정 파트에만 머무르지 않고 서비스 전체 구조와 파트 간 연결을 함께 고민하려 합니다.";
+  "10번 이상의 프로젝트, 3곳의 대학생 개발 연합동아리, 7회 이상의 대회·공모전. 백엔드부터 프론트엔드, 모바일까지 풀스택으로 참여해 왔고, 웹 서비스를 1인 개발해 베타 테스트까지 운영해 봤습니다. 이번에도 특정 파트에만 머무르지 않고 서비스 전체 구조와 파트 간 연결을 함께 고민하려 합니다.";
 
 const STACKS = [
   { title: "Back-End", items: ["Spring Boot", "FastAPI", "Node.js", "PostgreSQL", "MySQL", "REST API 설계"] },
   { title: "Front-End", items: ["JavaScript", "TypeScript", "React"] },
-  { title: "Mobile (iOS)", items: ["Xcode", "SwiftUI", "UIKit"] },
+  { title: "Mobile", items: ["Xcode", "SwiftUI", "UIKit"] },
 ];
 
 /** 코너를 채우는 장식 오브젝트 */
