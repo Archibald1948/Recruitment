@@ -22,8 +22,11 @@ export default function Hero() {
         </h1>
 
         <p
-          className="anim-reveal mt-5 max-w-[min(560px,92%)] whitespace-pre-line text-[clamp(0.9rem,1.6vw,1.05rem)] leading-[1.65] text-white/85"
-          style={{ ["--d" as string]: "0.28s" }}
+          className="anim-reveal mt-5 max-w-[min(560px,92%)] whitespace-pre-line text-[clamp(0.95rem,1.7vw,1.1rem)] leading-[1.7] font-medium text-white"
+          style={{
+            ["--d" as string]: "0.28s",
+            textShadow: "0 1px 14px rgba(12,8,10,0.55)",
+          }}
         >
           {site.subhead}
         </p>
