@@ -34,7 +34,17 @@
 
 ## 3. Notion 데이터베이스 스키마
 
-DB 이름: **지원자 관리**
+DB 이름: **지원자 관리** — 생성 완료
+
+| 항목 | 값 |
+|---|---|
+| 페이지 | https://app.notion.com/p/55867ca8646d43f8ad6bac20e3b0c9af |
+| `NOTION_DATABASE_ID` | `55867ca8646d43f8ad6bac20e3b0c9af` |
+| `NOTION_DATA_SOURCE_ID` | `25392f9c-aa5d-4b1e-954e-da54a6fcf3e1` |
+| 뷰 | 기본 테이블 + **심사 보드**(상태별 보드, 제출일시 오름차순) |
+
+> `포지션` 셀렉트 옵션 이름은 `src/config/site.ts`의 `title`과 **글자 하나까지 같아야 한다**
+> (`기획 / PM` `Front-End` `Back-End` `UI/UX Designer`). 노션에서 이름을 바꾸면 저장이 깨진다.
 
 | 속성명 | 타입 | 값 / 비고 |
 |---|---|---|
@@ -114,7 +124,32 @@ DB 이름: **지원자 관리**
 
 ---
 
-## 6. 환경 변수
+## 6. 노션 연동 절차
+
+DB는 만들어졌지만, 앱은 **자체 통합 토큰**으로 접근한다. MCP 커넥터와는 별개다.
+
+1. https://www.notion.so/profile/integrations 에서 **내부 통합(Internal integration)** 생성
+   - 이름: 아무거나 (예: `모집 사이트`)
+   - 연결할 워크스페이스: `Main`
+   - 권한: **콘텐츠 읽기 / 콘텐츠 업데이트 / 콘텐츠 삽입** 세 개면 충분하다.
+     사용자 정보 읽기는 필요 없다
+2. 발급된 시크릿(`ntn_`으로 시작)을 복사
+3. **지원자 관리 DB 페이지 우측 상단 `⋯` → 연결(Connections) → 1번에서 만든 통합 추가**
+   - 이 단계를 건너뛰면 토큰이 맞아도 404가 난다
+   - 통합은 **이 DB 하나에만** 공유한다. 워크스페이스 전체를 열지 않는다
+4. 시크릿을 `.env.local`의 `NOTION_TOKEN`과 Vercel 환경변수에 넣는다
+
+```bash
+# Vercel (프로덕션)
+vercel env add NOTION_TOKEN production
+vercel env add NOTION_TOKEN development
+```
+
+`NOTION_DATABASE_ID`와 `NOTION_DATA_SOURCE_ID`는 이미 Vercel에 등록되어 있다.
+
+---
+
+## 7. 환경 변수
 
 ```
 NOTION_TOKEN=              # 노션 내부 통합 시크릿 (서버 전용)
@@ -129,7 +164,7 @@ TOKEN_PEPPER=              # 수정 토큰 해시용 시크릿 (32바이트 랜�
 
 ---
 
-## 7. 사이트 설정 (`src/config/site.ts`)
+## 8. 사이트 설정 (`src/config/site.ts`)
 
 자주 바뀌는 값은 코드 곳곳에 흩지 않고 여기 한 곳에서 관리한다.
 
@@ -141,7 +176,7 @@ TOKEN_PEPPER=              # 수정 토큰 해시용 시크릿 (32바이트 랜�
 
 ---
 
-## 8. 남은 결정 사항
+## 9. 남은 결정 사항
 
 - [ ] **모집 마감일** — 현재 `2026-09-14` 임시값. D-day 카운트에 직결
 - [ ] **포지션별 모집 인원** — 네 포지션 모두 `n명` 자리
