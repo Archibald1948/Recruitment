@@ -9,9 +9,9 @@
 type Tone = number | null;
 
 const RAMP: [number, number, number][] = [
-  [241, 231, 246], // 라벤더 화이트
-  [176, 71, 155], // 마젠타
-  [74, 22, 96], // 딥 퍼플
+  [238, 236, 234], // 옅은 회색
+  [201, 138, 78], // 앰버
+  [92, 36, 6], // 번트 오렌지
 ];
 
 function toneColor(t: number): string {
