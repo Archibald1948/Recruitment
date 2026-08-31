@@ -218,7 +218,7 @@ export default function ApplyForm({
         <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
           <div
             className="h-full rounded-full transition-[width] duration-500"
-            style={{ width: `${progress}%`, background: "var(--grad-cta)" }}
+            style={{ width: `${progress}%`, background: "linear-gradient(90deg, #8a5c58, #c98a94, #e3c8bd)" }}
           />
         </div>
       </div>
@@ -486,7 +486,7 @@ function Field({
     <label className="block">
       <span className="field-label">
         {label}
-        {required && <span className="ml-1 text-[#e2711d]">*</span>}
+        {required && <span className="ml-1 text-[#c98a94]">*</span>}
       </span>
       {children}
       {hint && !error && <span className="mt-2 block text-xs text-[var(--muted)]">{hint}</span>}
