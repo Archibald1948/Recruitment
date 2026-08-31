@@ -91,18 +91,15 @@ export async function sendApplicationReceipt(opts: {
       아래 링크에서 <strong style="color:#fff">지원 내용을 다시 확인하고 수정</strong>할 수 있고,
       현재 심사 상태도 볼 수 있습니다. 이 링크는 본인만 접근할 수 있으니 공유하지 말아주세요.
     </p>
-    <p style="margin:0 0 24px">
+    <p style="margin:0">
       <a href="${opts.editUrl}"
          style="display:inline-block;background:#fff;color:#0c0c0c;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px">
         내 지원서 확인하기
       </a>
-    </p>
-    <p style="margin:0;font-size:13px;color:#8e8e8e">
-      링크가 열리지 않으면 아래 주소를 복사해 주소창에 붙여넣어 주세요.<br />
-      <span style="word-break:break-all">${opts.editUrl}</span>
     </p>`,
   );
 
+  // HTML을 막는 클라이언트에서는 버튼이 보이지 않으므로 텍스트 파트에는 주소를 남긴다.
   const text = [
     `${opts.name}님, 지원이 정상적으로 접수되었습니다.`,
     ``,
