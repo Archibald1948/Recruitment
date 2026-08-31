@@ -196,6 +196,45 @@ body {
 }
 
 /* ── 애니메이션 ──────────────────────────────────────────────── */
+/*
+ * 히어로 웨이브. 두 겹이 서로 다른 주기로 흐르며 겹쳐야
+ * 레퍼런스처럼 "위아래로 움직이는 파도 두 개"로 읽힌다.
+ * 주기가 같으면 통째로 움직이는 한 장처럼 보인다.
+ */
+@keyframes waveA {
+  0% {
+    transform: translate3d(-0.6%, -1.4%, 0) scale(1.02, 1);
+  }
+  50% {
+    transform: translate3d(0.8%, 1.8%, 0) scale(1.07, 1.06);
+  }
+  100% {
+    transform: translate3d(-0.6%, -1.4%, 0) scale(1.02, 1);
+  }
+}
+
+@keyframes waveB {
+  0% {
+    transform: translate3d(0.9%, 1.6%, 0) scale(1.05, 1.02);
+  }
+  50% {
+    transform: translate3d(-1.1%, -2%, 0) scale(1, 1.08);
+  }
+  100% {
+    transform: translate3d(0.9%, 1.6%, 0) scale(1.05, 1.02);
+  }
+}
+
+.wave-a {
+  animation: waveA 19s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
+.wave-b {
+  animation: waveB 27s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  will-change: transform;
+}
+
 @keyframes headlineFade {
   from {
     opacity: 0;

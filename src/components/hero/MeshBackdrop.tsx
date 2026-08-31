@@ -71,7 +71,7 @@ export default function MeshBackdrop() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#0c0c0c]">
       <div className="absolute inset-0" style={{ background: VERTICAL }} />
-      <div className="absolute inset-0" style={{ background: SIDE_TINT }} />
+      <div className="wave-b absolute -inset-[10%]" style={{ background: SIDE_TINT }} />
 
       <MeshGradient
         className="absolute inset-0 h-full w-full"
@@ -80,13 +80,14 @@ export default function MeshBackdrop() {
         swirl={0.55}
         grainMixer={0.14}
         grainOverlay={0.06}
-        speed={reduced ? 0 : 0.12}
+        speed={reduced ? 0 : 0.2}
         frame={reduced ? 12_000 : undefined}
-        style={{ mixBlendMode: "soft-light", opacity: 0.55 }}
+        style={{ mixBlendMode: "soft-light", opacity: 0.62 }}
       />
 
-      <div className="absolute inset-0" style={{ background: LENS }} />
-      <div className="absolute inset-0" style={{ background: HORIZON }} />
+      {/* 두 웨이브는 각자 다른 주기로 흐른다. 스케일 시 가장자리가 드러나지 않도록 오버스캔. */}
+      <div className="wave-a absolute -inset-[8%]" style={{ background: LENS }} />
+      <div className="wave-b absolute -inset-[8%]" style={{ background: HORIZON }} />
 
       {/* 그레인. 레퍼런스의 거친 질감은 이 레이어가 만든다. */}
       <div
