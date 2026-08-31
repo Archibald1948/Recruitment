@@ -25,7 +25,7 @@ const CAP_RATIO = 0.72;
 
 export default function DotMatrixHeadline({
   lines,
-  capRows = 11,
+  capRows = 14,
   gapRows = 4,
   delays = [],
   className,
@@ -104,12 +104,12 @@ export default function DotMatrixHeadline({
         ctx.clearRect(0, 0, width, h);
         ctx.fillStyle = "#fff";
 
-        const r = cell * 0.36;
+        const r = cell * 0.355;
         for (let y = 0; y < rows; y++) {
           for (let x = 0; x < maxCols; x++) {
             const alpha = data[(y * maxCols + x) * 4 + 3];
-            if (alpha < 70) continue;
-            ctx.globalAlpha = Math.min(1, 0.35 + alpha / 255);
+            if (alpha < 58) continue;
+            ctx.globalAlpha = Math.min(1, 0.42 + alpha / 220);
             ctx.beginPath();
             ctx.arc(x * cell + cell / 2, y * cell + cell / 2, r, 0, Math.PI * 2);
             ctx.fill();
