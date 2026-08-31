@@ -1,5 +1,4 @@
 import { daysLeft, positions, site } from "@/config/site";
-import Nav from "@/components/Nav";
 import GlyphField from "./GlyphField";
 import LiveStats from "./LiveStats";
 import MeshBackdrop from "./MeshBackdrop";
@@ -15,8 +14,6 @@ export default function Hero() {
     >
       <MeshBackdrop />
       <GlyphField />
-
-      <Nav />
 
       <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 text-center">
         <h1 className="hero-headline font-display font-normal text-white">
