@@ -70,7 +70,13 @@ export default function GlyphField() {
         const wave = reduced ? 0.6 : (Math.sin((t / c.period) * Math.PI * 2 + c.phase) + 1) / 2;
         // 아래로 갈수록 사라지게 — 하단 검정 페이드와 겹쳐 지저분해지지 않도록
         const depth = 1 - Math.min(1, Math.max(0, c.y / h - 0.08) / 0.62);
-        ctx.fillStyle = `rgba(255,255,255,${(c.peak * wave * depth).toFixed(4)})`;
+
+        // 배경이 위쪽은 밝고 아래쪽은 어둡다. 흰색으로만 그리면 상단에서 아예 보이지 않으므로
+        // 밝은 구간에서는 어두운 글리프로 뒤집는다.
+        const t2 = Math.min(1, Math.max(0, (c.y / h - 0.16) / 0.22));
+        const ch = Math.round(74 + (255 - 74) * t2);
+        const alpha = c.peak * wave * depth * (t2 < 0.5 ? 1.45 : 1);
+        ctx.fillStyle = `rgba(${ch},${Math.round(58 + (255 - 58) * t2)},${Math.round(44 + (255 - 44) * t2)},${alpha.toFixed(4)})`;
         ctx.fillText(c.ch, c.x, c.y);
       }
 
