@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 export default function FadeIn({
   children,
@@ -10,6 +10,7 @@ export default function FadeIn({
   x = 0,
   y = 30,
   className,
+  style,
 }: {
   children: ReactNode;
   delay?: number;
@@ -17,10 +18,12 @@ export default function FadeIn({
   x?: number;
   y?: number;
   className?: string;
+  style?: CSSProperties;
 }) {
   return (
     <motion.div
       className={className}
+      style={style}
       initial={{ opacity: 0, x, y }}
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: true, margin: "50px", amount: 0 }}
