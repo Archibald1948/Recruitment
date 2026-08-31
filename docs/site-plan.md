@@ -59,7 +59,7 @@ DB 이름: **지원자 관리** — 생성 완료
 | `포지션별 답변` | Rich text | 포지션 분기 질문 답변 (라벨 포함) |
 | `포트폴리오` | URL | GitHub / Notion / Behance 등 링크 |
 | `주간 참여 가능 시간` | Select | `5시간 미만` `5~10시간` `10~15시간` `15시간 이상` |
-| `유입 경로` | Select | `?ref=` 파라미터에서 자동 기록 |
+| `유입 경로` | Select | 유입 경로 자동 기록 (§4.5) |
 | `개인정보 동의` | Checkbox | |
 | `수정 토큰 해시` | Rich text | SHA-256(token + PEPPER). **원문 저장 금지** |
 | `제출일시` | Created time | |
@@ -93,6 +93,36 @@ DB 이름: **지원자 관리** — 생성 완료
 | Front-End | React·Next.js 사용 경험 / API 연동 경험 |
 | Back-End | 주 사용 언어·프레임워크 / DB 설계 또는 배포 경험 |
 | UI/UX Designer | Figma 사용 수준 / 개발자와 협업해 본 경험 |
+
+### 4.5 유입 경로 추적
+
+커뮤니티마다 링크를 다르게 뿌리고, 어디서 좋은 지원자가 오는지 데이터로 남긴다.
+
+```
+https://builditship.kro.kr/?ref=everytime
+https://builditship.kro.kr/?ref=okky
+https://builditship.kro.kr/?ref=discord
+https://builditship.kro.kr/?ref=instagram
+```
+
+- `?ref=` 와 `?utm_source=` 둘 다 받는다
+- **첫 방문 시점에 sessionStorage에 저장한다.** 폼까지 오는 동안 새로고침하거나
+  다른 페이지를 거치면 파라미터가 사라지기 때문
+- 이미 저장된 값은 덮어쓰지 않는다 — 처음 들어온 경로가 진짜 유입처다
+- 파라미터가 없으면 **referrer로 추정**한다. everytime·okky·discord·naver 등
+  알려진 도메인은 보기 좋은 이름으로 정리하고, 나머지는 호스트명 그대로 남긴다
+- 아무것도 없으면 `direct`
+- 노션 셀렉트에 그대로 들어가므로 안전한 문자만 남기고 40자로 자른다
+
+포지션 딥링크도 함께 쓸 수 있다. 프론트엔드 모집 글에는 이렇게 뿌린다:
+
+```
+https://builditship.kro.kr/?ref=okky&position=frontend#apply
+```
+
+포지션 카드의 "이 포지션 지원하기" 버튼도 같은 방식으로 폼의 포지션을 미리 채운다.
+
+---
 
 ### 폼 UX
 
