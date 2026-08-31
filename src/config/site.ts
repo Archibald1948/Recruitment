@@ -16,6 +16,8 @@ export interface Position {
   open: boolean;
   /** 모집 인원 문구. 미정이면 'n명' */
   headcount: string;
+  /** 이미 합류한 인원처럼, 모집 상태와 별개로 알릴 내용 */
+  note?: string;
   summary: string;
   /** 주요 역할 / 예상 스택 */
   points: string[];
@@ -37,6 +39,8 @@ export const site = {
   startsAt: "2026년 9월",
   duration: "3개월 이상",
   meeting: "주 1회",
+  /** 히어로/지원 섹션에 노출할 현재 진행 상황 */
+  stage: "팀 빌딩 단계 · 프론트엔드 1명, 백엔드 1명 합류 완료",
 
   /** 문의처 — TODO: 실제 값으로 교체 */
   contactEmail: "",
@@ -139,8 +143,9 @@ export const positions: Position[] = [
     no: "02",
     title: "Front-End",
     label: "Front-End",
-    open: false,
-    headcount: "1명 모집 완료",
+    open: true,
+    headcount: "n명",
+    note: "1명 합류 완료",
     summary: "React / Next.js로 사용자가 실제로 만지는 화면을 만듭니다.",
     points: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Git / GitHub"],
     wants: [
@@ -168,8 +173,9 @@ export const positions: Position[] = [
     no: "03",
     title: "Back-End",
     label: "Back-End",
-    open: false,
-    headcount: "1명 모집 완료",
+    open: true,
+    headcount: "n명",
+    note: "1명 합류 완료",
     summary: "API와 DB를 설계하고, 서비스를 배포하고 운영합니다.",
     points: ["Spring Boot / Node.js / FastAPI", "PostgreSQL", "REST API", "AWS 등 Cloud", "Git / GitHub"],
     wants: [
