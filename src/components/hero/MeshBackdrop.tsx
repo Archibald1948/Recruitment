@@ -41,23 +41,42 @@ const SIDE_TINT =
   "radial-gradient(54% 42% at 96% 22%, rgba(196,188,228,0.50) 0%, rgba(196,188,228,0) 72%)," +
   "radial-gradient(46% 30% at 78% 58%, rgba(214,150,160,0.34) 0%, rgba(214,150,160,0) 74%)";
 
-/** 웨이브 1 — 화면 한가운데를 가로지르는 커다란 렌즈. 가장자리에 모브빛 테두리가 남는다. */
-const LENS =
-  "radial-gradient(58% 29% at 50% 49%," +
-  " rgba(10,6,7,0.98) 0%," +
-  " rgba(20,11,13,0.95) 46%," +
-  " rgba(62,33,35,0.62) 70%," +
-  " rgba(150,92,90,0.20) 87%," +
-  " rgba(150,92,90,0) 100%)";
+/*
+ * 웨이브는 **경계가 보여야** 두 개로 읽힌다.
+ * 어두운 덩어리(BODY)만 겹치면 하나의 뭉개진 그림자로 보이므로,
+ * 각 덩어리의 가장자리에 밝은 테두리(RIM)를 한 겹씩 얹는다.
+ * 두 테두리가 서로 다른 높이에서 각각 호를 그리며 반대 방향으로 움직인다.
+ */
 
-/** 웨이브 2 — 아래에서 올라오는 곡선. 렌즈와 겹치며 자연스러운 층을 만든다. */
-const HORIZON =
-  "radial-gradient(126% 50% at 50% 108%," +
-  " #0c0c0c 44%," +
-  " rgba(14,8,7,0.97) 56%," +
-  " rgba(54,26,19,0.78) 66%," +
-  " rgba(132,70,48,0.28) 76%," +
-  " rgba(132,70,48,0) 86%)";
+/** 웨이브 1 — 위쪽 파도. 화면 가운데를 가로지른다. */
+const WAVE1_BODY =
+  "radial-gradient(56% 26% at 50% 44%," +
+  " rgba(10,6,7,0.96) 0%," +
+  " rgba(22,12,14,0.9) 48%," +
+  " rgba(60,32,34,0.5) 74%," +
+  " rgba(60,32,34,0) 100%)";
+
+const WAVE1_RIM =
+  "radial-gradient(58% 28% at 50% 44%," +
+  " rgba(236,196,186,0) 60%," +
+  " rgba(236,196,186,0.34) 72%," +
+  " rgba(236,196,186,0.10) 80%," +
+  " rgba(236,196,186,0) 90%)";
+
+/** 웨이브 2 — 아래쪽 파도. 1번과 겹치며 층을 만든다. */
+const WAVE2_BODY =
+  "radial-gradient(96% 40% at 50% 100%," +
+  " #0c0c0c 34%," +
+  " rgba(14,8,7,0.95) 50%," +
+  " rgba(56,28,20,0.66) 66%," +
+  " rgba(56,28,20,0) 88%)";
+
+const WAVE2_RIM =
+  "radial-gradient(98% 42% at 50% 100%," +
+  " rgba(246,182,150,0) 52%," +
+  " rgba(246,182,150,0.30) 64%," +
+  " rgba(246,182,150,0.09) 73%," +
+  " rgba(246,182,150,0) 84%)";
 
 /** 유기적인 움직임만 담당한다. 색은 저채도로 맞춰 세로 서사를 흐리지 않게 한다. */
 const MESH = ["#dcd8e8", "#e7c6b1", "#bb8b8d", "#4c2b2c", "#0c0c0c"];
@@ -85,9 +104,15 @@ export default function MeshBackdrop() {
         style={{ mixBlendMode: "soft-light", opacity: 0.62 }}
       />
 
-      {/* 두 웨이브는 각자 다른 주기로 흐른다. 스케일 시 가장자리가 드러나지 않도록 오버스캔. */}
-      <div className="wave-a absolute -inset-[8%]" style={{ background: LENS }} />
-      <div className="wave-b absolute -inset-[8%]" style={{ background: HORIZON }} />
+      {/* 두 웨이브는 반대 방향으로, 서로 다른 주기로 움직인다. */}
+      <div className="wave-a absolute -inset-[10%]">
+        <div className="absolute inset-0" style={{ background: WAVE1_BODY }} />
+        <div className="absolute inset-0" style={{ background: WAVE1_RIM }} />
+      </div>
+      <div className="wave-b absolute -inset-[10%]">
+        <div className="absolute inset-0" style={{ background: WAVE2_BODY }} />
+        <div className="absolute inset-0" style={{ background: WAVE2_RIM }} />
+      </div>
 
       {/* 그레인. 레퍼런스의 거친 질감은 이 레이어가 만든다. */}
       <div
