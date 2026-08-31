@@ -171,6 +171,8 @@ export default function ApplyForm({
     if (!local.ok) {
       setErrors(local.errors as Errors);
       setNotice("입력하지 않았거나 형식이 맞지 않는 항목이 있습니다.");
+      // 인라인 표시만으로는 화면 밖 항목을 놓치기 쉬워 즉시 알림도 함께 띄운다.
+      window.alert("필수 항목을 작성해주세요.");
       focusFirstError(local.errors as Errors);
       return;
     }
@@ -268,6 +270,10 @@ export default function ApplyForm({
           />
         </div>
       </div>
+
+      <p className="-mt-4 mb-6 text-xs text-[var(--muted)]">
+        <span className="text-[#c98a94]">*</span> 표시는 필수 항목입니다.
+      </p>
 
       {notice && (
         <div
