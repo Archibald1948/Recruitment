@@ -3,6 +3,8 @@
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { openPositions, positionById, positions, site } from "@/config/site";
+import { formatPhone, normalizeUrl } from "@/lib/format";
+import { validateApplication } from "@/lib/validation";
 
 const DRAFT_KEY = "recruit:draft:v1";
 
@@ -126,6 +128,19 @@ export default function ApplyForm({
     e.preventDefault();
     if (busy || !editable) return;
 
+    // 서버와 같은 규칙으로 먼저 검사해 왕복 없이 즉시 알려준다.
+    // 서버 검증은 그대로 유지된다 — API를 직접 때리는 요청을 막아야 하기 때문.
+    const local = validateApplication(
+      { ...values, agree: values.agree },
+      { requirePosition: mode === "create" },
+    );
+    if (!local.ok) {
+      setErrors(local.errors as Errors);
+      setNotice("입력하지 않았거나 형식이 맞지 않는 항목이 있습니다.");
+      focusFirstError(local.errors as Errors);
+      return;
+    }
+
     setBusy(true);
     setNotice(null);
     setErrors({});
@@ -153,7 +168,7 @@ export default function ApplyForm({
       if (res.status === 422 && data.errors) {
         setErrors(data.errors);
         setNotice("입력하지 않은 항목이 있습니다. 아래를 확인해 주세요.");
-        document.getElementById("apply-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        focusFirstError(data.errors);
         return;
       }
       if (!res.ok) {
@@ -235,7 +250,8 @@ export default function ApplyForm({
       )}
 
       <div className="flex flex-col gap-6">
-        <Field label="이름" required error={errors.name}>
+        <Field label="이름"
+          name="name" required error={errors.name}>
           <input
             className="field"
             value={values.name}
@@ -248,6 +264,7 @@ export default function ApplyForm({
 
         <Field
           label="이메일"
+          name="email"
           required
           error={errors.email}
           hint={
@@ -268,18 +285,22 @@ export default function ApplyForm({
           />
         </Field>
 
-        <Field label="연락처" error={errors.phone} hint="선택 항목입니다.">
+        <Field label="연락처"
+          name="phone" error={errors.phone} hint="선택 항목입니다.">
           <input
             className="field"
             type="tel"
+            inputMode="numeric"
             value={values.phone}
-            onChange={(e) => set("phone", e.target.value)}
+            onChange={(e) => set("phone", formatPhone(e.target.value))}
+            aria-invalid={!!errors.phone}
             autoComplete="tel"
             placeholder="010-0000-0000"
           />
         </Field>
 
-        <Field label="지원 포지션" required error={errors.position}>
+        <Field label="지원 포지션"
+          name="position" required error={errors.position}>
           <div className="grid gap-2 sm:grid-cols-2">
             {selectable.map((p) => {
               const active = values.position === p.id;
@@ -307,7 +328,13 @@ export default function ApplyForm({
           </div>
         </Field>
 
-        <Field label="한 줄 소개" required error={errors.oneLiner} hint="60자 이내">
+        <Field
+          label="한 줄 소개"
+          name="oneLiner"
+          required
+          error={errors.oneLiner}
+          hint={`${values.oneLiner.length} / 60자`}
+        >
           <input
             className="field"
             maxLength={60}
@@ -320,6 +347,7 @@ export default function ApplyForm({
 
         <Field
           label="지원 동기"
+          name="motivation"
           required
           error={errors.motivation}
           hint="프로젝트를 끝까지 함께할 수 있는지를 가장 중요하게 봅니다."
@@ -333,7 +361,8 @@ export default function ApplyForm({
           />
         </Field>
 
-        <Field label="관련 경험" error={errors.experience} hint="선택 항목입니다.">
+        <Field label="관련 경험"
+          name="experience" error={errors.experience} hint="선택 항목입니다.">
           <textarea
             className="field min-h-28 resize-y"
             value={values.experience}
@@ -344,6 +373,7 @@ export default function ApplyForm({
 
         <Field
           label="포트폴리오 / GitHub 링크"
+          name="portfolio"
           error={errors.portfolio}
           hint="파일 업로드는 받지 않습니다. GitHub · Notion · Behance · PDF 링크를 넣어주세요."
         >
@@ -352,12 +382,14 @@ export default function ApplyForm({
             type="url"
             value={values.portfolio}
             onChange={(e) => set("portfolio", e.target.value)}
+            onBlur={(e) => set("portfolio", normalizeUrl(e.target.value))}
             aria-invalid={!!errors.portfolio}
-            placeholder="https://github.com/..."
+            placeholder="github.com/... (https:// 는 자동으로 붙습니다)"
           />
         </Field>
 
-        <Field label="주간 참여 가능 시간" required error={errors.availability}>
+        <Field label="주간 참여 가능 시간"
+          name="availability" required error={errors.availability}>
           <div className="flex flex-wrap gap-2">
             {site.availability.map((a) => (
               <button
@@ -386,6 +418,7 @@ export default function ApplyForm({
               <Field
                 key={q.id}
                 label={q.label}
+                name={`answers.${q.id}`}
                 required={q.required}
                 error={errors[`answers.${q.id}`]}
               >
@@ -469,21 +502,33 @@ export default function ApplyForm({
   );
 }
 
+/** 첫 번째 오류 항목으로 스크롤하고 포커스를 옮긴다. */
+function focusFirstError(errors: Errors) {
+  const first = Object.keys(errors)[0];
+  if (!first) return;
+  const el = document.querySelector<HTMLElement>(`[data-field="${first}"] [aria-invalid="true"], [data-field="${first}"] input, [data-field="${first}"] textarea`);
+  const target = el ?? document.getElementById("apply-form");
+  target?.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (el && "focus" in el) setTimeout(() => el.focus({ preventScroll: true }), 320);
+}
+
 function Field({
   label,
   required,
   hint,
   error,
+  name,
   children,
 }: {
   label: string;
   required?: boolean;
   hint?: string;
   error?: string;
+  name?: string;
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
+    <label className="block" data-field={name}>
       <span className="field-label">
         {label}
         {required && <span className="ml-1 text-[#c98a94]">*</span>}
