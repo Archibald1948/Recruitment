@@ -11,8 +11,8 @@ const pixel = Pixelify_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Build It, Ship It Together — 개발 프로젝트 팀원 모집",
-    template: "%s · Build It, Ship It Together",
+    default: "Build It, Ship It Together",
+    template: "%s · 같이 개발해요.",
   },
   description:
     "기획부터 개발, 배포, 그리고 실제 사용자를 만나는 운영까지. 하나의 서비스를 끝까지 완성할 팀원을 모집합니다. 기획/PM · 프론트엔드 · 백엔드 · UI/UX 디자이너.",
