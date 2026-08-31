@@ -1,15 +1,58 @@
+import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import { site } from "@/config/site";
 
+/**
+ * 접수 확인 메일.
+ *
+ * 발송 수단은 두 가지를 지원하고, 설정된 것을 자동으로 고른다.
+ *
+ *   1) Gmail SMTP  — 도메인이 필요 없다. 앱 비밀번호만 있으면 바로 보낼 수 있다
+ *   2) Resend      — 도메인을 확보한 뒤 갈아끼운다. 발신 평판과 도달률이 더 좋다
+ *
+ * 둘 다 없으면 콘솔에 수정 링크만 남기고 조용히 넘어간다.
+ * 메일 발송 실패가 접수 자체를 되돌리지는 않는다.
+ */
+
+export type MailProvider = "gmail" | "resend" | "none";
+
+export function activeProvider(): MailProvider {
+  if (process.env.RESEND_API_KEY) return "resend";
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) return "gmail";
+  return "none";
+}
+
 let resend: Resend | null = null;
-function client(): Resend | null {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return null;
-  if (!resend) resend = new Resend(key);
+let smtp: nodemailer.Transporter | null = null;
+
+function resendClient(): Resend {
+  if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
   return resend;
 }
 
-const from = () => process.env.MAIL_FROM || "onboarding@resend.dev";
+function smtpClient(): nodemailer.Transporter {
+  if (!smtp) {
+    smtp = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        // 계정 비밀번호가 아니라 앱 비밀번호다. 2단계 인증이 켜져 있어야 발급된다.
+        pass: process.env.GMAIL_APP_PASSWORD,
+      },
+    });
+  }
+  return smtp;
+}
+
+/**
+ * 발신자 표기.
+ * Gmail은 인증된 계정 주소로만 보낼 수 있어서 표시 이름만 붙인다.
+ */
+function from(): string {
+  const label = process.env.MAIL_FROM_NAME || site.name;
+  if (activeProvider() === "gmail") return `"${label}" <${process.env.GMAIL_USER}>`;
+  return process.env.MAIL_FROM || `"${label}" <onboarding@resend.dev>`;
+}
 
 const shell = (title: string, body: string) => `
 <div style="background:#0c0c0c;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif">
@@ -24,20 +67,22 @@ const shell = (title: string, body: string) => `
   </div>
 </div>`;
 
-/** 접수 확인 + 수정 링크. 메일 발송 실패가 접수 자체를 되돌리지는 않는다. */
+/** 접수 확인 + 수정 링크. 발송 실패가 접수 자체를 되돌리지는 않는다. */
 export async function sendApplicationReceipt(opts: {
   to: string;
   name: string;
   position: string;
   editUrl: string;
-}): Promise<{ sent: boolean; reason?: string }> {
-  const c = client();
-  if (!c) {
+}): Promise<{ sent: boolean; via: MailProvider; reason?: string }> {
+  const provider = activeProvider();
+
+  if (provider === "none") {
     // 로컬 개발에선 콘솔로 링크를 확인한다.
-    console.warn("[mail] RESEND_API_KEY 미설정 — 수정 링크:", opts.editUrl);
-    return { sent: false, reason: "RESEND_API_KEY 미설정" };
+    console.warn("[mail] 발송 수단 미설정 — 수정 링크:", opts.editUrl);
+    return { sent: false, via: "none", reason: "발송 수단 미설정" };
   }
 
+  const subject = "[팀 프로젝트] 지원이 접수되었습니다";
   const html = shell(
     `${opts.name}님, 지원이 정상적으로 접수되었습니다.`,
     `
@@ -58,16 +103,37 @@ export async function sendApplicationReceipt(opts: {
     </p>`,
   );
 
+  const text = [
+    `${opts.name}님, 지원이 정상적으로 접수되었습니다.`,
+    ``,
+    `지원 포지션: ${opts.position}`,
+    ``,
+    `아래 링크에서 지원 내용을 확인·수정하고 심사 상태를 볼 수 있습니다.`,
+    `이 링크는 본인만 접근할 수 있으니 공유하지 말아주세요.`,
+    ``,
+    opts.editUrl,
+  ].join("\n");
+
   try {
-    const { error } = await c.emails.send({
+    if (provider === "gmail") {
+      await smtpClient().sendMail({ from: from(), to: opts.to, subject, html, text });
+      return { sent: true, via: "gmail" };
+    }
+
+    const { error } = await resendClient().emails.send({
       from: from(),
       to: opts.to,
-      subject: "[팀 프로젝트] 지원이 접수되었습니다",
+      subject,
       html,
+      text,
     });
-    if (error) return { sent: false, reason: error.message };
-    return { sent: true };
+    if (error) return { sent: false, via: "resend", reason: error.message };
+    return { sent: true, via: "resend" };
   } catch (e) {
-    return { sent: false, reason: e instanceof Error ? e.message : "발송 실패" };
+    return {
+      sent: false,
+      via: provider,
+      reason: e instanceof Error ? e.message : "발송 실패",
+    };
   }
 }
