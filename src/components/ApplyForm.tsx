@@ -298,6 +298,9 @@ export default function ApplyForm({
                 >
                   <span className="font-display block text-xs text-[var(--muted)]">{p.no}</span>
                   <span className="mt-1 block text-sm text-white">{p.title}</span>
+                  {p.note && (
+                    <span className="mt-1 block text-xs text-[var(--muted)]">{p.note}</span>
+                  )}
                 </button>
               );
             })}
