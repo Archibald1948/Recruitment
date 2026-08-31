@@ -1,15 +1,36 @@
 import ApplyForm from "@/components/ApplyForm";
 import FadeIn from "@/components/ui/FadeIn";
+import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
+import { PixelOrbit, PixelSphere } from "@/components/decor/PixelOrnaments";
 import { daysLeft, isClosed, openPositions, site } from "@/config/site";
+
+const ORNAMENTS: DecorItem[] = [
+  {
+    Shape: PixelSphere,
+    position: "top-[10%] left-[2%] md:left-[6%]",
+    size: "w-[110px] md:w-[170px]",
+    delay: 0.1,
+    from: "left",
+  },
+  {
+    Shape: PixelOrbit,
+    position: "bottom-[8%] right-[2%] md:right-[6%]",
+    size: "w-[120px] md:w-[180px]",
+    delay: 0.24,
+    from: "right",
+  },
+];
 
 export default function Apply() {
   const closed = isClosed();
   const remaining = daysLeft();
 
   return (
-    <section id="apply" className="relative bg-[#0c0c0c] px-5 py-24 sm:px-8 md:px-10 md:py-32">
+    <section id="apply" className="relative overflow-hidden bg-[#0c0c0c] px-5 py-24 sm:px-8 md:px-10 md:py-32">
+      <SectionDecor items={ORNAMENTS} opacity="opacity-40" />
+
       <FadeIn>
-        <h2 className="section-heading grad-heading font-display text-center">Apply</h2>
+        <h2 className="section-heading grad-heading font-display relative z-10 text-center">Apply</h2>
       </FadeIn>
 
       <FadeIn delay={0.05}>
