@@ -20,7 +20,7 @@
 | 원본 | 문제 | 대체 |
 |---|---|---|
 | A안 CloudFront MP4 배경 | 타인 에셋, 2MB+, 색 제어 불가 | **`@paper-design/shaders-react` MeshGradient** (Apache 2.0) |
-| A안 BubbledotICG-FinePos (OnlineWebFonts) | 라이선스 출처 불명 | **Pixelify Sans** (Google Fonts, OFL) |
+| A안 BubbledotICG-FinePos (OnlineWebFonts) | 라이선스 출처 불명 | **캔버스 도트 매트릭스 렌더러** (§5.3). Google Fonts 픽셀 폰트는 전부 네모 픽셀이라 둥근 도트가 안 나온다 |
 | A안 "Trusted by 2000+ Enterprises" + MS/Amazon/Google 로고 | 허위 표시 | **실제 수치**(D-day / 지원자 수 / 파트 수 / 기간) |
 | B안 motionsites.ai GIF 21개 | 타인 에셋 핫링크 | **텍스트 배지 마퀴** (협업툴·기술 스택) |
 | B안 figma.site 3D 오브젝트 4개 | 타인 에셋 핫링크 | **자체 픽셀 SVG 오브젝트 4종** (§5.2) |
@@ -208,6 +208,24 @@ About 섹션 양옆이 비어 허전해 보이는 문제를 채우는 장식. �
 - 배치는 네 모서리, `z-0`, `pointer-events: none`, `aria-hidden`
 - 진입은 좌우에서 밀려 들어옴(`x: ∓80`, `duration 0.9`, delay `0.1 / 0.15 / 0.25 / 0.3`)
 - 모바일에서는 본문과 겹쳐 지저분해지므로 `sm` 미만에서 숨긴다
+
+### 5.3 도트 매트릭스 헤드라인
+
+레퍼런스의 둥근 도트 헤드라인은 폰트로는 재현할 수 없어 캔버스로 직접 그린다.
+
+1. 글자를 **저해상도 오프스크린 캔버스**에 렌더링한다 (픽셀 1개 = 도트 1개)
+2. 알파가 있는 자리에만 원을 찍는다
+
+- 격자는 **대문자 높이(`capRows`, 기본 11행)** 기준으로 잡는다. 폭을 먼저 정하면
+  긴 줄에서 글자당 도트가 모자라 뭉개진다
+- 도트 크기는 **가장 긴 줄 기준으로 한 번만** 계산해 모든 줄이 같은 크기를 쓴다
+- 도트 반경 `cell * 0.36`, 자간 `0.06em`
+- 원문은 `sr-only`로 제공하고 캔버스는 `aria-hidden`
+
+### 5.4 그레인
+
+`feTurbulence`를 data URI 배경 이미지로 구워 `mix-blend-mode: overlay`, opacity 0.38로
+전면에 깐다. **이 레이어가 없으면 CSS 그라디언트 티가 난다.**
 
 ---
 
