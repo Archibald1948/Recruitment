@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 const ITEMS = [
   { k: "수집 항목", v: "이름, 이메일, 연락처(선택), 지원 포지션, 한 줄 소개, 지원 동기, 관련 경험, 포트폴리오 링크(선택), 주간 참여 가능 시간, 포지션별 답변, 유입 경로" },
-  { k: "수집 목적", v: "팀 프로젝트 팀원 모집 심사 및 결과 안내, 지원자와의 연락" },
-  { k: "보유 및 이용 기간", v: `${site.privacyRetention} 후 지체 없이 파기` },
+  { k: "수집 목적", v: `${site.privacyPurpose} 심사 및 결과 안내, 지원자와의 연락. 그 외 목적으로는 사용하지 않습니다.` },
+  { k: "보유 및 이용 기간", v: site.privacyRetention },
   { k: "보관 위치", v: "Notion (Notion Labs, Inc.) 데이터베이스" },
   { k: "동의를 거부할 권리", v: "동의를 거부할 수 있으나, 이 경우 지원서 접수가 불가능합니다." },
 ];
@@ -30,6 +30,8 @@ export default function PrivacyPage() {
         </h1>
         <p className="body-copy mb-12 text-[var(--text-dim)]/60">
           지원서 접수를 위해 아래와 같이 개인정보를 수집·이용합니다.
+          <br />
+          <strong className="text-white">{site.privacyNotice}</strong>
         </p>
 
         <dl className="flex flex-col">

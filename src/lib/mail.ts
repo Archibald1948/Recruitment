@@ -62,7 +62,7 @@ const shell = (title: string, body: string) => `
     <hr style="border:0;border-top:1px solid rgba(215,226,234,.15);margin:28px 0 16px" />
     <p style="margin:0;font-size:12px;line-height:1.6;color:#8e8e8e">
       이 메일은 지원서 접수 시 자동 발송됩니다.<br />
-      수집한 개인정보는 ${site.privacyRetention} 후 파기됩니다.
+      ${site.privacyNotice}
     </p>
   </div>
 </div>`;

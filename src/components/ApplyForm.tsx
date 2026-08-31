@@ -478,8 +478,9 @@ export default function ApplyForm({
             <span>
               개인정보 수집·이용에 동의합니다.{" "}
               <a href="/privacy" target="_blank" className="underline underline-offset-4">
-                수집 항목과 보유기간 보기
+                수집 항목 보기
               </a>
+              <span className="mt-1 block text-xs text-[var(--muted)]">{site.privacyNotice}</span>
             </span>
           </label>
           {errors.agree && <p className="field-error">{errors.agree}</p>}
