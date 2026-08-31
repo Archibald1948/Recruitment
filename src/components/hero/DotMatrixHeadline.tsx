@@ -17,7 +17,12 @@ import { useEffect, useRef } from "react";
  * 계산해 모든 줄이 같은 크기를 쓰게 한다.
  */
 
-const FONT = (px: number) => `800 ${px}px "Helvetica Neue", Arial, sans-serif`;
+/*
+ * 도트로 찍으면 획이 뭉개진다. 산세리프 볼드는 e의 가로획이 막히고 i의 점이 기둥에
+ * 붙어버려서, 카운터(글자 속 빈 공간)가 넓고 i의 점이 확실히 떨어진 고정폭 서체를 쓴다.
+ */
+const FONT = (px: number) =>
+  `700 ${px}px "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace`;
 /** 저해상도 캔버스에서 쓸 기준 글자 크기. 클수록 계산이 정확하다. */
 const BASE = 100;
 /** 대문자 높이는 대략 em의 0.72배 */
@@ -25,8 +30,8 @@ const CAP_RATIO = 0.72;
 
 export default function DotMatrixHeadline({
   lines,
-  capRows = 14,
-  gapRows = 4,
+  capRows = 16,
+  gapRows = 5,
   delays = [],
   className,
 }: {
@@ -55,7 +60,7 @@ export default function DotMatrixHeadline({
       // 기준 크기에서 각 줄의 폭을 재고, 대문자 높이가 capRows가 되도록 환산한다.
       probe.font = FONT(BASE);
       try {
-        probe.letterSpacing = `${BASE * 0.06}px`;
+        probe.letterSpacing = `${BASE * 0.02}px`;
       } catch {
         /* letterSpacing 미지원 브라우저는 기본 자간으로 간다 */
       }
@@ -80,7 +85,7 @@ export default function DotMatrixHeadline({
 
         sctx.font = FONT(fontPx);
         try {
-          sctx.letterSpacing = `${fontPx * 0.06}px`;
+          sctx.letterSpacing = `${fontPx * 0.02}px`;
         } catch {
           /* noop */
         }
@@ -104,11 +109,11 @@ export default function DotMatrixHeadline({
         ctx.clearRect(0, 0, width, h);
         ctx.fillStyle = "#fff";
 
-        const r = cell * 0.355;
+        const r = cell * 0.34;
         for (let y = 0; y < rows; y++) {
           for (let x = 0; x < maxCols; x++) {
             const alpha = data[(y * maxCols + x) * 4 + 3];
-            if (alpha < 58) continue;
+            if (alpha < 52) continue;
             ctx.globalAlpha = Math.min(1, 0.42 + alpha / 220);
             ctx.beginPath();
             ctx.arc(x * cell + cell / 2, y * cell + cell / 2, r, 0, Math.PI * 2);
