@@ -14,11 +14,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "모집이 마감되었습니다." }, { status: 410 });
   }
 
-  if (!rateLimit(`apply:${clientIp(req)}`)) {
-    return NextResponse.json(
-      { error: "잠시 후 다시 시도해 주세요." },
-      { status: 429 },
-    );
+  const ip = clientIp(req);
+
+  // 한도는 두 단계로 나눈다.
+  // 유효성 실패까지 엄격한 한도에 넣으면 오타를 몇 번 낸 지원자가 잠겨버린다.
+  // 여기서는 무차별 요청만 막고, 실제 접수 한도는 검증을 통과한 뒤에 건다.
+  if (!rateLimit(`apply:burst:${ip}`, 40)) {
+    return NextResponse.json({ error: "잠시 후 다시 시도해 주세요." }, { status: 429 });
   }
 
   let raw: unknown;
@@ -34,6 +36,14 @@ export async function POST(req: Request) {
   if (value.company) return NextResponse.json({ id: "ok" }, { status: 201 });
 
   if (!ok) return NextResponse.json({ errors }, { status: 422 });
+
+  // 검증을 통과한 요청만 실제 접수 한도를 소모한다.
+  if (!rateLimit(`apply:create:${ip}`, 5)) {
+    return NextResponse.json(
+      { error: "잠시 후 다시 시도해 주세요. 이미 접수되었을 수 있으니 메일을 확인해 주세요." },
+      { status: 429 },
+    );
+  }
 
   try {
     const existing = await findByEmail(value.email);
