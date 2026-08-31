@@ -25,6 +25,24 @@ export function verifyEditToken(token: string, storedHash: string): boolean {
 }
 
 export function editUrl(pageId: string, token: string): string {
-  const base = (process.env.APP_URL || "http://localhost:3000").replace(/\/$/, "");
+  const base = appBaseUrl();
   return `${base}/apply/${pageId}?t=${encodeURIComponent(token)}`;
+}
+
+/**
+ * 매직 링크의 기준 주소.
+ *
+ * APP_URL을 깜빡하면 지원자에게 localhost 주소가 담긴 메일이 나간다.
+ * 배포 환경에서는 Vercel이 넣어주는 도메인으로 자동 대체한다.
+ */
+function appBaseUrl(): string {
+  const explicit = process.env.APP_URL?.trim();
+  const isLocal = !explicit || /localhost|127\.0\.0\.1/.test(explicit);
+
+  if (!isLocal) return explicit.replace(/\/$/, "");
+
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+  if (vercel) return `https://${vercel.replace(/\/$/, "")}`;
+
+  return (explicit || "http://localhost:3000").replace(/\/$/, "");
 }
