@@ -49,7 +49,7 @@ export default function GlyphField() {
       for (let r = 0; r < rows; r++) {
         const rowRatio = r / rows;
         // 위쪽은 거의 꽉 차고, 파도가 시작되는 지점부터 급격히 성겨진다.
-        const density = rowRatio < 0.3 ? 0.95 : Math.max(0, 0.95 - (rowRatio - 0.3) * 3.2);
+        const density = rowRatio < 0.24 ? 0.95 : Math.max(0, 0.95 - (rowRatio - 0.24) * 4.0);
         for (let c = 0; c < cols; c++) {
           if (Math.random() > density) continue;
           cells.push({
@@ -75,7 +75,7 @@ export default function GlyphField() {
       for (const c of cells) {
         const wave = reduced ? 0.7 : 0.45 + ((Math.sin((t / c.period) * Math.PI * 2 + c.phase) + 1) / 2) * 0.55;
         // 파도에 흡수되며 사라진다.
-        const depth = 1 - Math.min(1, Math.max(0, c.y / h - 0.22) / 0.16);
+        const depth = 1 - Math.min(1, Math.max(0, c.y / h - 0.2) / 0.14);
         const alpha = c.peak * wave * depth;
         if (alpha < 0.012) continue;
         ctx.fillStyle = `rgba(255,255,255,${alpha.toFixed(3)})`;

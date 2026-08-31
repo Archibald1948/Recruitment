@@ -20,7 +20,7 @@ export default function Hero() {
         레퍼런스는 상단을 글자 텍스처가 채우고, 헤드라인은 그 아래 어두운 렌즈 위에 앉는다.
         가운데 정렬만 하면 헤드라인이 텍스처 한가운데로 올라와 서로 방해한다.
       */}
-      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pt-[8vh] text-center">
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-5 pt-[18vh] text-center">
         <h1 className="w-full max-w-[1020px]">
           <DotMatrixHeadline lines={[...site.headline]} />
         </h1>
