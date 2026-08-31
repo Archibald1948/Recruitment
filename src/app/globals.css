@@ -190,17 +190,6 @@ body {
 }
 
 /* ── 애니메이션 ──────────────────────────────────────────────── */
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-18px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
 @keyframes headlineFade {
   from {
     opacity: 0;
@@ -223,10 +212,6 @@ body {
     transform: none;
     filter: none;
   }
-}
-
-.anim-nav {
-  animation: slideDown 0.7s var(--ease-hero) both;
 }
 
 .anim-line {
