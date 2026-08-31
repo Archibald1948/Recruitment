@@ -68,7 +68,10 @@ export async function POST(req: Request) {
       editUrl: url,
     });
 
-    return NextResponse.json({ id: page.id, editUrl: url, mailed: mail.sent }, { status: 201 });
+    return NextResponse.json(
+      { id: page.id, editUrl: url, mailed: mail.sent, via: mail.via },
+      { status: 201 },
+    );
   } catch (e) {
     console.error("[apply] 접수 실패:", e);
     return NextResponse.json(
