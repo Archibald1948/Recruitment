@@ -107,7 +107,7 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
 ```
 ┌─ HERO ──────────────────────────────── 100dvh
 │   MeshGradient 웨이브 + 글리프 텍스처
-│   nav / 헤드라인 2줄 / 서브 / CTA / 스탯 4
+│   헤드라인 2줄 / 서브 / CTA / 스탯 4
 │   ▼ 하단 30vh #0C0C0C 페이드
 ├─ MARQUEE ───────────── 협업툴·스택 배지 2줄 (역방향)
 ├─ ABOUT ─────────────── 팀장 소개 (문자 리빌 1문단)
@@ -198,7 +198,7 @@ About 섹션 양옆이 비어 허전해 보이는 문제를 채우는 장식. �
 easing   cubic-bezier(0.22, 1, 0.36, 1)   히어로 계열
          cubic-bezier(0.25, 0.1, 0.25, 1) FadeIn 기본
 FadeIn   opacity 0 → 1, y 30 → 0, duration 0.7s, viewport { once: true }
-히어로   header slideDown 0.7s / 헤드라인 줄별 0.12s·0.3s / 서브 0.28s / CTA 0.4s
+히어로   헤드라인 줄별 0.12s·0.3s / 서브 0.28s / CTA 0.4s
 스탯     0.5s, 0.58s, 0.66s, 0.74s
 ```
 
@@ -210,7 +210,6 @@ FadeIn   opacity 0 → 1, y 30 → 0, duration 0.7s, viewport { once: true }
 
 Tailwind 기본 브레이크포인트(sm 640 / md 768 / lg 1024), 모바일 퍼스트, 유동 타이포는 `clamp()`.
 
-- **≤720px**: 데스크톱 nav 숨김 → 원형 버거(48×48, `#28282a`, 흰 바 3개 18×1.5px). 열면 흰 원 + 검정 X(±6.5px, ±45°). 오버레이 `rgba(0,0,0,0.62)` + blur 6px. 흰 시트 메뉴 radius 28px. Esc / 오버레이 클릭 / 링크 클릭 / resize>720 에 닫힘. `aria-expanded` 토글
 - **≤720px**: 스탯 4열 → 2열
 - **≤420px**: 헤드라인 letter-spacing `-0.08em`, 스탯 라벨 축소
 
