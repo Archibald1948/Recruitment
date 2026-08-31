@@ -52,6 +52,12 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+  /*
+   * 한글은 기본 규칙상 글자 단위로 끊겨 "머무 / 르지"처럼 어절이 갈라진다.
+   * keep-all로 어절을 지키고, 넘칠 수 있는 긴 영문/URL만 break-word로 처리한다.
+   */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 ::selection {
@@ -226,12 +232,12 @@ body {
 }
 
 .wave-a {
-  animation: waveA 19s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: waveA 17s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   will-change: transform;
 }
 
 .wave-b {
-  animation: waveB 27s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: waveB 29s cubic-bezier(0.45, 0, 0.55, 1) infinite;
   will-change: transform;
 }
 
