@@ -30,7 +30,7 @@ export default function AnimatedText({
       <span className="sr-only">{text}</span>
       <p ref={ref} aria-hidden className={className}>
         {chars.map((ch, i) => (
-          <Char key={i} progress={scrollYProgress} range={[i / chars.length, (i + 1) / chars.length]}>
+          <Char key={i} progress={scrollYProgress} index={i} total={chars.length}>
             {ch}
           </Char>
         ))}
@@ -42,17 +42,30 @@ export default function AnimatedText({
 function Char({
   children,
   progress,
-  range,
+  index,
+  total,
 }: {
   children: string;
   progress: ReturnType<typeof useScroll>["scrollYProgress"];
-  range: [number, number];
+  index: number;
+  total: number;
 }) {
-  const opacity = useTransform(progress, range, [0.2, 1]);
-  if (children === "\n") return <br />;
+  // 글자 하나가 또렷해지는 구간을 앞뒤로 겹쳐 두면
+  // 딱딱 끊기지 않고 물결처럼 이어진다.
+  const at = index / total;
+  const start = Math.max(0, at - 0.1);
+  const end = Math.min(1, at + 0.05);
+  const opacity = useTransform(progress, [start, end], [0.2, 1]);
+
+  const glyph = children === " " ? " " : children;
+
   return (
-    <motion.span style={{ opacity }}>
-      {children === " " ? " " : children}
-    </motion.span>
+    <span className="relative inline-block">
+      {/* 자리만 차지하는 사본. 위에 얹히는 글자가 absolute라 폭이 무너지지 않게 한다. */}
+      <span className="opacity-0">{glyph}</span>
+      <motion.span style={{ opacity }} className="absolute top-0 left-0">
+        {glyph}
+      </motion.span>
+    </span>
   );
 }
