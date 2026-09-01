@@ -88,7 +88,7 @@ function StatItem({ stat, index, active }: { stat: Stat; index: number; active: 
         {rotating !== null ? (
           // 글자 수가 달라도 자리가 흔들리지 않도록 가장 긴 값으로 폭을 잡는다.
           <span className="relative inline-grid place-items-center">
-            <span aria-hidden className="invisible col-start-1 row-start-1">
+            <span aria-hidden className="invisible col-start-1 row-start-1 select-none">
               {stat.values?.reduce((a, b) => (b.length > a.length ? b : a), "")}
             </span>
             <span key={rotating} className="anim-rotate col-start-1 row-start-1">
