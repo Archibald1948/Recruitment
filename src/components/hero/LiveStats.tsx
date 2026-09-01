@@ -32,7 +32,15 @@ export default function LiveStats({
   const stats: Stat[] = [
     { glyph: "<", value: remaining, suffix: "일", decimals: 0, label: "지원 마감까지" },
     { glyph: "%", value: applicants, suffix: "명", decimals: 0, label: "현재 지원자" },
-    { glyph: "*", value: partCount, suffix: "파트", decimals: 0, label: "함께할 파트" },
+    {
+      glyph: "*",
+      value: partCount,
+      suffix: "파트",
+      decimals: 0,
+      label: "함께할 파트",
+      // 몇 개인지보다 어떤 파트인지가 중요해 이름을 순서대로 돌린다.
+      values: ["Design", "Frontend", "Planning", "Backend"],
+    },
     { glyph: "#", value: months, suffix: "개월+", decimals: 0, label: "예상 기간" },
   ];
 

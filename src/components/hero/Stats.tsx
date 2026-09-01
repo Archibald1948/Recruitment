@@ -9,6 +9,11 @@ export interface Stat {
   suffix: string;
   decimals: number;
   label: string;
+  /**
+   * 숫자 대신 순서대로 돌아가며 보여줄 값들.
+   * 파트 이름처럼 "몇 개"보다 "무엇"이 중요한 항목에 쓴다.
+   */
+  values?: string[];
 }
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -44,8 +49,25 @@ function useCountUp(target: number, index: number, active: boolean) {
   return reduced ? target : n;
 }
 
+/** 값들을 순서대로 돌려가며 보여준다. */
+function useRotation(values: string[] | undefined, active: boolean) {
+  const reduced = usePrefersReducedMotion();
+  const [i, setI] = useState(0);
+
+  useEffect(() => {
+    if (!values || values.length < 2 || !active || reduced) return;
+    const id = window.setInterval(() => {
+      setI((prev) => (prev + 1) % values.length);
+    }, 2000);
+    return () => window.clearInterval(id);
+  }, [values, active, reduced]);
+
+  return values ? values[i % values.length] : null;
+}
+
 function StatItem({ stat, index, active }: { stat: Stat; index: number; active: boolean }) {
   const n = useCountUp(stat.value, index, active);
+  const rotating = useRotation(stat.values, active);
 
   return (
     <div
@@ -63,8 +85,22 @@ function StatItem({ stat, index, active }: { stat: Stat; index: number; active: 
         className="tabular font-medium text-white"
         style={{ fontSize: "clamp(18px, 2.2vw, 26px)", letterSpacing: "-0.025em" }}
       >
-        {n.toFixed(stat.decimals)}
-        {stat.suffix}
+        {rotating !== null ? (
+          // 글자 수가 달라도 자리가 흔들리지 않도록 가장 긴 값으로 폭을 잡는다.
+          <span className="relative inline-grid place-items-center">
+            <span aria-hidden className="invisible col-start-1 row-start-1">
+              {stat.values?.reduce((a, b) => (b.length > a.length ? b : a), "")}
+            </span>
+            <span key={rotating} className="anim-rotate col-start-1 row-start-1">
+              {rotating}
+            </span>
+          </span>
+        ) : (
+          <>
+            {n.toFixed(stat.decimals)}
+            {stat.suffix}
+          </>
+        )}
       </span>
       <span
         className="text-[var(--muted)]"

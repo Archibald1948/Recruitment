@@ -241,6 +241,21 @@ body {
   will-change: transform;
 }
 
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.anim-rotate {
+  animation: rotateIn 0.45s var(--ease-hero) both;
+}
+
 @keyframes headlineFade {
   from {
     opacity: 0;
