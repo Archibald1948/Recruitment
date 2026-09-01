@@ -33,7 +33,9 @@ export default function LiveStats({
     { glyph: "<", value: remaining, suffix: "일", decimals: 0, label: "지원 마감까지" },
     { glyph: "%", value: applicants, suffix: "명", decimals: 0, label: "현재 지원자" },
     {
-      glyph: "*",
+      // *는 이 픽셀 폰트에서 작고 위로 붙어 나와 옆 글리프들과 무게가 안 맞았다.
+      // +는 가운데 정렬이라 <, %, # 과 나란히 놓았을 때 균형이 잡힌다.
+      glyph: "+",
       value: partCount,
       suffix: "파트",
       decimals: 0,
