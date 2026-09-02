@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   if (!rateLimit(`admin:${clientIp(req)}`, 60)) {
     return NextResponse.json({ error: "잠시 후 다시 시도해 주세요." }, { status: 429 });
   }
-  if (!adminAuthorized(req)) {
+  if (!(await adminAuthorized(req))) {
     return NextResponse.json({ error: "권한이 없습니다." }, { status: 401 });
   }
 
