@@ -134,15 +134,22 @@ export const positions: Position[] = [
     ],
     questions: [
       {
-        id: "domain",
-        label: "관심 있는 서비스 도메인과 그 이유를 알려주세요.",
-        placeholder: "어떤 문제를 다루는 서비스에 관심이 있는지, 왜 그런지",
+        id: "priority",
+        label:
+          "개발 기간이 제한되어 모든 기능을 구현할 수 없다면, 어떤 기준으로 기능의 우선순위를 결정하시겠어요?",
+        placeholder: "무엇을 먼저 만들고 무엇을 미룰지, 그 판단 기준을 적어주세요.",
         required: true,
       },
       {
-        id: "pmExp",
-        label: "기획 · 마케팅 · 콘텐츠 관련 경험이 있다면 적어주세요.",
-        placeholder: "관련 전공이나 경험이 없어도 괜찮습니다. 없으면 비워두셔도 됩니다.",
+        id: "goodService",
+        label: "본인이 생각하는 좋은 서비스란 무엇인가요?",
+        placeholder: "예시가 되는 서비스를 들어 설명해 주셔도 좋습니다.",
+        required: true,
+      },
+      {
+        id: "domain",
+        label: "관심 있는 서비스 도메인과 그 이유를 알려주세요.",
+        placeholder: "어떤 문제를 다루는 서비스에 관심이 있는지, 왜 그런지",
         required: false,
       },
     ],
@@ -164,14 +171,30 @@ export const positions: Position[] = [
     ],
     questions: [
       {
-        id: "feExp",
-        label: "React / Next.js 사용 경험을 알려주세요.",
-        placeholder: "만들어 본 것, 사용해 본 기간, 어려웠던 점 등",
+        id: "handoff",
+        label:
+          "디자이너가 건넨 시안에 구현이 어려운 부분이 있다면, 어떻게 풀어가시겠어요?",
+        placeholder: "그대로 구현할지, 대안을 제안할지, 어떻게 이야기를 꺼낼지 적어주세요.",
         required: true,
       },
       {
-        id: "apiExp",
-        label: "API 연동 경험이 있다면 적어주세요.",
+        id: "apiFailure",
+        label:
+          "API 응답이 느리거나 실패하는 상황을 화면에서 어떻게 다루시겠어요?",
+        placeholder: "로딩·에러·재시도를 사용자에게 어떻게 보여줄지 생각을 적어주세요.",
+        required: true,
+      },
+      {
+        id: "memorableWork",
+        label:
+          "React 또는 Next.js로 만들어 본 것 중 가장 기억에 남는 화면과, 그때 어려웠던 점을 알려주세요.",
+        placeholder: "규모는 상관없습니다. 무엇이 어려웠고 어떻게 해결했는지가 궁금합니다.",
+        required: false,
+      },
+      {
+        id: "perfA11y",
+        label:
+          "성능이나 접근성 때문에 구현 방식을 바꿔본 경험이 있다면 알려주세요.",
         placeholder: "없으면 비워두셔도 됩니다.",
         required: false,
       },
@@ -194,15 +217,23 @@ export const positions: Position[] = [
     ],
     questions: [
       {
-        id: "beStack",
-        label: "주로 사용하는 언어와 프레임워크를 알려주세요.",
-        placeholder: "예: Java / Spring Boot, Node.js / Express …",
+        id: "debugging",
+        label:
+          "개발 중 서버 오류나 예상하지 못한 문제가 발생했을 때, 어떤 방식으로 원인을 찾고 해결하는 편인가요?",
+        placeholder: "실제로 겪었던 상황을 예로 들어 주시면 좋습니다.",
         required: true,
       },
       {
-        id: "beOps",
-        label: "DB 설계 또는 배포 경험이 있다면 적어주세요.",
-        placeholder: "없으면 비워두셔도 됩니다.",
+        id: "apiDesign",
+        label:
+          "API를 설계하거나 개발해본 경험이 있다면, 어떤 방식으로 설계했는지 또는 어떤 걸 개발해봤는지 간단히 설명해주세요.",
+        placeholder: "규모는 상관없습니다. 어떤 고민을 했는지가 궁금합니다.",
+        required: true,
+      },
+      {
+        id: "beStack",
+        label: "주로 사용하는 언어와 프레임워크를 알려주세요.",
+        placeholder: "예: Java / Spring Boot, Node.js / Express …",
         required: false,
       },
     ],
@@ -223,14 +254,23 @@ export const positions: Position[] = [
     ],
     questions: [
       {
-        id: "figma",
-        label: "Figma 사용 수준을 알려주세요.",
-        placeholder: "컴포넌트 / 오토레이아웃 / 프로토타입 등 어디까지 다뤄보셨는지",
+        id: "figmaCollab",
+        label: "Figma 사용 수준과 개발자와의 협업 경험을 알려주세요.",
+        placeholder:
+          "컴포넌트·오토레이아웃·프로토타입 등 어디까지 다뤄보셨는지, 개발자와 함께 작업해 본 경험이 있다면 함께 적어주세요.",
         required: true,
       },
       {
-        id: "handoff",
-        label: "개발자와 협업해 본 경험이 있다면 적어주세요.",
+        id: "usability",
+        label:
+          "본인이 만든 디자인이 실제 사용자에게 사용하기 어렵다는 피드백을 받는다면, 어떤 방식으로 원인을 확인하고 개선하시겠어요?",
+        placeholder: "무엇을 먼저 확인하고 어떤 순서로 접근할지 적어주세요.",
+        required: true,
+      },
+      {
+        id: "wireframe",
+        label:
+          "와이어프레임에서 최종 UI 디자인으로 발전시키는 과정에서 가장 중요하게 생각하는 부분은 무엇인가요?",
         placeholder: "없으면 비워두셔도 됩니다.",
         required: false,
       },
