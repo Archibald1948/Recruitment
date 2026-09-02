@@ -20,7 +20,9 @@ export default function SiteLightRays() {
       color="rgba(238, 202, 210, 0.16)"
       count={9}
       blur={44}
-      speed={18}
+      // speed는 한 광선의 주기(초)다. 값이 작을수록 빨리 나타나고 자주 스친다.
+      // 18초는 첫 화면에서 광선이 다 뜨기까지 너무 오래 걸렸다.
+      speed={10}
       length="88vh"
     />
   );
