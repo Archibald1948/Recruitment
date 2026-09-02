@@ -75,7 +75,7 @@ export default function About() {
           />
         </div>
 
-        <div className="grid w-full gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid w-full grid-cols-2 gap-x-5 gap-y-8 sm:gap-8 lg:grid-cols-4">
           {STACKS.map((s, i) => (
             <FadeIn key={s.title} delay={i * 0.1}>
               <div className="border-t border-[var(--line)] pt-5">
