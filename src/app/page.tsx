@@ -1,4 +1,5 @@
 import About from "@/components/About";
+import SiteLightRays from "@/components/SiteLightRays";
 import Apply from "@/components/Apply";
 import Footer from "@/components/Footer";
 import Hero from "@/components/hero/Hero";
@@ -9,7 +10,9 @@ import { site } from "@/config/site";
 
 export default function Home() {
   return (
-    <main className="overflow-x-clip bg-[#0c0c0c]">
+    <main className="relative overflow-x-clip">
+      <SiteLightRays />
+
       <Hero />
       <Marquee top={[...site.marquee.top]} bottom={[...site.marquee.bottom]} />
       <About />
