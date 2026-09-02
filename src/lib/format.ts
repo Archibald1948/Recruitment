@@ -36,3 +36,24 @@ export function normalizeUrl(value: string): string {
   if (/^[a-z0-9-]+(\.[a-z0-9-]+)+/i.test(v)) return `https://${v}`;
   return v;
 }
+
+/**
+ * 미팅 일시를 한국 시간으로 표기한다.
+ *
+ * 노션 Date는 날짜만 고르면 시간이 없다. 그때 "오전 9:00" 같은 없는 시각을
+ * 지어내지 않도록 날짜까지만 적는다.
+ */
+export function formatMeetingAt(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+
+  const dateOnly = iso.length === 10;
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+    ...(dateOnly ? {} : { hour: "numeric", minute: "2-digit" }),
+  }).format(d);
+}

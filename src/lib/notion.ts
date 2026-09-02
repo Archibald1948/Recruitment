@@ -24,10 +24,15 @@ export const PROP = {
   ref: "유입 경로",
   agree: "개인정보 동의",
   tokenHash: "수정 토큰 해시",
+
+  /* 아래 넷은 운영진이 노션에서 직접 채우는 칸이다. 지원 폼은 건드리지 않는다. */
+  meetingAt: "미팅 일시",
+  zoomUrl: "줌 링크",
+  notice: "안내 메시지",
+  notifiedLog: "안내 발송",
 } as const;
 
-export const STATUS_FLOW = ["접수됨", "서류 검토", "줌 미팅", "합류", "보류"] as const;
-export type ApplicationStatus = (typeof STATUS_FLOW)[number];
+export { STATUS_FLOW, type ApplicationStatus } from "./status";
 
 let client: Client | null = null;
 export function notion(): Client {
@@ -109,6 +114,10 @@ export interface ApplicationRecord {
   availability: string;
   ref: string;
   tokenHash: string;
+  meetingAt: string;
+  zoomUrl: string;
+  notice: string;
+  notifiedLog: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -130,6 +139,10 @@ function toRecord(page: any): ApplicationRecord {
     availability: readSelect(p[PROP.availability]),
     ref: readSelect(p[PROP.ref]),
     tokenHash: readText(p[PROP.tokenHash]),
+    meetingAt: p[PROP.meetingAt]?.date?.start ?? "",
+    zoomUrl: p[PROP.zoomUrl]?.url ?? "",
+    notice: readText(p[PROP.notice]),
+    notifiedLog: readText(p[PROP.notifiedLog]),
     createdAt: page.created_time ?? "",
     updatedAt: page.last_edited_time ?? "",
   };
@@ -215,6 +228,45 @@ export async function findByEmail(email: string): Promise<ApplicationRecord | nu
   })) as any;
   const first = res.results?.[0];
   return first ? toRecord(first) : null;
+}
+
+/**
+ * 운영자 화면용 전체 목록. 최신순.
+ *
+ * 지원자 수가 수백을 넘길 사이트가 아니라 페이지네이션 없이 전부 훑는다.
+ * 토큰 해시가 섞여 있으므로 응답으로 내보내기 전에 반드시 걷어내야 한다.
+ */
+export async function listApplications(): Promise<ApplicationRecord[]> {
+  const data_source_id = await getDataSourceId();
+  const out: ApplicationRecord[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const res = (await notion().dataSources.query({
+      data_source_id,
+      sorts: [{ timestamp: "created_time", direction: "descending" }] as any,
+      page_size: 100,
+      start_cursor: cursor,
+    })) as any;
+    out.push(...(res.results ?? []).map(toRecord));
+    cursor = res.has_more ? res.next_cursor : undefined;
+  } while (cursor);
+
+  return out;
+}
+
+/**
+ * 안내 메일을 보낸 사실을 노션에 남긴다.
+ *
+ * 같은 사람에게 같은 안내를 두 번 보내는 사고를 막는 장치다. 운영자 화면이
+ * 이 값을 그대로 보여주므로, 언제 어떤 상태로 보냈는지 한눈에 들어와야 한다.
+ */
+export async function markNotified(pageId: string, line: string) {
+  await notion().pages.update({
+    page_id: pageId,
+    properties: { [PROP.notifiedLog]: { rich_text: text(line) } } as any,
+  });
+  await appendHistory(pageId, line);
 }
 
 export async function countApplications(): Promise<number> {

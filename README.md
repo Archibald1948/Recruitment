@@ -18,9 +18,11 @@
 | `/privacy` | 개인정보 수집·이용 안내 |
 | `/links` | 채널별 홍보 링크 복사판 (운영자 전용, noindex) |
 | `/lab` | 히어로 배경 셰이더 실험실 (noindex) |
+| `/admin` | 지원자 목록 + 심사 안내 메일 발송 (운영자 키 필요, noindex) |
 
 API는 `POST /api/apply`, `POST /api/qna`, `GET·PATCH /api/applications/[id]`,
-`GET /api/stats` 네 갈래입니다. 자세한 계약은 [`docs/site-plan.md`](docs/site-plan.md) §2.
+`GET /api/stats`, 그리고 운영자용 `GET /api/admin/applications` ·
+`POST /api/admin/notify` 입니다. 자세한 계약은 [`docs/site-plan.md`](docs/site-plan.md) §2.
 
 ---
 
@@ -75,6 +77,7 @@ DB 속성 이름은 코드에 그대로 박혀 있습니다. 노션에서 속성
 | `NOTION_QNA_DATABASE_ID` | `/qna` 목록 조회 실패 |
 | `NOTION_SETTINGS_DATABASE_ID` | 마감일이 코드 기본값으로 고정 |
 | `TOKEN_PEPPER` | 수정 토큰 발급 실패 |
+| `ADMIN_TOKEN` | `/admin`이 잠겨 안내 메일을 보낼 수 없음 |
 | `GMAIL_USER` + `GMAIL_APP_PASSWORD` 또는 `RESEND_API_KEY` | 접수는 되지만 메일이 안 나감 |
 
 ---
@@ -86,6 +89,9 @@ DB 속성 이름은 코드에 그대로 박혀 있습니다. 노션에서 속성
 - **마감일은 코드가 아니라 노션에 있습니다.** 환경변수에 두면 바꿀 때마다 재배포해야 합니다.
   노션에 두면 날짜 칸만 고치면 되고 최대 60초 뒤 반영됩니다. 노션을 못 읽으면 코드 기본값으로
   떨어져, 마감일 조회 실패가 지원 폼 전체를 멈추지 않습니다.
+- **심사 안내 메일은 사람이 눌러서 보냅니다.** 노션 상태를 바꾼다고 자동으로 나가지
+  않습니다. 메일은 되돌릴 수 없는데 상태를 잘못 눌렀다 되돌리는 일은 흔하기 때문입니다.
+  `/admin`에서 내용을 확인하고 발송하며, 발송 기록은 노션에 남습니다.
 - **수정 토큰은 원문을 저장하지 않습니다.** `SHA-256(token + PEPPER)`만 노션에 넣고,
   검증은 `timingSafeEqual`로 합니다. 원문은 접수 메일 링크에만 존재합니다.
 - **레이트리밋을 2단으로 나눴습니다.** 유효성 실패까지 엄격한 한도에 넣으면 오타를 몇 번 낸
