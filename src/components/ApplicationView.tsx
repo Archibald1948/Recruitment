@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ApplyForm, { type FormValues } from "@/components/ApplyForm";
 import { positionById } from "@/config/site";
-import { isHeld, STEPS, stepIndex } from "@/lib/status";
+import { isRejected, STEPS, stepIndex } from "@/lib/status";
 
 const FLOW = STEPS;
 
@@ -29,17 +29,17 @@ interface Record_ {
 }
 
 function StatusTrack({ status }: { status: string }) {
-  const held = isHeld(status);
+  const rejected = isRejected(status);
   const idx = stepIndex(status);
 
   return (
     <div className="rounded-[28px] border border-[var(--line)] bg-white/[0.03] p-6 md:p-8">
       <p className="font-display text-xs tracking-widest text-[var(--muted)] uppercase">Status</p>
 
-      {held ? (
-        <p className="mt-4 text-[var(--text-dim)]">
-          현재 <strong className="text-white">보류</strong> 상태입니다. 진행 상황이 정해지면
-          메일로 안내드리겠습니다.
+      {rejected ? (
+        <p className="mt-4 break-keep text-[var(--text-dim)]">
+          아쉽게도 이번에는 함께하지 못하게 되었습니다. 시간을 들여 지원해 주신 것에
+          진심으로 감사드립니다.
         </p>
       ) : (
         <ol className="mt-6 flex flex-col gap-0 sm:flex-row sm:items-center">
