@@ -68,14 +68,6 @@ const shell = (title: string, body: string) => `
 </div>`;
 
 /** 접수 확인 + 수정 링크. 발송 실패가 접수 자체를 되돌리지는 않는다. */
-/**
- * 팀장 주소. 저장소가 공개라 코드에 박지 않고 환경변수로만 둔다.
- * 지원자가 접수 메일에 답장하면 이 주소로 가고, 문의 메일도 여기로 간다.
- */
-function teamEmail(): string | undefined {
-  return process.env.CONTACT_EMAIL?.trim() || undefined;
-}
-
 export async function sendApplicationReceipt(opts: {
   to: string;
   name: string;
@@ -124,7 +116,6 @@ export async function sendApplicationReceipt(opts: {
       await smtpClient().sendMail({
         from: from(),
         to: opts.to,
-        replyTo: teamEmail(),
         subject,
         html,
         text,
@@ -135,7 +126,6 @@ export async function sendApplicationReceipt(opts: {
     const { error } = await resendClient().emails.send({
       from: from(),
       to: opts.to,
-      replyTo: teamEmail(),
       subject,
       html,
       text,
@@ -148,59 +138,5 @@ export async function sendApplicationReceipt(opts: {
       via: provider,
       reason: e instanceof Error ? e.message : "발송 실패",
     };
-  }
-}
-
-/**
- * 문의 메일. 지원 전에 궁금한 점을 팀장에게 바로 전달한다.
- * 답장이 문의한 사람에게 바로 가도록 replyTo에 문의자 주소를 넣는다.
- */
-export async function sendContactMessage(opts: {
-  name: string;
-  email: string;
-  message: string;
-}): Promise<{ sent: boolean; via: MailProvider; reason?: string }> {
-  const provider = activeProvider();
-  const to = teamEmail();
-
-  if (!to) return { sent: false, via: provider, reason: "CONTACT_EMAIL 미설정" };
-  if (provider === "none") {
-    console.warn("[mail] 발송 수단 미설정 — 문의 내용:", opts.name, opts.email);
-    return { sent: false, via: "none", reason: "발송 수단 미설정" };
-  }
-
-  const subject = `[모집 사이트 문의] ${opts.name}님`;
-  const html = shell(
-    `${opts.name}님이 문의를 남겼습니다.`,
-    `
-    <p style="margin:0 0 8px">보낸 사람: <strong style="color:#fff">${opts.name}</strong></p>
-    <p style="margin:0 0 20px">회신 주소: <a href="mailto:${opts.email}" style="color:#fff">${opts.email}</a></p>
-    <div style="white-space:pre-wrap;border-left:2px solid rgba(215,226,234,.25);padding-left:14px">${opts.message}</div>`,
-  );
-  const text = [
-    `${opts.name}님이 문의를 남겼습니다.`,
-    ``,
-    `회신 주소: ${opts.email}`,
-    ``,
-    opts.message,
-  ].join("\n");
-
-  try {
-    if (provider === "gmail") {
-      await smtpClient().sendMail({ from: from(), to, replyTo: opts.email, subject, html, text });
-      return { sent: true, via: "gmail" };
-    }
-    const { error } = await resendClient().emails.send({
-      from: from(),
-      to,
-      replyTo: opts.email,
-      subject,
-      html,
-      text,
-    });
-    if (error) return { sent: false, via: "resend", reason: error.message };
-    return { sent: true, via: "resend" };
-  } catch (e) {
-    return { sent: false, via: provider, reason: e instanceof Error ? e.message : "발송 실패" };
   }
 }

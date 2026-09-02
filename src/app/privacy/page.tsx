@@ -47,9 +47,11 @@ export default function PrivacyPage() {
 
         <p className="mt-10 text-sm leading-relaxed text-[var(--muted)]">
           지원자는 언제든 본인의 개인정보 열람·정정·삭제를 요청할 수 있습니다. 접수 확인 메일에
-          담긴 링크에서 직접 수정할 수 있으며, 삭제를 원하시면
-          {site.contactEmail ? ` ${site.contactEmail} 으로 ` : " 문의처로 "}
-          연락해 주세요.
+          담긴 링크에서 직접 수정할 수 있으며, 삭제를 원하시면{" "}
+          <Link href="/qna" className="text-white underline underline-offset-4">
+            Q&amp;A 게시판
+          </Link>
+          에 남겨주세요.
         </p>
       </div>
     </main>

@@ -47,7 +47,6 @@ export const site = {
   stage: "팀 빌딩 단계 · 프론트엔드 1명, 백엔드 1명 합류 완료",
 
   /** 문의처 — TODO: 실제 값으로 교체 */
-  contactEmail: "",
 
   /** 마퀴 2줄 */
   marquee: {

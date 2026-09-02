@@ -6,14 +6,12 @@ export default function Footer() {
       <div className="mx-auto flex max-w-5xl flex-col gap-4 text-xs text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between">
         <span className="font-display tracking-widest uppercase">{site.name}</span>
         <div className="flex flex-wrap gap-x-5 gap-y-2">
+          <a href="/qna" className="transition-colors hover:text-white">
+            Q&amp;A 문의
+          </a>
           <a href="/privacy" className="transition-colors hover:text-white">
             개인정보 수집·이용 안내
           </a>
-          {site.contactEmail && (
-            <a href={`mailto:${site.contactEmail}`} className="transition-colors hover:text-white">
-              {site.contactEmail}
-            </a>
-          )}
         </div>
       </div>
     </footer>
