@@ -3,10 +3,14 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { WarpBackground } from "@/components/magicui/warp-background";
 import QuestionForm from "@/components/QuestionForm";
 import { ANSWERER, type QnaEntry } from "@/lib/qna";
 
 type Filter = "all" | "answered" | "waiting";
+
+/** 빔 색. 원본의 무작위 무지개색 대신 히어로 팔레트를 쓴다. */
+const BEAM_COLORS = ["#c98a94", "#e3c8bd", "#a8a6c1", "#efcadd"];
 
 /** 목록에 붙일 글 번호. 필터를 바꿔도 번호가 흔들리지 않게 전체 기준으로 매긴다. */
 interface NumberedEntry extends QnaEntry {
@@ -222,6 +226,41 @@ export default function QnaBoard({
                 <Row key={entry.id} entry={entry} highlighted={entry.id === postedId} />
               ))}
             </div>
+          )}
+
+          {/*
+            글이 적으면 목록 아래가 통째로 비었다. 마무리 CTA를 두어 그 공간을
+            채우고, 다 읽고 내려온 사람에게 질문할 곳을 한 번 더 보여준다.
+          */}
+          {!failed && (
+            <WarpBackground
+              className="mt-14 rounded-[24px] border-[var(--line)] p-8 sm:p-12"
+              gridColor="rgba(255,255,255,0.055)"
+              beamColors={BEAM_COLORS}
+              beamsPerSide={2}
+              beamSize={6}
+              beamDuration={6}
+              beamDelayMax={5}
+            >
+              <div className="text-center">
+                <p className="font-display text-xs tracking-widest text-[var(--muted)] uppercase">
+                  Still Curious?
+                </p>
+                <p className="body-copy mx-auto mt-3 max-w-sm break-keep text-white">
+                  아직 궁금한 점이 남아 있다면 편하게 남겨주세요.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenCount((n) => n + 1);
+                    setFormOpen(true);
+                  }}
+                  className="btn-ghost mt-6 inline-flex items-center gap-2 px-6 py-3 text-xs"
+                >
+                  <Plus className="h-3.5 w-3.5" /> 질문 남기기
+                </button>
+              </div>
+            </WarpBackground>
           )}
           </div>
       </div>
