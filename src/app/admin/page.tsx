@@ -3,6 +3,7 @@
 import { Check, ChevronDown, Loader2, Mail, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { formatMeetingAt, fromDateTimeLocalKst, toDateTimeLocalKst } from "@/lib/format";
+import { formatSlot } from "@/lib/meeting-slots";
 import { canonicalStatus, STATUS_FLOW } from "@/lib/status";
 
 /**
@@ -22,6 +23,7 @@ interface Row {
   position: string;
   status: string;
   meetingAt: string;
+  preferredSlot: string;
   zoomUrl: string;
   notice: string;
   notifiedLog: string;
@@ -119,6 +121,26 @@ function ApplicantCard({
       </div>
 
       <p className="mt-2 text-xs break-all text-[var(--muted)]">{row.email}</p>
+
+      {row.preferredSlot && (
+        <p className="mt-3 text-sm text-[var(--text-dim)]">
+          희망{" "}
+          <span className="text-white">{formatSlot(row.preferredSlot)}</span>
+          <button
+            type="button"
+            onClick={() => {
+              // 지원자가 원한 시각을 확정 일정으로 그대로 옮긴다. 손으로 옮겨
+              // 적다가 시간을 틀리는 것이 이 화면에서 제일 잦은 실수다.
+              setDraft((d) => ({ ...d, meetingAt: toDateTimeLocalKst(row.preferredSlot) }));
+              setOpen(true);
+              setSaved(false);
+            }}
+            className="ml-2 rounded-full border border-[var(--line)] px-2.5 py-0.5 text-xs text-[var(--muted)] transition-colors hover:text-white"
+          >
+            이 시간으로
+          </button>
+        </p>
+      )}
 
       {when && (
         <p className="mt-3 text-sm text-[var(--text-dim)]">
