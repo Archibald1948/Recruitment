@@ -49,14 +49,11 @@ export default function Marquee({ top, bottom }: { top: string[]; bottom: string
       aria-label="협업 도구와 기술 스택"
       className="relative z-10 -mt-px overflow-hidden pt-20 pb-10 sm:pt-28 md:pt-36"
     >
-      <div className="flex flex-col gap-3">
+      {/* 양 끝 페이드: 배경을 덧칠하면 뒤의 광선까지 잘리므로 마스크로 깎는다 */}
+      <div className="flex flex-col gap-3 [mask-image:linear-gradient(to_right,transparent_0,#000_4rem,#000_calc(100%-4rem),transparent_100%)] md:[mask-image:linear-gradient(to_right,transparent_0,#000_8rem,#000_calc(100%-8rem),transparent_100%)]">
         <Row items={top} offset={offset} reverse={false} />
         <Row items={bottom} offset={offset} reverse />
       </div>
-
-      {/* 양 끝 페이드 */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#0c0c0c] to-transparent md:w-32" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#0c0c0c] to-transparent md:w-32" />
     </section>
   );
 }
