@@ -93,12 +93,15 @@ function useTypewriter(values: string[] | undefined, active: boolean) {
 
   if (!values?.length) return null;
   // 모션을 줄인 환경에서는 첫 값을 그대로 보여준다.
-  return reduced ? values[0] : text;
+  if (reduced) return { typed: values[0], word: values[0] };
+  // word(지금 치고 있는 단어 전체)는 글자가 늘어도 자리가 안 밀리도록
+  // 폭을 미리 잡는 데 쓴다.
+  return { typed: text, word: values[wordIndex % values.length] };
 }
 
 function StatItem({ stat, index, active }: { stat: Stat; index: number; active: boolean }) {
   const n = useCountUp(stat.value, index, active);
-  const typed = useTypewriter(stat.values, active);
+  const tw = useTypewriter(stat.values, active);
 
   return (
     <div
@@ -116,16 +119,31 @@ function StatItem({ stat, index, active }: { stat: Stat; index: number; active: 
         className="tabular font-medium text-white"
         style={{ fontSize: "clamp(18px, 2.2vw, 26px)", letterSpacing: "-0.025em" }}
       >
-        {typed !== null ? (
-          // 글자 수가 달라도 자리가 흔들리지 않도록 가장 긴 값으로 폭을 잡는다.
-          <span className="relative inline-grid justify-items-start">
-            <span aria-hidden className="invisible col-start-1 row-start-1 select-none">
+        {tw !== null ? (
+          // 상자를 두 겹으로 둔다.
+          // 바깥: 가장 긴 값으로 열 폭을 고정한다. 단어가 바뀌어도 옆 지표가 밀리지 않는다.
+          // 안쪽: 지금 단어 폭만큼만 잡고 왼쪽 정렬한다. 글자가 늘어도 이미 쓴 글자가
+          //       밀리지 않는다. 이 상자 자체가 바깥에서 가운데 놓이므로 단어는
+          //       글자 수와 무관하게 중앙에 온다.
+          <span className="relative inline-grid justify-items-center">
+            <span
+              aria-hidden
+              className="invisible col-start-1 row-start-1 select-none whitespace-pre"
+            >
               {stat.values?.reduce((a, b) => (b.length > a.length ? b : a), "")}|
             </span>
-            <span className="col-start-1 row-start-1 whitespace-pre">
-              {typed}
-              <span aria-hidden className="anim-caret font-normal text-white/70">
-                |
+            <span className="relative col-start-1 row-start-1 inline-grid justify-items-start">
+              <span
+                aria-hidden
+                className="invisible col-start-1 row-start-1 select-none whitespace-pre"
+              >
+                {tw.word}|
+              </span>
+              <span className="col-start-1 row-start-1 whitespace-pre">
+                {tw.typed}
+                <span aria-hidden className="anim-caret font-normal text-white/70">
+                  |
+                </span>
               </span>
             </span>
           </span>
