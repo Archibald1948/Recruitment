@@ -49,25 +49,56 @@ function useCountUp(target: number, index: number, active: boolean) {
   return reduced ? target : n;
 }
 
-/** 값들을 순서대로 돌려가며 보여준다. */
-function useRotation(values: string[] | undefined, active: boolean) {
+/**
+ * 값들을 타자기처럼 한 글자씩 쳤다 지우며 순서대로 보여준다.
+ *
+ *   빈 화면(커서 깜빡임) → 한 글자씩 입력 → 잠시 유지 → 한 글자씩 삭제 → 다음 값
+ *
+ * 각 단계가 끝날 때마다 다음 단계를 예약하는 방식이라, 단계별로 다른 속도를 줄 수 있다.
+ * 지우는 속도는 치는 속도보다 빨라야 자연스럽다.
+ */
+const TYPE_MS = 85;
+const DELETE_MS = 45;
+const HOLD_MS = 1700;
+const BLANK_MS = 420;
+
+function useTypewriter(values: string[] | undefined, active: boolean) {
   const reduced = usePrefersReducedMotion();
-  const [i, setI] = useState(0);
+  const [text, setText] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    if (!values || values.length < 2 || !active || reduced) return;
-    const id = window.setInterval(() => {
-      setI((prev) => (prev + 1) % values.length);
-    }, 2000);
-    return () => window.clearInterval(id);
-  }, [values, active, reduced]);
+    if (!values?.length || !active || reduced) return;
 
-  return values ? values[i % values.length] : null;
+    const word = values[wordIndex % values.length];
+    const done = !deleting && text === word;
+    const emptied = deleting && text === "";
+
+    const delay = done ? HOLD_MS : emptied ? BLANK_MS : deleting ? DELETE_MS : TYPE_MS;
+
+    const id = window.setTimeout(() => {
+      if (done) {
+        setDeleting(true);
+      } else if (emptied) {
+        setDeleting(false);
+        setWordIndex((i) => i + 1);
+      } else {
+        setText(deleting ? word.slice(0, text.length - 1) : word.slice(0, text.length + 1));
+      }
+    }, delay);
+
+    return () => window.clearTimeout(id);
+  }, [values, active, reduced, text, deleting, wordIndex]);
+
+  if (!values?.length) return null;
+  // 모션을 줄인 환경에서는 첫 값을 그대로 보여준다.
+  return reduced ? values[0] : text;
 }
 
 function StatItem({ stat, index, active }: { stat: Stat; index: number; active: boolean }) {
   const n = useCountUp(stat.value, index, active);
-  const rotating = useRotation(stat.values, active);
+  const typed = useTypewriter(stat.values, active);
 
   return (
     <div
@@ -85,14 +116,17 @@ function StatItem({ stat, index, active }: { stat: Stat; index: number; active: 
         className="tabular font-medium text-white"
         style={{ fontSize: "clamp(18px, 2.2vw, 26px)", letterSpacing: "-0.025em" }}
       >
-        {rotating !== null ? (
+        {typed !== null ? (
           // 글자 수가 달라도 자리가 흔들리지 않도록 가장 긴 값으로 폭을 잡는다.
-          <span className="relative inline-grid place-items-center">
+          <span className="relative inline-grid justify-items-start">
             <span aria-hidden className="invisible col-start-1 row-start-1 select-none">
-              {stat.values?.reduce((a, b) => (b.length > a.length ? b : a), "")}
+              {stat.values?.reduce((a, b) => (b.length > a.length ? b : a), "")}|
             </span>
-            <span key={rotating} className="anim-rotate col-start-1 row-start-1">
-              {rotating}
+            <span className="col-start-1 row-start-1 whitespace-pre">
+              {typed}
+              <span aria-hidden className="anim-caret font-normal text-white/70">
+                |
+              </span>
             </span>
           </span>
         ) : (

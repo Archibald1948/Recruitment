@@ -241,19 +241,20 @@ body {
   will-change: transform;
 }
 
-@keyframes rotateIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
+/* 타자기 커서. step-end로 부드럽게 페이드하지 않고 딱딱 깜빡이게 한다. */
+@keyframes caretBlink {
+  0%,
+  49% {
     opacity: 1;
-    transform: none;
+  }
+  50%,
+  100% {
+    opacity: 0;
   }
 }
 
-.anim-rotate {
-  animation: rotateIn 0.45s var(--ease-hero) both;
+.anim-caret {
+  animation: caretBlink 1s step-end infinite;
 }
 
 @keyframes headlineFade {
