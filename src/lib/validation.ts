@@ -1,5 +1,6 @@
 import { positionById, positions, site } from "@/config/site";
 import { formatPhone, isPlausiblePhone, normalizeUrl } from "./format";
+import { isSelectableSlot } from "./meeting-slots";
 
 export interface ApplicationInput {
   name: string;
@@ -11,6 +12,8 @@ export interface ApplicationInput {
   experience?: string;
   portfolio?: string;
   availability: string;
+  /** 지원자가 고른 화상 미팅 희망 시간. "2026-09-12T09:00" 꼴 */
+  meetingSlot: string;
   agree: boolean;
   answers: Record<string, string>;
   ref?: string;
@@ -48,6 +51,7 @@ export function validateApplication(
     experience: str(body.experience) || undefined,
     portfolio: normalizeUrl(str(body.portfolio)) || undefined,
     availability: str(body.availability),
+    meetingSlot: str(body.meetingSlot),
     agree: body.agree === true || body.agree === "true",
     answers: {},
     ref: str(body.ref).slice(0, 60) || undefined,
@@ -88,6 +92,14 @@ export function validateApplication(
   if (!value.availability) errors.availability = "참여 가능 시간을 선택해 주세요.";
   else if (!site.availability.includes(value.availability as never))
     errors.availability = "선택지에서 골라주세요.";
+
+  /*
+   * 화면에서 고를 수 없는 시간대라도 API를 직접 부르면 넘길 수 있다. 규칙을
+   * 만든 함수로 여기서 한 번 더 확인한다.
+   */
+  if (!value.meetingSlot) errors.meetingSlot = "희망 미팅 시간을 선택해 주세요.";
+  else if (!isSelectableSlot(value.meetingSlot))
+    errors.meetingSlot = "선택할 수 없는 시간입니다. 목록에서 다시 골라주세요.";
 
   if (!value.agree) errors.agree = "개인정보 수집·이용에 동의해 주세요.";
 

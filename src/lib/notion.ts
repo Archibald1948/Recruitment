@@ -1,5 +1,6 @@
 import { Client } from "@notionhq/client";
 import type { ApplicationInput } from "./validation";
+import { slotToIso } from "./meeting-slots";
 import { serializeAnswers } from "./validation";
 import { positionById } from "@/config/site";
 
@@ -30,6 +31,7 @@ export const PROP = {
   zoomUrl: "줌 링크",
   notice: "안내 메시지",
   notifiedLog: "안내 발송",
+  preferredSlot: "희망 미팅 시간",
 } as const;
 
 export { STATUS_FLOW, type ApplicationStatus } from "./status";
@@ -115,6 +117,7 @@ export interface ApplicationRecord {
   ref: string;
   tokenHash: string;
   meetingAt: string;
+  preferredSlot: string;
   zoomUrl: string;
   notice: string;
   notifiedLog: string;
@@ -140,6 +143,7 @@ function toRecord(page: any): ApplicationRecord {
     ref: readSelect(p[PROP.ref]),
     tokenHash: readText(p[PROP.tokenHash]),
     meetingAt: p[PROP.meetingAt]?.date?.start ?? "",
+    preferredSlot: p[PROP.preferredSlot]?.date?.start ?? "",
     zoomUrl: p[PROP.zoomUrl]?.url ?? "",
     notice: readText(p[PROP.notice]),
     notifiedLog: readText(p[PROP.notifiedLog]),
@@ -158,6 +162,9 @@ function buildProperties(input: ApplicationInput): Record<string, any> {
     [PROP.experience]: { rich_text: text(input.experience) },
     [PROP.answers]: { rich_text: text(serializeAnswers(input.position, input.answers)) },
     [PROP.availability]: { select: { name: input.availability } },
+    [PROP.preferredSlot]: {
+      date: input.meetingSlot ? { start: slotToIso(input.meetingSlot) } : null,
+    },
     [PROP.agree]: { checkbox: input.agree },
   };
 
