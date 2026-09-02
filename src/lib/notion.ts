@@ -39,20 +39,29 @@ export function notion(): Client {
   return client;
 }
 
-let dataSourceIdCache: string | null = null;
+const dataSourceIdCache = new Map<string, string>();
 
-/** 데이터베이스 id로부터 data source id를 한 번만 조회해 캐시한다. */
-export async function getDataSourceId(): Promise<string> {
-  if (dataSourceIdCache) return dataSourceIdCache;
+/**
+ * 데이터베이스 id로부터 data source id를 한 번만 조회해 캐시한다.
+ *
+ * data source id를 환경변수로 직접 주면 조회를 건너뛴다. 지원자 DB와 Q&A DB가
+ * 각각 다른 변수 쌍을 쓰므로 캐시는 환경변수 이름을 키로 잡는다.
+ */
+export async function resolveDataSourceId(
+  dataSourceEnv: string,
+  databaseEnv: string,
+): Promise<string> {
+  const cached = dataSourceIdCache.get(dataSourceEnv);
+  if (cached) return cached;
 
-  const explicit = process.env.NOTION_DATA_SOURCE_ID;
+  const explicit = process.env[dataSourceEnv]?.trim();
   if (explicit) {
-    dataSourceIdCache = explicit;
+    dataSourceIdCache.set(dataSourceEnv, explicit);
     return explicit;
   }
 
-  const databaseId = process.env.NOTION_DATABASE_ID;
-  if (!databaseId) throw new Error("NOTION_DATABASE_ID 환경변수가 설정되지 않았습니다.");
+  const databaseId = process.env[databaseEnv]?.trim();
+  if (!databaseId) throw new Error(`${databaseEnv} 환경변수가 설정되지 않았습니다.`);
 
   const db = (await notion().databases.retrieve({ database_id: databaseId })) as unknown as {
     data_sources?: { id: string }[];
@@ -60,8 +69,13 @@ export async function getDataSourceId(): Promise<string> {
   const id = db.data_sources?.[0]?.id;
   if (!id) throw new Error("해당 데이터베이스에서 data source를 찾지 못했습니다.");
 
-  dataSourceIdCache = id;
+  dataSourceIdCache.set(dataSourceEnv, id);
   return id;
+}
+
+/** 지원자 관리 DB */
+export function getDataSourceId(): Promise<string> {
+  return resolveDataSourceId("NOTION_DATA_SOURCE_ID", "NOTION_DATABASE_ID");
 }
 
 /* ── 속성 헬퍼 ─────────────────────────────────────────────── */
