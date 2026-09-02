@@ -55,6 +55,15 @@ function from(): string {
   return process.env.MAIL_FROM || `"${label}" <onboarding@resend.dev>`;
 }
 
+/**
+ * 모든 메일 끝에 붙는 회신 안내.
+ *
+ * 발신 주소가 곧 수신함이다. 지원자가 일정 변경 같은 걸 알릴 곳이 없으면
+ * 답이 갈 데가 없어진다.
+ */
+const REPLY_NOTE =
+  "기타 문의 사항 및 변동 사항 있으시면 해당 메일로 회신 부탁드립니다.";
+
 const shell = (
   title: string,
   body: string,
@@ -65,6 +74,9 @@ const shell = (
     <h1 style="margin:0 0 20px;font-size:19px;line-height:1.4;color:#fff">${title}</h1>
     <div style="font-size:14px;line-height:1.75;color:#d7e2ea">${body}</div>
     <hr style="border:0;border-top:1px solid rgba(215,226,234,.15);margin:28px 0 16px" />
+    <p style="margin:0 0 12px;font-size:13px;line-height:1.7;color:#d7e2ea">
+      ${REPLY_NOTE}
+    </p>
     <p style="margin:0;font-size:12px;line-height:1.6;color:#8e8e8e">
       ${note}<br />
       ${site.privacyNotice}
@@ -143,6 +155,8 @@ export async function sendApplicationReceipt(opts: {
     `이 링크는 본인만 접근할 수 있으니 공유하지 말아주세요.`,
     ``,
     opts.editUrl,
+    ``,
+    REPLY_NOTE,
   ].join("\n");
 
   return deliver(opts.to, subject, html, text);
@@ -250,6 +264,7 @@ export async function sendStatusUpdate(opts: {
     ``,
     opts.notice ?? "",
     opts.joinUrl ? `\n미팅 입장: ${opts.joinUrl}\n(누르는 시점의 최신 링크로 연결됩니다)` : "",
+    `\n${REPLY_NOTE}`,
   ]
     .filter((line) => line !== "")
     .join("\n");
