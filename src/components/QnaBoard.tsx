@@ -1,7 +1,8 @@
 "use client";
 
 import { Plus, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import QuestionForm from "@/components/QuestionForm";
 import { ANSWERER, type QnaEntry } from "@/lib/qna";
 
@@ -22,11 +23,17 @@ function formatDate(iso: string): string {
   }).format(d);
 }
 
-function Row({ entry }: { entry: NumberedEntry }) {
+function Row({ entry, highlighted }: { entry: NumberedEntry; highlighted: boolean }) {
   const answered = !!entry.answer;
 
   return (
-    <article className="border-t border-[var(--line)] py-7">
+    <article
+      id={`qna-${entry.id}`}
+      className={`scroll-mt-8 border-t border-[var(--line)] py-7 transition-colors duration-700 ${
+        // 방금 등록한 글을 잠시 물들여, 목록 어디에 들어갔는지 눈으로 잡히게 한다.
+        highlighted ? "-mx-4 rounded-2xl bg-white/[0.06] px-4" : ""
+      }`}
+    >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="font-display text-xs tracking-widest text-[var(--muted)]/70">
           #{String(entry.no).padStart(3, "0")}
@@ -42,13 +49,15 @@ function Row({ entry }: { entry: NumberedEntry }) {
         </span>
         <span className="text-xs text-[var(--muted)]">{entry.nickname || "익명"}</span>
         <span className="text-xs text-[var(--muted)]/60">{formatDate(entry.createdAt)}</span>
+        {highlighted && (
+          <span className="rounded-full bg-[#c98a94]/20 px-2.5 py-0.5 text-xs text-[#e3c8bd]">
+            방금 등록
+          </span>
+        )}
       </div>
 
       <div className="mt-4 flex gap-3">
-        <span
-          aria-hidden
-          className="font-display shrink-0 text-sm leading-6 text-[#c98a94]"
-        >
+        <span aria-hidden className="font-display shrink-0 text-sm leading-6 text-[#c98a94]">
           Q
         </span>
         <p className="body-copy min-w-0 break-keep whitespace-pre-wrap text-white">
@@ -59,10 +68,7 @@ function Row({ entry }: { entry: NumberedEntry }) {
       {answered && (
         <div className="mt-5 rounded-[18px] border border-[var(--line)] bg-white/[0.04] p-5 sm:ml-7">
           <div className="flex gap-3">
-            <span
-              aria-hidden
-              className="font-display shrink-0 text-sm leading-6 text-[#e3c8bd]"
-            >
+            <span aria-hidden className="font-display shrink-0 text-sm leading-6 text-[#e3c8bd]">
               A
             </span>
             <div className="min-w-0">
@@ -94,12 +100,24 @@ export default function QnaBoard({
 }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [formOpen, setFormOpen] = useState(false);
+  const [postedId, setPostedId] = useState<string | null>(null);
 
   // 목록은 최신순으로 들어온다. 가장 오래된 글이 1번이 되도록 뒤에서부터 센다.
   const numbered = useMemo<NumberedEntry[]>(
     () => entries.map((e, i) => ({ ...e, no: entries.length - i })),
     [entries],
   );
+
+  // 등록 직후: 서버가 목록을 다시 내려주면 그 글로 스크롤하고 잠시 강조한다.
+  // entries가 갱신될 때마다 확인하므로, refresh가 늦게 끝나도 놓치지 않는다.
+  useEffect(() => {
+    if (!postedId) return;
+    const el = document.getElementById(`qna-${postedId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    const t = setTimeout(() => setPostedId(null), 3200);
+    return () => clearTimeout(t);
+  }, [postedId, entries]);
 
   const answeredCount = numbered.filter((e) => e.answer).length;
   const tabs: { key: Filter; label: string; count: number }[] = [
@@ -112,16 +130,32 @@ export default function QnaBoard({
     filter === "all" ? true : filter === "answered" ? !!e.answer : !e.answer,
   );
 
+  const hasList = !failed && numbered.length > 0;
+
   return (
-    <>
-      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <p className="body-copy max-w-md break-keep text-[var(--text-dim)]/60">
+    <div className="lg:flex lg:items-start lg:gap-16">
+      {/*
+        넓은 화면에서는 제목·설명·필터를 왼쪽 기둥으로 세운다. 한 줄로 길게
+        늘어놓으면 양옆이 비고, 목록을 읽는 동안 필터가 화면 밖으로 나간다.
+        sticky로 붙여 스크롤 중에도 필터에 손이 닿게 한다.
+      */}
+      <aside className="lg:sticky lg:top-16 lg:w-60 lg:shrink-0">
+        <Link
+          href="/"
+          className="font-display text-xs tracking-widest text-[var(--muted)] uppercase transition-colors hover:text-white"
+        >
+          &lt; 모집 공고
+        </Link>
+
+        <h1 className="mt-6 text-2xl font-medium text-white md:text-3xl">Q&amp;A</h1>
+        <p className="body-copy mt-4 break-keep text-[var(--text-dim)]/60">
           지원 전 궁금한 점을 남겨주세요. {ANSWERER}이 확인하고 답변을 답니다.
         </p>
+
         <button
           type="button"
           onClick={() => setFormOpen((v) => !v)}
-          className="btn-ghost inline-flex shrink-0 items-center gap-2 px-6 py-3 text-xs"
+          className="btn-ghost mt-6 inline-flex items-center gap-2 px-6 py-3 text-xs"
           aria-expanded={formOpen}
         >
           {formOpen ? (
@@ -134,35 +168,41 @@ export default function QnaBoard({
             </>
           )}
         </button>
-      </div>
 
-      {formOpen && (
-        <div className="mb-12">
-          <QuestionForm />
-        </div>
-      )}
+        {hasList && (
+          <div className="mt-8 flex flex-wrap gap-2 lg:flex-col lg:gap-1">
+            {tabs.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setFilter(t.key)}
+                aria-pressed={filter === t.key}
+                className={`rounded-full border px-4 py-2 text-xs transition-colors lg:flex lg:w-full lg:items-center lg:justify-between ${
+                  filter === t.key
+                    ? "border-white bg-white font-medium text-[#0c0c0c]"
+                    : "border-[var(--line)] text-[var(--muted)] hover:text-white"
+                }`}
+              >
+                <span>{t.label}</span> <span className="tabular">{t.count}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </aside>
 
-      {!failed && numbered.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {tabs.map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setFilter(t.key)}
-              aria-pressed={filter === t.key}
-              className={`rounded-full border px-4 py-2 text-xs transition-colors ${
-                filter === t.key
-                  ? "border-white bg-white font-medium text-[#0c0c0c]"
-                  : "border-[var(--line)] text-[var(--muted)] hover:text-white"
-              }`}
-            >
-              {t.label} <span className="tabular">{t.count}</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="mt-10 min-w-0 flex-1 lg:mt-0">
+        {formOpen && (
+          <div className="mb-12">
+            <QuestionForm
+              onPosted={(id) => {
+                // 새 글은 언제나 "답변 대기"다. 답변 완료 탭에 있으면 안 보인다.
+                setFilter("all");
+                setPostedId(id);
+              }}
+            />
+          </div>
+        )}
 
-      <section className="mt-6">
         {failed ? (
           <p className="rounded-[20px] border border-[var(--line)] px-6 py-10 text-center text-sm text-[var(--muted)]">
             질문 목록을 불러오지 못했습니다. 잠시 후 새로고침해 주세요.
@@ -178,11 +218,11 @@ export default function QnaBoard({
         ) : (
           <div className="flex flex-col border-b border-[var(--line)]">
             {shown.map((entry) => (
-              <Row key={entry.id} entry={entry} />
+              <Row key={entry.id} entry={entry} highlighted={entry.id === postedId} />
             ))}
           </div>
         )}
-      </section>
-    </>
+      </div>
+    </div>
   );
 }

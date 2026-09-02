@@ -76,9 +76,13 @@ export async function listQuestions(limit = 100): Promise<QnaEntry[]> {
   return (res.results ?? []).map(toEntry).filter((e: QnaEntry) => e.question);
 }
 
-export async function createQuestion(input: { nickname: string; question: string }) {
+/** 생성된 페이지 id를 돌려준다. 등록 직후 목록에서 그 글을 찾아 이동하는 데 쓴다. */
+export async function createQuestion(input: {
+  nickname: string;
+  question: string;
+}): Promise<string> {
   const data_source_id = await qnaDataSourceId();
-  await notion().pages.create({
+  const page = await notion().pages.create({
     parent: { type: "data_source_id", data_source_id } as any,
     properties: {
       [QNA_PROP.question]: { title: chunk(input.question) },
@@ -87,4 +91,5 @@ export async function createQuestion(input: { nickname: string; question: string
       [QNA_PROP.published]: { checkbox: true },
     } as any,
   });
+  return (page as any).id as string;
 }

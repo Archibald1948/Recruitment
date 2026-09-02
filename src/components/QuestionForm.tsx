@@ -11,7 +11,12 @@ import { QNA_MAX_NICKNAME, QNA_MAX_QUESTION, validateQuestion } from "@/lib/vali
  * 등록에 성공하면 서버가 /qna를 재검증하므로 router.refresh()로 목록을
  * 다시 받아 방금 쓴 글이 바로 보이게 한다.
  */
-export default function QuestionForm() {
+export default function QuestionForm({
+  onPosted,
+}: {
+  /** 등록된 글의 id. 부모가 목록에서 그 글로 이동시킨다. */
+  onPosted?: (id: string) => void;
+}) {
   const router = useRouter();
   const [values, setValues] = useState({ nickname: "", question: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,6 +71,7 @@ export default function QuestionForm() {
       setValues({ nickname: values.nickname, question: "" });
       setDone(true);
       router.refresh();
+      if (typeof data.id === "string") onPosted?.(data.id);
     } catch {
       setNotice("네트워크 오류입니다. 연결을 확인하고 다시 시도해 주세요.");
     } finally {

@@ -37,8 +37,9 @@ export async function POST(req: Request) {
     );
   }
 
+  let id: string;
   try {
-    await createQuestion({ nickname: value.nickname, question: value.question });
+    id = await createQuestion({ nickname: value.nickname, question: value.question });
   } catch (e) {
     console.error("[qna] 등록 실패:", e);
     return NextResponse.json(
@@ -50,5 +51,5 @@ export async function POST(req: Request) {
   // 방금 쓴 글이 목록에 바로 보여야 한다. ISR 주기를 기다리지 않는다.
   revalidatePath("/qna");
 
-  return NextResponse.json({ posted: true });
+  return NextResponse.json({ posted: true, id });
 }

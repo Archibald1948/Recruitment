@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import QnaBoard from "@/components/QnaBoard";
 import { listQuestions, type QnaEntry } from "@/lib/qna";
 
@@ -25,16 +24,7 @@ export default async function QnaPage() {
 
   return (
     <main className="min-h-screen bg-[#0c0c0c] px-5 py-16 sm:px-8 md:px-10 md:py-24">
-      <div className="mx-auto max-w-2xl">
-        <Link
-          href="/"
-          className="font-display text-xs tracking-widest text-[var(--muted)] uppercase transition-colors hover:text-white"
-        >
-          &lt; 모집 공고
-        </Link>
-
-        <h1 className="mt-6 mb-4 text-2xl font-medium text-white md:text-3xl">Q&amp;A</h1>
-
+      <div className="mx-auto max-w-5xl">
         <QnaBoard entries={entries} failed={failed} />
       </div>
     </main>
