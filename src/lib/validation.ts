@@ -118,3 +118,44 @@ export function serializeAnswers(positionId: string, answers: Record<string, str
     .map((q) => `[${q.label}]\n${answers[q.id]}`)
     .join("\n\n");
 }
+
+
+export interface ContactInput {
+  name: string;
+  email: string;
+  message: string;
+  /** 허니팟 — 사람이면 비어 있어야 한다 */
+  company?: string;
+}
+
+const MAX_MESSAGE = 1000;
+
+export function validateContact(raw: unknown): {
+  ok: boolean;
+  errors: Errors;
+  value: ContactInput;
+} {
+  const body = (raw ?? {}) as Record<string, unknown>;
+  const errors: Errors = {};
+
+  const value: ContactInput = {
+    name: str(body.name),
+    email: str(body.email).toLowerCase(),
+    message: str(body.message),
+    company: str(body.company) || undefined,
+  };
+
+  if (!value.name) errors.name = "이름을 입력해 주세요.";
+  else if (value.name.length > MAX.name) errors.name = `이름은 ${MAX.name}자 이내로 입력해 주세요.`;
+
+  if (!value.email) errors.email = "답장받을 이메일을 입력해 주세요.";
+  else if (!EMAIL_RE.test(value.email)) errors.email = "이메일 형식이 올바르지 않습니다.";
+
+  if (!value.message) errors.message = "문의 내용을 입력해 주세요.";
+  else if (value.message.length > MAX_MESSAGE)
+    errors.message = `${MAX_MESSAGE}자 이내로 줄여주세요. (현재 ${value.message.length}자)`;
+
+  return { ok: Object.keys(errors).length === 0, errors, value };
+}
+
+export const CONTACT_MAX_MESSAGE = MAX_MESSAGE;
