@@ -186,9 +186,9 @@ const STATUS_COPY: Record<string, { subject: string; lead: (name: string) => str
     subject: "[팀 프로젝트] 서류 검토가 시작되었습니다",
     lead: (n) => `${n}님, 제출해 주신 지원서를 검토하고 있습니다.`,
   },
-  "줌 미팅": {
-    subject: "[팀 프로젝트] 줌 미팅 안내",
-    lead: (n) => `${n}님, 서류 검토를 통과하셨습니다. 줌 미팅 일정을 안내드립니다.`,
+  "구글 미트": {
+    subject: "[팀 프로젝트] 구글 미트 미팅 안내",
+    lead: (n) => `${n}님, 서류 검토를 통과하셨습니다. 미팅 일정을 안내드립니다.`,
   },
   합류: {
     subject: "[팀 프로젝트] 합류 안내",
@@ -218,7 +218,7 @@ export async function sendStatusUpdate(opts: {
   status: string;
   meetingAt?: string;
   /**
-   * 줌 주소가 아니라 우리 쪽 입장 링크다. 줌 주소를 메일에 박으면 회의를 다시
+   * 미트 주소가 아니라 우리 쪽 입장 링크다. 미트 주소를 메일에 박으면 회의를 다시
    * 만들거나 일정을 옮겼을 때 지원자가 죽은 링크를 받는다.
    */
   joinUrl?: string;
