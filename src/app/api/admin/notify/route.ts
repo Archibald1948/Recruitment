@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     position: record.position,
     status,
     meetingAt: record.meetingAt,
-    // 줌 주소가 아니라 우리 쪽 입장 링크를 싣는다. 링크가 바뀌어도 메일이 살아 있다.
+    // 미팅 주소가 아니라 우리 쪽 입장 링크를 싣는다. 링크가 바뀌어도 메일이 살아 있다.
     joinUrl: record.zoomUrl ? joinUrl(id) : undefined,
     notice: record.notice,
   });

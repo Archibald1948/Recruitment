@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isClosed, positionById } from "@/config/site";
 import { getDeadline } from "@/lib/settings";
 import { createApplication, findByEmail } from "@/lib/notion";
+import { SlotTakenError, withSlot } from "@/lib/slot-lock";
 import { sendApplicationReceipt } from "@/lib/mail";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { createEditToken, editUrl, hashEditToken } from "@/lib/tokens";
@@ -59,7 +60,10 @@ export async function POST(req: Request) {
     }
 
     const token = createEditToken();
-    const page = await createApplication(value, hashEditToken(token));
+    // 확인과 생성을 한 덩어리로 묶는다. 사이가 벌어지면 두 명이 같은 칸에 들어간다.
+    const page = await withSlot(value.meetingSlot, undefined, () =>
+      createApplication(value, hashEditToken(token)),
+    );
     const url = editUrl(page.id, token);
 
     const mail = await sendApplicationReceipt({
@@ -74,6 +78,10 @@ export async function POST(req: Request) {
       { status: 201 },
     );
   } catch (e) {
+    // 같은 칸을 먼저 가져간 사람이 있으면 지원자가 다시 고를 수 있게 따로 알린다.
+    if (e instanceof SlotTakenError) {
+      return NextResponse.json({ errors: { meetingSlot: e.message } }, { status: 409 });
+    }
     console.error("[apply] 접수 실패:", e);
     return NextResponse.json(
       { error: "접수 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요." },

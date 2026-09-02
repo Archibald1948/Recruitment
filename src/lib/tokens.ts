@@ -72,7 +72,7 @@ export function verifyJoinToken(pageId: string, token: string): boolean {
 /**
  * 미팅 입장 링크.
  *
- * 줌 주소를 직접 싣지 않는다. 눌린 순간 노션의 지금 값으로 넘겨주므로,
+ * 미팅 주소를 직접 싣지 않는다. 눌린 순간 노션의 지금 값으로 넘겨주므로,
  * 메일을 보낸 뒤에 링크가 바뀌어도 같은 주소가 계속 통한다.
  */
 export function joinUrl(pageId: string): string {

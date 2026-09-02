@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isClosed, positionById, positions } from "@/config/site";
 import { getDeadline } from "@/lib/settings";
 import { appendHistory, getApplication, updateApplication } from "@/lib/notion";
+import { SlotTakenError, withSlot } from "@/lib/slot-lock";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { verifyEditToken } from "@/lib/tokens";
 import { validateApplication } from "@/lib/validation";
@@ -70,7 +71,8 @@ export async function PATCH(req: Request, ctx: Ctx) {
   if (!ok) return NextResponse.json({ errors }, { status: 422 });
 
   try {
-    await updateApplication(id, value);
+    // 본인이 이미 잡아둔 자리는 충돌로 보지 않는다.
+    await withSlot(value.meetingSlot, id, () => updateApplication(id, value));
 
     const stamp = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
     await appendHistory(
@@ -81,6 +83,9 @@ export async function PATCH(req: Request, ctx: Ctx) {
     const updated = await getApplication(id);
     return NextResponse.json(updated ? present(updated, await getDeadline()) : { ok: true });
   } catch (e) {
+    if (e instanceof SlotTakenError) {
+      return NextResponse.json({ errors: { meetingSlot: e.message } }, { status: 409 });
+    }
     console.error("[applications] 수정 실패:", e);
     return NextResponse.json({ error: "수정 중 문제가 발생했습니다." }, { status: 500 });
   }

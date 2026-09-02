@@ -49,7 +49,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
   }
   if (zoomUrl && !/^https?:\/\//i.test(zoomUrl)) {
     return NextResponse.json(
-      { error: "줌 링크는 http:// 또는 https:// 로 시작해야 합니다." },
+      { error: "미팅 링크는 http:// 또는 https:// 로 시작해야 합니다." },
       { status: 422 },
     );
   }

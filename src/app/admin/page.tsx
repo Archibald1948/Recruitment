@@ -145,7 +145,7 @@ function ApplicantCard({
       {when && (
         <p className="mt-3 text-sm text-[var(--text-dim)]">
           일시 <span className="text-white">{when}</span>
-          {row.zoomUrl && <span className="ml-2 text-xs text-[var(--muted)]">줌 링크 있음</span>}
+          {row.zoomUrl && <span className="ml-2 text-xs text-[var(--muted)]">미팅 링크 있음</span>}
         </p>
       )}
 
@@ -219,7 +219,7 @@ function ApplicantCard({
           </label>
 
           <label className="block">
-            <span className="field-label">줌 링크</span>
+            <span className="field-label">미팅 링크</span>
             <input
               className="field"
               type="url"
@@ -309,7 +309,7 @@ export default function AdminPage() {
       `${row.name} (${row.email})`,
       `상태: ${status || row.status}`,
       when ? `일시: ${when}` : "",
-      row.zoomUrl ? `줌 링크: 있음` : "줌 링크: 없음",
+      row.zoomUrl ? `미팅 링크: 있음` : "미팅 링크: 없음",
       row.notice ? `안내 메시지: ${row.notice.slice(0, 40)}…` : "안내 메시지: 없음",
       row.notifiedLog ? `\n이미 보낸 기록: ${row.notifiedLog}` : "",
       `\n이 내용으로 안내 메일을 보낼까요?`,
