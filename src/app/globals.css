@@ -25,6 +25,7 @@
 
   --ease-hero: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-fade: cubic-bezier(0.25, 0.1, 0.25, 1);
+
 }
 
 @theme inline {
@@ -32,6 +33,15 @@
   --color-ink: var(--ink);
   --color-dim: var(--text-dim);
   --color-muted: var(--muted);
+  /*
+   * shadcn·Magic UI 계열 컴포넌트가 쓰는 색 이름을 이 사이트 토큰에 이어준다.
+   * 없으면 border-border가 색을 못 찾아 currentColor(흰색)로 떨어져
+   * 흰 테두리가 그어진다. 벤더 컴포넌트 안쪽은 className으로 덮을 수 없어
+   * 여기서 맞춰주는 것이 확실하다.
+   */
+  --color-border: var(--line);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
   --font-display: var(--font-pixel), "Courier New", monospace;
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
