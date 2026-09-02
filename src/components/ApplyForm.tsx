@@ -6,6 +6,7 @@ import { openPositions, positionById, positions, site } from "@/config/site";
 import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
 import { captureRef, readRef } from "@/lib/ref";
+import { useUnsavedGuard } from "@/lib/useUnsavedGuard";
 import { ANSWER_MAX, validateApplication } from "@/lib/validation";
 
 const DRAFT_KEY = "recruit:draft:v1";
@@ -65,6 +66,23 @@ export default function ApplyForm({
   const [saved, setSaved] = useState(false);
   const honeypot = useRef<HTMLInputElement>(null);
 
+  /* ── 이탈 방지 ────────────────────────────────────────────── */
+  // 처음 들어왔을 때의 값. 여기서 달라진 게 있으면 "쓰던 중"이다.
+  // 신규 작성은 임시저장이 복원되면 그 값이 기준이 되므로, 불러오기만 하고
+  // 나가는 경우에는 붙잡지 않는다.
+  // ref로 두면 렌더 중에 읽게 되어 규칙에 걸린다. 값 자체가 렌더 결과를
+  // 바꾸므로 state가 맞다.
+  const [baseline, setBaseline] = useState(() => JSON.stringify({ ...EMPTY, ...initial }));
+  const dirty = !done && JSON.stringify(values) !== baseline;
+
+  useUnsavedGuard(
+    dirty,
+    mode === "edit"
+      ? // 수정 화면은 임시저장이 없다. 저장하지 않으면 그대로 사라진다.
+        "저장하지 않은 수정 내용이 있습니다. 지금 나가면 수정한 내용이 사라집니다. 나가시겠습니까?"
+      : "작성 중인 지원서가 있습니다. 이 브라우저에는 임시 저장되지만 다른 기기에서는 이어서 쓸 수 없습니다. 나가시겠습니까?",
+  );
+
   const selectable = mode === "create" ? openPositions : positions;
   const position = positionById(values.position);
 
@@ -75,8 +93,13 @@ export default function ApplyForm({
       const raw = localStorage.getItem(DRAFT_KEY);
       // localStorage는 서버에 없으므로 초기 state로 넣으면 하이드레이션이 깨진다.
       // 마운트 후 복원이 유일하게 안전한 방법이라 이 규칙만 예외로 둔다.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (raw) setValues((v) => ({ ...v, ...JSON.parse(raw) }));
+      if (raw) {
+        const restored: FormValues = { ...EMPTY, ...JSON.parse(raw) };
+        /* eslint-disable react-hooks/set-state-in-effect */
+        setBaseline(JSON.stringify(restored));
+        setValues(restored);
+        /* eslint-enable react-hooks/set-state-in-effect */
+      }
     } catch {
       /* 저장소를 못 쓰는 브라우저여도 폼은 동작해야 한다 */
     }
@@ -230,6 +253,9 @@ export default function ApplyForm({
       }
 
       if (mode === "edit") {
+        // 저장에 성공했으니 지금 값이 새 기준이다. 그대로 두면 이탈 방지가
+        // 계속 붙잡는다.
+        setBaseline(JSON.stringify(values));
         setSaved(true);
         setTimeout(() => setSaved(false), 4000);
       } else {
