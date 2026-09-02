@@ -13,6 +13,13 @@ const KEY = "recruit:ref";
 /** 알려진 유입처는 보기 좋은 이름으로 정리한다. 노션 셀렉트가 지저분해지지 않게. */
 const KNOWN_HOSTS: Record<string, string> = {
   "everytime.kr": "everytime",
+  "campuspick.com": "campuspick",
+  "linkareer.com": "linkareer",
+  "holaworld.io": "hola",
+  "inflearn.com": "inflearn",
+  "disquiet.io": "disquiet",
+  "threads.net": "threads",
+  "threads.com": "threads",
   "okky.kr": "okky",
   "discord.com": "discord",
   "discord.gg": "discord",
