@@ -159,3 +159,48 @@ export function validateContact(raw: unknown): {
 }
 
 export const CONTACT_MAX_MESSAGE = MAX_MESSAGE;
+
+/* ── Q&A 게시판 ────────────────────────────────────────────── */
+
+export interface QuestionInput {
+  nickname: string;
+  question: string;
+  /** 허니팟 — 사람이면 비어 있어야 한다 */
+  company?: string;
+}
+
+const QNA = { nickname: 20, question: 500 };
+
+/**
+ * 게시판 질문 검증.
+ *
+ * 이메일을 받지 않는다. 공개 게시판이라 답변도 공개로 달리고, 굳이 개인정보를
+ * 새로 모을 이유가 없다. 대신 닉네임으로 본인 글을 알아볼 수 있게 한다.
+ */
+export function validateQuestion(raw: unknown): {
+  ok: boolean;
+  errors: Errors;
+  value: QuestionInput;
+} {
+  const body = (raw ?? {}) as Record<string, unknown>;
+  const errors: Errors = {};
+
+  const value: QuestionInput = {
+    nickname: str(body.nickname),
+    question: str(body.question),
+    company: str(body.company) || undefined,
+  };
+
+  if (!value.nickname) errors.nickname = "닉네임을 입력해 주세요.";
+  else if (value.nickname.length > QNA.nickname)
+    errors.nickname = `닉네임은 ${QNA.nickname}자 이내로 입력해 주세요.`;
+
+  if (!value.question) errors.question = "질문을 입력해 주세요.";
+  else if (value.question.length > QNA.question)
+    errors.question = `${QNA.question}자 이내로 줄여주세요. (현재 ${value.question.length}자)`;
+
+  return { ok: Object.keys(errors).length === 0, errors, value };
+}
+
+export const QNA_MAX_NICKNAME = QNA.nickname;
+export const QNA_MAX_QUESTION = QNA.question;
