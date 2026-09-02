@@ -42,6 +42,9 @@
   --color-border: var(--line);
   --color-background: var(--bg);
   --color-foreground: var(--text);
+  /* 흰 알약에 검은 글씨 — 사이트의 CTA 규칙과 같다 */
+  --color-primary: var(--text);
+  --color-primary-foreground: var(--ink);
   --font-display: var(--font-pixel), "Courier New", monospace;
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
