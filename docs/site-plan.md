@@ -105,6 +105,10 @@ https://builditship.kro.kr/?ref=discord
 https://builditship.kro.kr/?ref=instagram
 ```
 
+- **대부분은 `?ref=` 를 붙일 필요가 없다.** 커뮤니티에서 링크를 타고 들어오면
+  referrer로 유입처가 자동 기록된다. 카카오톡·DM처럼 referrer가 실리지 않는
+  경로에서만 명시적으로 붙인다
+- 손으로 타이핑하지 않도록 `/links`(noindex)에서 채널별 링크를 클릭 한 번으로 복사한다
 - `?ref=` 와 `?utm_source=` 둘 다 받는다
 - **첫 방문 시점에 sessionStorage에 저장한다.** 폼까지 오는 동안 새로고침하거나
   다른 페이지를 거치면 파라미터가 사라지기 때문
