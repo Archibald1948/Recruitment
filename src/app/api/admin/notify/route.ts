@@ -4,6 +4,7 @@ import { sendStatusUpdate } from "@/lib/mail";
 import { getApplication, markNotified } from "@/lib/notion";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { canonicalStatus } from "@/lib/status";
+import { joinUrl } from "@/lib/tokens";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -52,7 +53,8 @@ export async function POST(req: Request) {
     position: record.position,
     status,
     meetingAt: record.meetingAt,
-    zoomUrl: record.zoomUrl,
+    // 줌 주소가 아니라 우리 쪽 입장 링크를 싣는다. 링크가 바뀌어도 메일이 살아 있다.
+    joinUrl: record.zoomUrl ? joinUrl(id) : undefined,
     notice: record.notice,
   });
 

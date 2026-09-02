@@ -203,7 +203,11 @@ export async function sendStatusUpdate(opts: {
   position: string;
   status: string;
   meetingAt?: string;
-  zoomUrl?: string;
+  /**
+   * 줌 주소가 아니라 우리 쪽 입장 링크다. 줌 주소를 메일에 박으면 회의를 다시
+   * 만들거나 일정을 옮겼을 때 지원자가 죽은 링크를 받는다.
+   */
+  joinUrl?: string;
   notice?: string;
 }): Promise<SendResult> {
   if (activeProvider() === "none") {
@@ -220,12 +224,16 @@ export async function sendStatusUpdate(opts: {
       ? `<p style="margin:0 0 16px">일시: <strong style="color:#fff">${esc(when)}</strong></p>`
       : "",
     opts.notice ? paragraphs(opts.notice) : "",
-    opts.zoomUrl
-      ? `<p style="margin:0">
-           <a href="${esc(opts.zoomUrl)}"
+    opts.joinUrl
+      ? `<p style="margin:0 0 12px">
+           <a href="${esc(opts.joinUrl)}"
               style="display:inline-block;background:#fff;color:#0c0c0c;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:600;font-size:14px">
-             줌 미팅 참여하기
+             미팅 입장하기
            </a>
+         </p>
+         <p style="margin:0;font-size:13px;color:rgba(215,226,234,.6)">
+           이 버튼은 누르는 시점의 최신 링크로 연결됩니다. 일정이나 링크가 바뀌어도
+           같은 버튼을 쓰시면 됩니다.
          </p>`
       : "",
   ]
@@ -241,7 +249,7 @@ export async function sendStatusUpdate(opts: {
     when ? `일시: ${when}` : "",
     ``,
     opts.notice ?? "",
-    opts.zoomUrl ? `\n줌 미팅 링크: ${opts.zoomUrl}` : "",
+    opts.joinUrl ? `\n미팅 입장: ${opts.joinUrl}\n(누르는 시점의 최신 링크로 연결됩니다)` : "",
   ]
     .filter((line) => line !== "")
     .join("\n");
