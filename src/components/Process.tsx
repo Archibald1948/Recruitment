@@ -150,7 +150,7 @@ export default function Process() {
   return (
     <section
       id="process"
-      className="relative z-10 -mt-10 rounded-t-[40px] bg-[#0c0c0c]/85 px-5 pt-20 pb-32 sm:-mt-12 sm:rounded-t-[50px] sm:px-8 md:-mt-14 md:rounded-t-[60px] md:px-10"
+      className="relative z-10 -mt-10 rounded-t-[40px] bg-[linear-gradient(to_bottom,#0c0c0c_0px,#0c0c0c_240px,transparent_720px)] px-5 pt-20 pb-32 sm:-mt-12 sm:rounded-t-[50px] sm:px-8 md:-mt-14 md:rounded-t-[60px] md:px-10"
     >
       <SectionDecor items={ORNAMENTS} opacity="opacity-45" />
 
