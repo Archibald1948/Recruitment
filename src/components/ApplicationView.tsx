@@ -6,7 +6,22 @@ import { useEffect, useState } from "react";
 import ApplyForm, { type FormValues } from "@/components/ApplyForm";
 import { positionById } from "@/config/site";
 
-const FLOW = ["접수됨", "서류 검토", "커피챗", "합류"] as const;
+const FLOW = ["접수됨", "서류 검토", "줌 미팅", "합류"] as const;
+
+/** 이름을 바꾸기 전에 저장된 값. 노션 옵션을 아직 안 고쳤어도 단계가 켜지게 한다. */
+const LEGACY: Record<string, string> = { 커피챗: "줌 미팅" };
+
+/**
+ * 노션 상태값을 화면 단계와 맞춘다.
+ *
+ * 문자열이 한 글자라도 어긋나면 indexOf가 -1이 되어 접수됨조차 꺼진 채로 보인다.
+ * 띄어쓰기 차이("줌미팅")와 예전 이름("커피챗")까지 흡수한다.
+ */
+function stepIndex(status: string): number {
+  const squash = (v: string) => v.replace(/\s+/g, "");
+  const name = LEGACY[status.trim()] ?? status;
+  return FLOW.findIndex((step) => squash(step) === squash(name));
+}
 
 interface Record_ {
   id: string;
@@ -28,8 +43,8 @@ interface Record_ {
 }
 
 function StatusTrack({ status }: { status: string }) {
-  const held = status === "보류";
-  const idx = FLOW.indexOf(status as (typeof FLOW)[number]);
+  const held = status.trim() === "보류";
+  const idx = stepIndex(status);
 
   return (
     <div className="rounded-[28px] border border-[var(--line)] bg-white/[0.03] p-6 md:p-8">

@@ -26,7 +26,7 @@ export const PROP = {
   tokenHash: "수정 토큰 해시",
 } as const;
 
-export const STATUS_FLOW = ["접수됨", "서류 검토", "커피챗", "합류", "보류"] as const;
+export const STATUS_FLOW = ["접수됨", "서류 검토", "줌 미팅", "합류", "보류"] as const;
 export type ApplicationStatus = (typeof STATUS_FLOW)[number];
 
 let client: Client | null = null;
