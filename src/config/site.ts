@@ -162,10 +162,10 @@ export const positions: Position[] = [
         required: false,
       },
       {
-        id: "successMetric",
+        id: "userResearch",
         label:
-          "서비스를 출시한 뒤, 잘 되고 있는지를 무엇으로 판단하시겠어요?",
-        placeholder: "보고 싶은 지표나 확인하고 싶은 사용자 반응을 적어주세요.",
+          "사용자의 문제나 니즈를 파악하기 위해 어떤 방식으로 조사해보고 싶나요?",
+        placeholder: "설문·인터뷰·경쟁 서비스 관찰 등, 어떤 방법으로 무엇을 확인하고 싶은지 적어주세요.",
         required: false,
       },
     ],
@@ -253,10 +253,10 @@ export const positions: Position[] = [
         required: false,
       },
       {
-        id: "deployOps",
+        id: "feAlignment",
         label:
-          "서버를 직접 배포하거나 운영해 본 경험이 있다면 알려주세요.",
-        placeholder: "사용한 환경과, 배포하면서 겪은 문제가 있었다면 함께 적어주세요.",
+          "프론트엔드 개발자와 API 명세나 데이터 구조에 대한 의견이 다를 경우, 어떤 방식으로 조율하시겠어요?",
+        placeholder: "무엇을 기준으로 판단하고, 어떻게 이야기를 꺼낼지 적어주세요.",
         required: false,
       },
     ],
@@ -298,10 +298,10 @@ export const positions: Position[] = [
         required: false,
       },
       {
-        id: "designSystem",
+        id: "tradeoff",
         label:
-          "화면이 여러 개로 늘어나도 스타일을 일관되게 유지하려면 무엇이 필요하다고 생각하시나요?",
-        placeholder: "컬러·타이포·컴포넌트를 어떻게 정리해 두실지 적어주세요.",
+          "디자인 완성도와 개발 일정·기술적 제약이 충돌할 경우, 어떤 기준으로 조율하시겠어요?",
+        placeholder: "무엇을 지키고 무엇을 양보할지, 그 판단 기준을 적어주세요.",
         required: false,
       },
     ],
