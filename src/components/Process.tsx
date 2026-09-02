@@ -107,7 +107,7 @@ export default function Process() {
           {[
             { k: "예상 시작일", v: site.startsAt },
             { k: "예상 개발 기간", v: site.duration },
-            { k: "정기 회의", v: `${site.meeting} · Discord 온라인` },
+            { k: "정기 회의", v: `${site.meeting} · Discord 온라인 중심` },
             { k: "진행 방식", v: "온라인 중심 · 필요 시 오프라인" },
           ].map((row) => (
             <div key={row.k} className="border-t border-[var(--line)] pt-4">
