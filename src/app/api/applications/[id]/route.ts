@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isClosed, positionById, positions } from "@/config/site";
+import { getDeadline } from "@/lib/settings";
 import { appendHistory, getApplication, updateApplication } from "@/lib/notion";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
 import { verifyEditToken } from "@/lib/tokens";
@@ -20,11 +21,14 @@ async function authorize(id: string, token: string | null) {
   return { record };
 }
 
-function present(record: NonNullable<Awaited<ReturnType<typeof getApplication>>>) {
+function present(
+  record: NonNullable<Awaited<ReturnType<typeof getApplication>>>,
+  deadline: string,
+) {
   const { tokenHash: _drop, ...safe } = record;
   void _drop;
   const position = positions.find((p) => p.title === safe.position);
-  return { ...safe, positionId: position?.id ?? "", editable: !isClosed() };
+  return { ...safe, positionId: position?.id ?? "", editable: !isClosed(deadline) };
 }
 
 export async function GET(req: Request, ctx: Ctx) {
@@ -34,7 +38,7 @@ export async function GET(req: Request, ctx: Ctx) {
   const auth = await authorize(id, token);
   if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  return NextResponse.json(present(auth.record));
+  return NextResponse.json(present(auth.record, await getDeadline()));
 }
 
 export async function PATCH(req: Request, ctx: Ctx) {
@@ -54,7 +58,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
   const auth = await authorize(id, typeof raw.token === "string" ? raw.token : null);
   if ("error" in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  if (isClosed()) {
+  if (isClosed(await getDeadline())) {
     return NextResponse.json(
       { error: "모집이 마감되어 더 이상 수정할 수 없습니다." },
       { status: 423 },
@@ -75,7 +79,7 @@ export async function PATCH(req: Request, ctx: Ctx) {
     );
 
     const updated = await getApplication(id);
-    return NextResponse.json(updated ? present(updated) : { ok: true });
+    return NextResponse.json(updated ? present(updated, await getDeadline()) : { ok: true });
   } catch (e) {
     console.error("[applications] 수정 실패:", e);
     return NextResponse.json({ error: "수정 중 문제가 발생했습니다." }, { status: 500 });

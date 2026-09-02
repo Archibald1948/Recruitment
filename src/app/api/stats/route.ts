@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { daysLeft, isClosed, openPositions } from "@/config/site";
 import { countApplications } from "@/lib/notion";
+import { getDeadline } from "@/lib/settings";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ const TTL = 60_000;
 let cache: { at: number; applicants: number } | null = null;
 
 export async function GET() {
+  const deadline = await getDeadline();
   let applicants = cache && Date.now() - cache.at < TTL ? cache.applicants : null;
 
   if (applicants === null) {
@@ -27,8 +29,8 @@ export async function GET() {
   return NextResponse.json(
     {
       applicants,
-      daysLeft: daysLeft(),
-      closed: isClosed(),
+      daysLeft: daysLeft(deadline),
+      closed: isClosed(deadline),
       openPositions: openPositions.length,
     },
     { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } },

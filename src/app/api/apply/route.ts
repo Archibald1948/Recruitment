@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { isClosed, positionById } from "@/config/site";
+import { getDeadline } from "@/lib/settings";
 import { createApplication, findByEmail } from "@/lib/notion";
 import { sendApplicationReceipt } from "@/lib/mail";
 import { clientIp, rateLimit } from "@/lib/ratelimit";
@@ -10,7 +11,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-  if (isClosed()) {
+  if (isClosed(await getDeadline())) {
     return NextResponse.json({ error: "모집이 마감되었습니다." }, { status: 410 });
   }
 
