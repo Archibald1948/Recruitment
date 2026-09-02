@@ -1,4 +1,5 @@
 import ApplyForm from "@/components/ApplyForm";
+import QnaPreview from "@/components/QnaPreview";
 import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
@@ -89,6 +90,8 @@ export default function Apply() {
 
       {/* 지원서를 쓰다 막히는 순간 바로 물어볼 수 있게 폼 바로 아래에 둔다. */}
       <div className="relative z-10 mt-20 border-t border-[var(--line)] pt-14">
+        <QnaPreview />
+
         <div className="mx-auto max-w-xl text-center">
           <p className="text-sm text-[var(--text-dim)]/60">
             지원 전에 궁금한 점이 있으신가요?
