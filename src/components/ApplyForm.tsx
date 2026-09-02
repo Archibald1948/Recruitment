@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, Check, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { openPositions, positionById, positions, site } from "@/config/site";
 import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
@@ -448,7 +448,7 @@ export default function ApplyForm({
         </Field>
 
         <Field label="지원 포지션"
-          name="position" required error={errors.position}>
+          name="position" required error={errors.position} as="group">
           <div className="grid gap-2 sm:grid-cols-2">
             {selectable.map((p) => {
               const active = values.position === p.id;
@@ -458,6 +458,8 @@ export default function ApplyForm({
                   key={p.id}
                   type="button"
                   disabled={locked}
+                  // 눌린 상태를 알려주지 않으면 무엇이 선택됐는지 읽어줄 방법이 없다.
+                  aria-pressed={active}
                   onClick={() => set("position", p.id)}
                   className={`rounded-2xl border px-4 py-3.5 text-left transition ${
                     active
@@ -534,12 +536,13 @@ export default function ApplyForm({
         </Field>
 
         <Field label="주간 참여 가능 시간"
-          name="availability" required error={errors.availability}>
+          name="availability" required error={errors.availability} as="group">
           <div className="flex flex-wrap gap-2">
             {site.availability.map((a) => (
               <button
                 key={a}
                 type="button"
+                aria-pressed={values.availability === a}
                 onClick={() => set("availability", a)}
                 className={`rounded-full border px-4 py-2.5 text-sm transition ${
                   values.availability === a
@@ -583,22 +586,33 @@ export default function ApplyForm({
 
         {/* 개인정보 동의 */}
         <div>
-          <label className="flex cursor-pointer items-start gap-3 text-sm text-[var(--text-dim)]">
-            <input
-              type="checkbox"
-              checked={values.agree}
-              onChange={(e) => set("agree", e.target.checked)}
-              aria-invalid={!!errors.agree}
-              className="mt-0.5 h-4 w-4 shrink-0 accent-white"
-            />
-            <span>
-              개인정보 수집·이용에 동의합니다.{" "}
-              <a href="/privacy" target="_blank" className="underline underline-offset-4">
-                수집 항목 보기
-              </a>
-              <span className="mt-1 block text-xs text-[var(--muted)]">{site.privacyNotice}</span>
+          {/*
+            보관 안내는 라벨 밖으로 뺀다. 라벨 안에 두면 체크박스 이름이
+            "개인정보 수집·이용에 동의합니다.수집 항목 보기 수집된 개인정보는…"
+            으로 통째로 읽힌다. 이름은 동의 문구만, 안내는 설명으로 넘긴다.
+          */}
+          <div className="text-sm text-[var(--text-dim)]">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={values.agree}
+                onChange={(e) => set("agree", e.target.checked)}
+                aria-invalid={!!errors.agree}
+                aria-describedby="agree-notice"
+                required
+                className="mt-0.5 h-4 w-4 shrink-0 accent-white"
+              />
+              <span>
+                개인정보 수집·이용에 동의합니다.{" "}
+                <a href="/privacy" target="_blank" className="underline underline-offset-4">
+                  수집 항목 보기
+                </a>
+              </span>
+            </label>
+            <span id="agree-notice" className="mt-1 block pl-7 text-xs text-[var(--muted)]">
+              {site.privacyNotice}
             </span>
-          </label>
+          </div>
           {errors.agree && <p className="field-error">{errors.agree}</p>}
         </div>
 
@@ -660,12 +674,24 @@ function focusFirstError(errors: Errors) {
   if (el && "focus" in el) setTimeout(() => el.focus({ preventScroll: true }), 320);
 }
 
+/**
+ * 라벨 · 힌트 · 오류를 한 벌로 묶는다.
+ *
+ * 예전에는 <label>이 힌트와 오류까지 감싸고 있어서, 스크린리더가 필드 이름을
+ * "이메일 지원 확인과 수정 링크를 여기로 보냅니다. 오타가 있으면…"처럼 통째로
+ * 읽었다. 라벨은 이름만 맡고 설명은 aria-describedby로 넘긴다.
+ *
+ * 선택 버튼 묶음처럼 폼 컨트롤이 하나가 아닌 경우에는 <label>을 쓸 수 없다.
+ * (label은 컨트롤 하나를 가리키는 요소다.) group으로 렌더해 aria-labelledby로
+ * 묶음 전체에 이름을 준다.
+ */
 function Field({
   label,
   required,
   hint,
   error,
   name,
+  as = "label",
   children,
 }: {
   label: string;
@@ -673,21 +699,69 @@ function Field({
   hint?: string;
   error?: string;
   name?: string;
+  /** 컨트롤이 여럿이면 "group" — 버튼 묶음 등 */
+  as?: "label" | "group";
   children: React.ReactNode;
 }) {
-  return (
-    <label className="block" data-field={name}>
-      <span className="field-label">
-        {label}
-        {required && <span className="ml-1 text-[#c98a94]">*</span>}
-      </span>
-      {children}
-      {hint && !error && <span className="mt-2 block text-xs text-[var(--muted)]">{hint}</span>}
+  const id = useId();
+  const labelId = `${id}-label`;
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+  const describedBy = [error ? errorId : null, hint && !error ? hintId : null]
+    .filter(Boolean)
+    .join(" ");
+
+  const heading = (
+    <span className="field-label" id={labelId}>
+      {label}
+      {required && (
+        <span className="ml-1 text-[#c98a94]" aria-hidden>
+          *
+        </span>
+      )}
+    </span>
+  );
+
+  const notes = (
+    <>
+      {hint && !error && (
+        <span id={hintId} className="mt-2 block text-xs text-[var(--muted)]">
+          {hint}
+        </span>
+      )}
       {error && (
-        <span className="field-error block" role="alert">
+        <span id={errorId} className="field-error block" role="alert">
           {error}
         </span>
       )}
-    </label>
+    </>
+  );
+
+  if (as === "group") {
+    return (
+      <div className="block" data-field={name} role="group" aria-labelledby={labelId}>
+        {heading}
+        {children}
+        {notes}
+      </div>
+    );
+  }
+
+  // 컨트롤에 id와 설명 연결을 직접 꽂는다. 호출부마다 적어주면 빠뜨리기 쉽다.
+  const control =
+    React.isValidElement(children) &&
+    React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+      id,
+      required,
+      "aria-required": required || undefined,
+      "aria-describedby": describedBy || undefined,
+    });
+
+  return (
+    <div className="block" data-field={name}>
+      <label htmlFor={id}>{heading}</label>
+      {control || children}
+      {notes}
+    </div>
   );
 }
