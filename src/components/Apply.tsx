@@ -27,7 +27,7 @@ export default function Apply() {
   const remaining = daysLeft();
 
   return (
-    <section id="apply" className="relative overflow-hidden bg-[#0c0c0c] px-5 py-24 sm:px-8 md:px-10 md:py-32">
+    <section id="apply" className="relative z-10 overflow-hidden px-5 py-24 sm:px-8 md:px-10 md:py-32">
       <SectionDecor items={ORNAMENTS} opacity="opacity-40" />
 
       <FadeIn>

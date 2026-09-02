@@ -57,7 +57,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-20 sm:px-8 md:px-10"
+      className="relative z-10 flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-20 sm:px-8 md:px-10"
     >
       <SectionDecor items={ORNAMENTS} opacity="opacity-70" />
 

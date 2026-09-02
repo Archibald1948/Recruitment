@@ -25,7 +25,7 @@ export default function Positions() {
   return (
     <section
       id="positions"
-      className="relative z-0 overflow-hidden rounded-t-[40px] bg-white px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
+      className="relative z-10 overflow-hidden rounded-t-[40px] bg-white px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
     >
       <SectionDecor items={ORNAMENTS} tone="ink" opacity="opacity-25" />
 

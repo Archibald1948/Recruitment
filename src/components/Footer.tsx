@@ -2,7 +2,7 @@ import { site } from "@/config/site";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-[var(--line)] bg-[#0c0c0c] px-5 py-10 sm:px-8 md:px-10">
+    <footer className="relative z-10 border-t border-[var(--line)] px-5 py-10 sm:px-8 md:px-10">
       <div className="mx-auto flex max-w-5xl flex-col gap-4 text-xs text-[var(--muted)] sm:flex-row sm:items-center sm:justify-between">
         <span className="font-display tracking-widest uppercase">{site.name}</span>
         <div className="flex flex-wrap gap-x-5 gap-y-2">

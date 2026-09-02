@@ -47,7 +47,7 @@ export default function Marquee({ top, bottom }: { top: string[]; bottom: string
     <section
       ref={ref}
       aria-label="협업 도구와 기술 스택"
-      className="relative -mt-px overflow-hidden bg-[#0c0c0c] pt-20 pb-10 sm:pt-28 md:pt-36"
+      className="relative z-10 -mt-px overflow-hidden pt-20 pb-10 sm:pt-28 md:pt-36"
     >
       <div className="flex flex-col gap-3">
         <Row items={top} offset={offset} reverse={false} />
