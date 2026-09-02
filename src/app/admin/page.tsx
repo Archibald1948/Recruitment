@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2, Mail, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { formatMeetingAt } from "@/lib/format";
 import { canonicalStatus } from "@/lib/status";
 
@@ -28,60 +28,51 @@ interface Row {
   createdAt: string;
 }
 
-const KEY = "admin-token";
+/** 목록만 가져온다. 상태 변경은 호출한 쪽에서 한다 — effect 안에서 곧바로
+ *  setState를 부르면 렌더가 연쇄로 돈다. */
+async function fetchRows(): Promise<Row[]> {
+  const res = await fetch("/api/admin/applications");
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error ?? "불러오지 못했습니다.");
+  return data.items as Row[];
+}
+
+const message = (e: unknown) => (e instanceof Error ? e.message : "불러오지 못했습니다.");
 
 export default function AdminPage() {
-  // 입력값을 state로 들고 있지 않다. 저장된 키를 effect에서 밀어넣으면 렌더가
-  // 한 번 더 도는 데다, 서버 렌더 결과와도 어긋난다.
-  const inputRef = useRef<HTMLInputElement>(null);
-  const tokenRef = useRef("");
   const [rows, setRows] = useState<Row[] | null>(null);
-  const [loading, setLoading] = useState(false);
+  // 들어오자마자 한 번 불러오므로 처음부터 로딩 상태다.
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [sending, setSending] = useState<string | null>(null);
   const [flash, setFlash] = useState("");
 
-  useEffect(() => {
+  // 인증은 게이트가 심어둔 세션 쿠키가 한다. 화면이 키를 들고 있지 않으므로
+  // 여기서 새어 나갈 것도 없다.
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
     try {
-      const saved = sessionStorage.getItem(KEY);
-      if (saved && inputRef.current) {
-        inputRef.current.value = saved;
-        tokenRef.current = saved;
-      }
-    } catch {
-      // 시크릿 모드 등에서 접근이 막혀도 화면은 떠야 한다.
+      setRows(await fetchRows());
+    } catch (e) {
+      setRows(null);
+      setError(message(e));
+    } finally {
+      setLoading(false);
     }
   }, []);
 
-  const load = useCallback(
-    async () => {
-      const t = inputRef.current?.value.trim() ?? "";
-      if (!t) {
-        setError("운영자 키를 입력해 주세요.");
-        return;
-      }
-      tokenRef.current = t;
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch("/api/admin/applications", { headers: { "x-admin-token": t } });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error ?? "불러오지 못했습니다.");
-        setRows(data.items as Row[]);
-        try {
-          sessionStorage.setItem(KEY, t);
-        } catch {
-          /* 저장 실패는 무시한다 */
-        }
-      } catch (e) {
-        setRows(null);
-        setError(e instanceof Error ? e.message : "불러오지 못했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  // 들어오면 바로 목록을 띄운다. 키를 다시 칠 이유가 없어졌다.
+  useEffect(() => {
+    let alive = true;
+    fetchRows()
+      .then((items) => alive && setRows(items))
+      .catch((e) => alive && setError(message(e)))
+      .finally(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   async function notify(row: Row) {
     const status = canonicalStatus(row.status);
@@ -105,7 +96,7 @@ export default function AdminPage() {
     try {
       const res = await fetch("/api/admin/notify", {
         method: "POST",
-        headers: { "content-type": "application/json", "x-admin-token": tokenRef.current },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ id: row.id }),
       });
       const data = await res.json().catch(() => ({}));
@@ -129,14 +120,7 @@ export default function AdminPage() {
           상태·미팅 일시·안내 문구는 노션에서 채우고, 여기서는 그 내용으로 안내 메일만 보냅니다.
         </p>
 
-        <div className="mt-8 flex flex-col gap-2 sm:flex-row">
-          <input
-            ref={inputRef}
-            type="password"
-            onKeyDown={(e) => e.key === "Enter" && load()}
-            placeholder="운영자 키"
-            className="flex-1 rounded-2xl border border-[var(--line)] bg-white/[0.03] px-4 py-3 text-sm text-white outline-none focus:border-white/40"
-          />
+        <div className="mt-8 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => load()}
@@ -144,7 +128,17 @@ export default function AdminPage() {
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#0c0c0c] disabled:opacity-40"
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-            불러오기
+            새로고침
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await fetch("/api/admin-gate", { method: "DELETE" });
+              window.location.replace("/admin");
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[var(--line)] px-5 py-3 text-sm text-[var(--muted)] transition-colors hover:text-white"
+          >
+            잠그기
           </button>
         </div>
 
