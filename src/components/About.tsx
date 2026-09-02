@@ -25,29 +25,31 @@ const STACKS = [
 const ORNAMENTS: DecorItem[] = [
   {
     Shape: PixelMoon,
-    position: "top-[4%] left-[1%] sm:left-[2%] md:left-[4%]",
-    size: "w-[120px] sm:w-[160px] md:w-[210px]",
+    position: "top-[4%]",
+    max: 210,
     delay: 0.1,
     from: "left",
   },
   {
     Shape: PixelOrbit,
-    position: "bottom-[8%] left-[3%] sm:left-[6%] md:left-[10%]",
-    size: "w-[100px] sm:w-[140px] md:w-[180px]",
+    position: "bottom-[8%]",
+    max: 180,
+    offset: 28,
     delay: 0.25,
     from: "left",
   },
   {
     Shape: PixelBlocks,
-    position: "top-[4%] right-[1%] sm:right-[2%] md:right-[4%]",
-    size: "w-[120px] sm:w-[160px] md:w-[210px]",
+    position: "top-[4%]",
+    max: 210,
     delay: 0.15,
     from: "right",
   },
   {
     Shape: PixelSphere,
-    position: "bottom-[8%] right-[3%] sm:right-[6%] md:right-[10%]",
-    size: "w-[130px] sm:w-[170px] md:w-[220px]",
+    position: "bottom-[8%]",
+    max: 220,
+    offset: 20,
     delay: 0.3,
     from: "right",
   },
@@ -59,7 +61,7 @@ export default function About() {
       id="about"
       className="relative z-10 flex min-h-screen flex-col items-center justify-center overflow-hidden px-5 py-20 sm:px-8 md:px-10"
     >
-      <SectionDecor items={ORNAMENTS} opacity="opacity-70" />
+      <SectionDecor items={ORNAMENTS} content={896} opacity="opacity-70" />
 
       <div className="relative z-10 flex w-full max-w-4xl flex-col items-center gap-16 sm:gap-20 md:gap-24">
         <div className="flex flex-col items-center gap-10 sm:gap-14 md:gap-16">

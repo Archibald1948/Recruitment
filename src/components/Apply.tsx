@@ -9,15 +9,15 @@ import { daysLeft, isClosed, openPositions, site } from "@/config/site";
 const ORNAMENTS: DecorItem[] = [
   {
     Shape: PixelSphere,
-    position: "top-[10%] left-[2%] md:left-[6%]",
-    size: "w-[110px] md:w-[170px]",
+    position: "top-[10%]",
+    max: 170,
     delay: 0.1,
     from: "left",
   },
   {
     Shape: PixelOrbit,
-    position: "bottom-[8%] right-[2%] md:right-[6%]",
-    size: "w-[120px] md:w-[180px]",
+    position: "bottom-[8%]",
+    max: 180,
     delay: 0.24,
     from: "right",
   },
@@ -32,7 +32,7 @@ export default function Apply() {
   // 장식이 가로로 삐져나가는 것만 잘라낸다.
   return (
     <section id="apply" className="relative z-10 overflow-x-clip px-5 py-24 sm:px-8 md:px-10 md:py-32">
-      <SectionDecor items={ORNAMENTS} opacity="opacity-40" />
+      <SectionDecor items={ORNAMENTS} content={768} opacity="opacity-40" />
 
       <FadeIn>
         <h2 className="section-heading grad-heading font-display relative z-10 text-center">Apply</h2>
@@ -89,11 +89,11 @@ export default function Apply() {
       )}
 
       {/* 지원서를 쓰다 막히는 순간 바로 물어볼 수 있게 폼 바로 아래에 둔다. */}
-      <div className="relative z-10 mt-20 border-t border-[var(--line)] pt-14">
+      <div className="relative z-10 mt-20 pt-14">
         <QnaPreview />
 
         <div className="mx-auto max-w-xl text-center">
-          <p className="text-sm text-[var(--text-dim)]/60">
+          <p className="text-sm text-white">
             지원 전에 궁금한 점이 있으신가요?
           </p>
           <p className="mt-2 text-xs text-[var(--muted)]">

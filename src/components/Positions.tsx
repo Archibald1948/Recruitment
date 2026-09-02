@@ -7,15 +7,15 @@ import { positions, site } from "@/config/site";
 const ORNAMENTS: DecorItem[] = [
   {
     Shape: PixelGrid,
-    position: "top-[6%] left-[2%] md:left-[5%]",
-    size: "w-[110px] md:w-[170px]",
+    position: "top-[6%]",
+    max: 170,
     delay: 0.12,
     from: "left",
   },
   {
     Shape: PixelDiamond,
-    position: "bottom-[5%] right-[2%] md:right-[5%]",
-    size: "w-[120px] md:w-[190px]",
+    position: "bottom-[5%]",
+    max: 190,
     delay: 0.24,
     from: "right",
   },
@@ -27,7 +27,7 @@ export default function Positions() {
       id="positions"
       className="relative z-10 overflow-hidden rounded-t-[40px] bg-white px-5 py-20 sm:rounded-t-[50px] sm:px-8 sm:py-24 md:rounded-t-[60px] md:px-10 md:py-32"
     >
-      <SectionDecor items={ORNAMENTS} tone="ink" opacity="opacity-25" />
+      <SectionDecor items={ORNAMENTS} content={1024} tone="ink" opacity="opacity-25" />
 
       <FadeIn>
         <h2 className="section-heading font-display relative z-10 text-center text-[#0c0c0c]">

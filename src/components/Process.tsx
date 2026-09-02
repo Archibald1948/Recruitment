@@ -54,15 +54,15 @@ function StackCard({
 const ORNAMENTS: DecorItem[] = [
   {
     Shape: PixelWave,
-    position: "top-[8%] left-[3%] md:left-[5%]",
-    size: "w-[130px] md:w-[200px]",
+    position: "top-[8%]",
+    max: 200,
     delay: 0.1,
     from: "left",
   },
   {
     Shape: PixelArc,
-    position: "bottom-[6%] right-[3%] md:right-[5%]",
-    size: "w-[140px] md:w-[210px]",
+    position: "bottom-[6%]",
+    max: 210,
     delay: 0.22,
     from: "right",
   },
@@ -152,7 +152,7 @@ export default function Process() {
       id="process"
       className="relative z-10 -mt-10 rounded-t-[40px] bg-[linear-gradient(to_bottom,#0c0c0c_0px,#0c0c0c_240px,transparent_720px)] px-5 pt-20 pb-32 sm:-mt-12 sm:rounded-t-[50px] sm:px-8 md:-mt-14 md:rounded-t-[60px] md:px-10"
     >
-      <SectionDecor items={ORNAMENTS} opacity="opacity-45" />
+      <SectionDecor items={ORNAMENTS} content={1024} opacity="opacity-45" />
 
       <h2 className="section-heading grad-heading font-display relative z-10 text-center">
         Process
