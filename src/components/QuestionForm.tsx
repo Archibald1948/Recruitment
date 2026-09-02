@@ -101,7 +101,7 @@ export default function QuestionForm({
     <form
       onSubmit={submit}
       noValidate
-      className="relative rounded-[24px] border border-[var(--line)] bg-white/[0.03] p-5 pr-14 sm:p-6 sm:pr-16"
+      className="relative rounded-[24px] border border-[var(--line)] bg-[#0c0c0c] p-5 pr-14 shadow-[0_24px_60px_rgba(0,0,0,0.6)] sm:p-6 sm:pr-16"
     >
       {onClose && (
         <button
