@@ -3,6 +3,7 @@
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { openPositions, positionById, positions, site } from "@/config/site";
+import { formatSlot, openSlotDays, slotToIso } from "@/lib/meeting-slots";
 import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
 import { captureRef, readRef } from "@/lib/ref";
@@ -25,6 +26,7 @@ export interface FormValues {
   experience: string;
   portfolio: string;
   availability: string;
+  meetingSlot: string;
   agree: boolean;
   answers: Record<string, string>;
 }
@@ -39,6 +41,7 @@ const EMPTY: FormValues = {
   experience: "",
   portfolio: "",
   availability: "",
+  meetingSlot: "",
   agree: false,
   answers: {},
 };
@@ -195,6 +198,7 @@ export default function ApplyForm({
       !!values.oneLiner,
       !!values.motivation,
       !!values.availability,
+      !!values.meetingSlot,
       values.agree,
       ...(position?.questions.filter((q) => q.required).map((q) => !!values.answers[q.id]) ?? []),
     ];
@@ -535,6 +539,12 @@ export default function ApplyForm({
           />
         </Field>
 
+        <MeetingSlotField
+          value={values.meetingSlot}
+          error={errors.meetingSlot}
+          onChange={(v) => set("meetingSlot", v)}
+        />
+
         <Field label="주간 참여 가능 시간"
           name="availability" required error={errors.availability} as="group">
           <div className="flex flex-wrap gap-2">
@@ -685,6 +695,102 @@ function focusFirstError(errors: Errors) {
  * (label은 컨트롤 하나를 가리키는 요소다.) group으로 렌더해 aria-labelledby로
  * 묶음 전체에 이름을 준다.
  */
+/**
+ * 화상 미팅 희망 시간.
+ *
+ * 하루에 스무 칸 넘게 나오는 날이 있어 한 번에 늘어놓으면 고르기 어렵다.
+ * 날짜를 먼저 고르고 그 날의 시간만 보여준다.
+ *
+ * 후보는 규칙 모듈이 만든다. 서버 검증도 같은 함수를 쓰므로 화면에 없는
+ * 시간이 통과할 일이 없다.
+ */
+function MeetingSlotField({
+  value,
+  error,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  onChange: (v: string) => void;
+}) {
+  // 지난 시간을 빼려면 현재 시각이 필요한데, 서버와 클라이언트의 "지금"이
+  // 달라 하이드레이션이 어긋난다. 마운트 후에 만든다.
+  const [days, setDays] = useState<ReturnType<typeof openSlotDays>>([]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDays(openSlotDays());
+  }, []);
+
+  const selectedDate = value ? value.split("T")[0] : "";
+  const day = days.find((d) => d.date === selectedDate);
+
+  return (
+    <Field
+      label="희망 미팅 시간"
+      name="meetingSlot"
+      required
+      error={error}
+      as="group"
+      hint="서류 통과 시 이 시간에 맞춰 안내드립니다. 확정 시각은 메일로 다시 알려드립니다."
+    >
+      {days.length === 0 ? (
+        <p className="rounded-2xl border border-[var(--line)] px-4 py-3 text-sm text-[var(--muted)]">
+          선택 가능한 시간을 불러오는 중입니다.
+        </p>
+      ) : (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2">
+            {days.map((d) => (
+              <button
+                key={d.date}
+                type="button"
+                aria-pressed={d.date === selectedDate}
+                onClick={() => onChange(`${d.date}T${d.times[0]}`)}
+                className={`rounded-full border px-4 py-2.5 text-sm transition ${
+                  d.date === selectedDate
+                    ? "border-white/70 bg-white/10 text-white"
+                    : "border-[var(--line)] text-[var(--text-dim)]/70 hover:border-white/30"
+                }`}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
+          {day && (
+            <div className="flex flex-wrap gap-2">
+              {day.times.map((t) => {
+                const v = `${day.date}T${t}`;
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    aria-pressed={v === value}
+                    onClick={() => onChange(v)}
+                    className={`rounded-xl border px-3 py-2 text-sm tabular transition ${
+                      v === value
+                        ? "border-white/70 bg-white/10 text-white"
+                        : "border-[var(--line)] text-[var(--text-dim)]/70 hover:border-white/30"
+                    }`}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {value && (
+            <p className="text-sm text-white">
+              선택: <strong className="font-medium">{formatSlot(slotToIso(value))}</strong>
+            </p>
+          )}
+        </div>
+      )}
+    </Field>
+  );
+}
+
 function Field({
   label,
   required,
