@@ -27,7 +27,7 @@ export default function MeshBackdrop() {
         softness={0.78}
         intensity={0.42}
         noise={0.38}
-        speed={0.32}
+        speed={0.55}
       />
 
       {/*
