@@ -26,11 +26,13 @@ export default function AdminGate() {
       const res = await fetch("/api/admin-gate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        // 지금 열려 있는 주소가 곧 비밀 경로다. 값을 코드에 박지 않아도 된다.
+        body: JSON.stringify({ password, from: window.location.pathname }),
       });
       if (res.ok) {
         // 쿠키가 붙은 뒤 다시 요청해야 proxy가 통과시킨다.
-        window.location.replace("/admin");
+        // 주소는 그대로 두고 다시 연다 — 비밀 경로를 여기 적어둘 필요가 없다.
+        window.location.reload();
         return;
       }
       const data = await res.json().catch(() => ({}));

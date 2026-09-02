@@ -134,7 +134,7 @@ export default function AdminPage() {
             type="button"
             onClick={async () => {
               await fetch("/api/admin-gate", { method: "DELETE" });
-              window.location.replace("/admin");
+              window.location.reload();
             }}
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[var(--line)] px-5 py-3 text-sm text-[var(--muted)] transition-colors hover:text-white"
           >

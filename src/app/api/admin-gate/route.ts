@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { adminPath } from "@/lib/admin-path";
 import { ADMIN_COOKIE, issueSession, passwordMatches } from "@/lib/admin-session";
 import { clientIp } from "@/lib/ratelimit";
 
@@ -50,11 +51,20 @@ export async function POST(req: Request) {
   }
 
   let password = "";
+  let from = "";
   try {
     const body = await req.json();
     password = typeof body?.password === "string" ? body.password : "";
+    from = typeof body?.from === "string" ? body.from : "";
   } catch {
     // 본문이 깨졌어도 아래 실패 처리로 흘려보낸다. 형식 오류를 따로 알려줄 이유가 없다.
+  }
+
+  // 잠금 화면이 어느 주소에서 떴는지 함께 받는다. 비밀 경로를 모르면 이 엔드포인트가
+  // 있는지조차 알 수 없다. 여기까지 감춰야 입구를 옮긴 의미가 있다.
+  const entrance = adminPath();
+  if (!entrance || from !== entrance) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   if (!passwordMatches(password, secret)) {
