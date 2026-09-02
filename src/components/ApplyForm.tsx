@@ -144,6 +144,22 @@ export default function ApplyForm({
   }, []);
 
   /* ── 진행률 ──────────────────────────────────────────────── */
+  // 붙었는지 여부. 붙었을 때만 배경과 경계선을 줘서, 폼 맨 위에서는
+  // 그냥 인라인 요소처럼 보이고 스크롤을 시작하면 바가 된다.
+  const [stuck, setStuck] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    // 센티널이 화면 위로 밀려 나가면 진행률 바가 붙은 것이다.
+    const io = new IntersectionObserver(([entry]) => setStuck(!entry.isIntersecting), {
+      threshold: 1,
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const progress = useMemo(() => {
     const required: boolean[] = [
       !!values.name,
@@ -257,13 +273,29 @@ export default function ApplyForm({
 
   return (
     <form id="apply-form" onSubmit={submit} noValidate className="mx-auto max-w-2xl">
-      {/* 진행률 */}
-      <div className="mb-8">
+      {/* 진행률 — 폼을 내려가며 작성하는 동안 계속 따라온다 */}
+      <div ref={sentinelRef} aria-hidden className="h-px" />
+      <div
+        className={`sticky top-0 z-20 -mx-4 mb-6 px-4 py-3 transition-colors duration-300 sm:-mx-6 sm:px-6 ${
+          stuck
+            ? "border-b border-[var(--line)] bg-[#0c0c0c]/85 backdrop-blur-md"
+            : "border-b border-transparent"
+        }`}
+      >
         <div className="mb-2 flex items-center justify-between text-xs text-[var(--muted)]">
           <span>작성 진행률</span>
-          <span className="tabular">{progress}%</span>
+          <span className="tabular" aria-live="polite">
+            {progress}%
+          </span>
         </div>
-        <div className="h-1 w-full overflow-hidden rounded-full bg-white/10">
+        <div
+          className="h-1 w-full overflow-hidden rounded-full bg-white/10"
+          role="progressbar"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="작성 진행률"
+        >
           <div
             className="h-full rounded-full transition-[width] duration-500"
             style={{ width: `${progress}%`, background: "linear-gradient(90deg, #8a5c58, #c98a94, #e3c8bd)" }}
@@ -271,7 +303,7 @@ export default function ApplyForm({
         </div>
       </div>
 
-      <p className="-mt-4 mb-6 text-xs text-[var(--muted)]">
+      <p className="mb-6 text-xs text-[var(--muted)]">
         <span className="text-[#c98a94]">*</span> 표시는 필수 항목입니다.
       </p>
 
