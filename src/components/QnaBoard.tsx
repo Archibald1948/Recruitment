@@ -234,7 +234,7 @@ export default function QnaBoard({
           */}
           {!failed && (
             <WarpBackground
-              className="mt-14 rounded-[24px] border-[var(--line)] p-8 sm:p-12"
+              className="mt-14 flex min-h-56 items-center justify-center rounded-[24px] border-[var(--line)] p-8 sm:p-12"
               gridColor="rgba(255,255,255,0.055)"
               beamColors={BEAM_COLORS}
               beamsPerSide={2}
@@ -249,16 +249,6 @@ export default function QnaBoard({
                 <p className="body-copy mx-auto mt-3 max-w-sm break-keep text-white">
                   아직 궁금한 점이 남아 있다면 편하게 남겨주세요.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenCount((n) => n + 1);
-                    setFormOpen(true);
-                  }}
-                  className="btn-ghost mt-6 inline-flex items-center gap-2 px-6 py-3 text-xs"
-                >
-                  <Plus className="h-3.5 w-3.5" /> 질문 남기기
-                </button>
               </div>
             </WarpBackground>
           )}
