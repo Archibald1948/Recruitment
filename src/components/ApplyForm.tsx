@@ -10,6 +10,10 @@ import { ANSWER_MAX, validateApplication } from "@/lib/validation";
 
 const DRAFT_KEY = "recruit:draft:v1";
 
+/** 진행률 막대 색. 가로·세로 두 곳에서 같은 색을 써야 해서 상수로 뺐다. */
+const PROGRESS_GRADIENT = "linear-gradient(90deg, #8a5c58, #c98a94, #e3c8bd)";
+const PROGRESS_GRADIENT_V = "linear-gradient(180deg, #8a5c58, #c98a94, #e3c8bd)";
+
 export interface FormValues {
   name: string;
   email: string;
@@ -272,34 +276,83 @@ export default function ApplyForm({
   }
 
   return (
-    <form id="apply-form" onSubmit={submit} noValidate className="mx-auto max-w-2xl">
-      {/* 진행률 — 폼을 내려가며 작성하는 동안 계속 따라온다 */}
+    <form id="apply-form" onSubmit={submit} noValidate className="relative mx-auto max-w-2xl">
+      {/*
+        진행률은 폼을 내려가는 내내 보여야 한다. 화면 폭에 따라 자리를 달리 잡는다.
+        좁은 화면에서는 위에 떠 있는 알약, 넓은 화면에서는 폼 왼쪽 여백의 세로 레일.
+      */}
       <div ref={sentinelRef} aria-hidden className="h-px" />
-      <div
-        className={`sticky top-0 z-20 -mx-4 mb-6 px-4 py-3 transition-colors duration-300 sm:-mx-6 sm:px-6 ${
-          stuck
-            ? "border-b border-[var(--line)] bg-[#0c0c0c]/85 backdrop-blur-md"
-            : "border-b border-transparent"
-        }`}
-      >
-        <div className="mb-2 flex items-center justify-between text-xs text-[var(--muted)]">
-          <span>작성 진행률</span>
-          <span className="tabular" aria-live="polite">
+
+      {/* 좁은 화면: 상단에 떠 있는 알약 */}
+      <div className="sticky top-4 z-20 mb-8 lg:hidden">
+        <div
+          className={`flex items-center gap-3 rounded-full border px-5 py-2.5 transition-colors duration-300 ${
+            stuck
+              ? "border-[var(--line)] bg-[#0c0c0c]/90 shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md"
+              : "border-[var(--line)] bg-[#0c0c0c]/60"
+          }`}
+        >
+          <span className="font-display shrink-0 text-[0.7rem] tracking-widest text-[var(--muted)] uppercase">
+            Progress
+          </span>
+          <div
+            className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/10"
+            role="progressbar"
+            aria-valuenow={progress}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="작성 진행률"
+          >
+            <div
+              className="h-full rounded-full transition-[width] duration-500"
+              style={{ width: `${progress}%`, background: PROGRESS_GRADIENT }}
+            />
+          </div>
+          <span
+            className="font-display w-10 shrink-0 text-right text-xs text-white tabular"
+            aria-live="polite"
+          >
             {progress}%
           </span>
         </div>
-        <div
-          className="h-1 w-full overflow-hidden rounded-full bg-white/10"
-          role="progressbar"
-          aria-valuenow={progress}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label="작성 진행률"
-        >
-          <div
-            className="h-full rounded-full transition-[width] duration-500"
-            style={{ width: `${progress}%`, background: "linear-gradient(90deg, #8a5c58, #c98a94, #e3c8bd)" }}
-          />
+      </div>
+
+      {/*
+        넓은 화면: 폼 왼쪽 여백의 세로 레일.
+        absolute로 폼 높이만큼 자리를 잡고 그 안의 sticky가 따라 내려간다.
+        본문 폭을 건드리지 않으므로 가운데 정렬된 제목과 어긋나지 않는다.
+
+        폭 계산(기준 1024px): 섹션 좌우 여백 40px, 폼 672px가 가운데 →
+        폼 왼쪽 끝이 화면 176px 지점. 레일을 160px 당겨 128px 폭으로 두면
+        화면 16px에서 시작해 폼과 32px 간격이 남는다. 여기보다 좁으면
+        레일이 화면 밖으로 나가므로 그때는 위쪽 알약을 쓴다.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 -left-40 hidden w-32 lg:block"
+      >
+        <div className="sticky top-28 flex gap-4">
+          <div className="relative h-40 w-[3px] shrink-0 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="absolute inset-x-0 top-0 rounded-full transition-[height] duration-500"
+              style={{ height: `${progress}%`, background: PROGRESS_GRADIENT_V }}
+            />
+          </div>
+          <div className="flex h-40 flex-col justify-between py-0.5">
+            <div>
+              <p className="font-display text-[0.7rem] tracking-widest text-[var(--muted)] uppercase">
+                Progress
+              </p>
+              <p className="font-display mt-2 text-[1.75rem] leading-none text-white tabular">
+                {progress}%
+              </p>
+            </div>
+            <p className="text-xs leading-relaxed text-[var(--muted)]">
+              작성 진행률
+              <br />
+              필수 항목 기준
+            </p>
+          </div>
         </div>
       </div>
 
