@@ -311,20 +311,24 @@ export const positions: Position[] = [
 export const openPositions = positions.filter((p) => p.open);
 export const positionById = (id: string) => positions.find((p) => p.id === id);
 
-function deadlineMs(): number {
-  const t = new Date(site.deadline).getTime();
+/**
+ * 마감일은 노션에서 읽어온다(src/lib/settings.ts). 아래 함수들이 문자열을
+ * 인자로 받는 이유가 이것이다. 생략하면 site.deadline(기본값)을 쓴다.
+ */
+function deadlineMs(deadline: string = site.deadline): number {
+  const t = new Date(deadline).getTime();
   // 날짜 문자열이 잘못되면 NaN이 되고, 모든 비교가 false가 되어
   // 마감 판정이 조용히 깨진다. 그때는 마감이 없는 것으로 본다.
   return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
 }
 
 /** 남은 일수. 마감일이 지났으면 0 */
-export function daysLeft(now: Date = new Date()): number {
-  const ms = deadlineMs();
+export function daysLeft(deadline?: string, now: Date = new Date()): number {
+  const ms = deadlineMs(deadline);
   if (!Number.isFinite(ms)) return 0;
   return Math.max(0, Math.ceil((ms - now.getTime()) / 86_400_000));
 }
 
-export function isClosed(now: Date = new Date()): boolean {
-  return deadlineMs() < now.getTime();
+export function isClosed(deadline?: string, now: Date = new Date()): boolean {
+  return deadlineMs(deadline) < now.getTime();
 }
