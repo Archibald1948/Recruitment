@@ -10,16 +10,17 @@
 
 | 구간 | 출처 | 내용 |
 |---|---|---|
-| 히어로 | **A안** | 메시 그라디언트 웨이브 + 도트 글리프 텍스처 + 도트 폰트 헤드라인 + 스탯 카운트업 |
+| 히어로 | **A안** | 셰이더 웨이브 그라디언트 + 도트 글리프 텍스처 + 도트 폰트 헤드라인 + 스탯 카운트업 |
 | 이음매 | 신규 | 히어로 하단 `#0C0C0C` 페이드 → 이후 섹션과 무이음 연결 |
 | 스크롤 이후 전 구간 | **B안** | 마퀴 / 어바웃 / 넘버링 리스트 / sticky 스택 카드 / 흰 섹션 대비 |
 | 지원 폼 | 신규 | Notion 연동 |
+| Q&A | 신규 | 게시판(`/qna`) + 랜딩 하단 맛보기. 답변 대기 패널은 터미널 애니메이션 |
 
 ### 폐기하고 대체한 것
 
 | 원본 | 문제 | 대체 |
 |---|---|---|
-| A안 CloudFront MP4 배경 | 타인 에셋, 2MB+, 색 제어 불가 | **`@paper-design/shaders-react` MeshGradient** (Apache 2.0) |
+| A안 CloudFront MP4 배경 | 타인 에셋, 2MB+, 색 제어 불가 | **`@paper-design/shaders-react` GrainGradient** `shape="wave"` (Apache 2.0) — §2 |
 | A안 BubbledotICG-FinePos (OnlineWebFonts) | 라이선스 출처 불명 | **캔버스 도트 매트릭스 렌더러** (§5.3). Google Fonts 픽셀 폰트는 전부 네모 픽셀이라 둥근 도트가 안 나온다 |
 | A안 "Trusted by 2000+ Enterprises" + MS/Amazon/Google 로고 | 허위 표시 | **실제 수치**(D-day / 지원자 수 / 파트 수 / 기간) |
 | B안 motionsites.ai GIF 21개 | 타인 에셋 핫링크 | **텍스트 배지 마퀴** (협업툴·기술 스택) |
@@ -53,13 +54,30 @@
 --line:          rgba(215, 226, 234, 0.15);
 --line-ink:      rgba(12, 12, 12, 0.15);
 
-/* 헤딩 그라디언트 (B안 .hero-heading) */
---grad-heading:  linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+/* 헤딩 그라디언트 (B안 .hero-heading) — 아래쪽을 밝게 올려 대비를 확보했다 */
+--grad-heading:  linear-gradient(180deg, #8B93A0 0%, #E2ECF3 100%);
 
 /* CTA — 검은 글씨의 흰 알약에 은은한 흰 글로우 (레퍼런스 Get Started) */
 --cta-glow:      0 0 0 1px rgba(255,255,255,.15), 0 0 22px rgba(255,255,255,.32), 0 0 44px rgba(255,255,255,.12);
 --accent:        #C98A94;   /* 폼 강조 — 배경 모브 톤 */
+
+/* CTA 호버 — 같은 글로우를 한 단계 세게 */
+--cta-glow-strong: 0 0 0 1px rgba(255,255,255,.25), 0 0 30px rgba(255,255,255,.45), 0 0 60px rgba(255,255,255,.2);
+
+/* 이징도 토큰이다 (§6) */
+--ease-hero:     cubic-bezier(0.22, 1, 0.36, 1);
+--ease-fade:     cubic-bezier(0.25, 0.1, 0.25, 1);
 ```
+
+> ### 벤더 컴포넌트를 위한 별칭
+> shadcn·Magic UI 계열 컴포넌트는 `border-border` `bg-background` 같은 **자기 색 이름**을 쓴다.
+> 이 이름이 비어 있으면 `currentColor`(흰색)로 떨어져 흰 테두리가 그어진다. 컴포넌트 안쪽은
+> className으로 덮을 수 없으므로 `@theme inline`에서 사이트 토큰에 이어준다.
+>
+> ```css
+> --color-border: var(--line);
+> --color-background: var(--bg);
+> ```
 
 ### 히어로 배경 — GrainGradient `wave`
 
@@ -77,7 +95,7 @@
 <GrainGradient
   colorBack="#0c0c0c"
   colors={["#a8a6c1","#c6c4d4","#cac7d2","#efcadd","#e1b5ac","#db898b","#ae6a61"]}
-  shape="wave" softness={0.78} intensity={0.42} noise={0.38} speed={0.32}
+  shape="wave" softness={0.78} intensity={0.42} noise={0.38} speed={0.55}
 />
 ```
 
@@ -131,24 +149,43 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
 ## 4. 섹션 구성
 
 ```
+   SiteLightRays ─────── 화면 고정(fixed) 광선 레이어, z-1
 ┌─ HERO ──────────────────────────────── 100dvh
-│   MeshGradient 웨이브 + 글리프 텍스처
+│   GrainGradient(wave) + 글리프 텍스처
 │   헤드라인 2줄 / 서브 / CTA / 스탯 4
-│   ▼ 하단 30vh #0C0C0C 페이드
+│   ▼ 하단 34vh #0C0C0C 페이드
 ├─ MARQUEE ───────────── 협업툴·스택 배지 2줄 (역방향)
 ├─ ABOUT ─────────────── 팀장 소개 (문자 리빌 1문단)
 ├─ POSITIONS ─────────── 흰 배경 rounded-t, 01~04
 ├─ PROCESS ───────────── sticky 스택 카드 3장
-└─ APPLY ──────────────── 지원 폼 → Notion
+├─ APPLY ─────────────── 지원 폼 → Notion + Q&A 맛보기
+└─ FOOTER ────────────── Q&A · 개인정보 안내 링크
 ```
+
+별도 페이지: `/qna`(게시판) · `/privacy`(개인정보 안내) · `/links`·`/lab`(noindex, 운영용).
+
+### 4.0 SiteLightRays — 전역 광선
+
+랜딩 최상단에 한 번 깔리는 `fixed` 레이어다. 히어로 안에 두면 스크롤과 함께 사라져
+아래 섹션이 밋밋해진다.
+
+- `fixed inset-0 z-[1]` — 히어로 배경(z-0) **위**, 본문(z-10) **아래**.
+  배경 위로는 비치되 글자를 가리지 않는 자리다
+- 색은 히어로 팔레트의 로즈 톤 `rgba(238,202,210,0.16)`. 라이브러리 기본값인 푸른빛은
+  이 사이트와 맞지 않는다
+- `count 9` / `blur 44` / `speed 10` / `length 88vh`.
+  `speed`는 광선 하나의 주기(초)라 값이 작을수록 자주 스친다. 기본 18초는 첫 화면에서
+  광선이 다 뜨기까지 너무 오래 걸렸다
 
 ### 4.1 HERO
 
 - 높이 `100dvh`, `overflow-x: clip`
-- 배경: `<MeshGradient />` absolute inset-0, z-0
+- 배경: `<MeshBackdrop />`(GrainGradient) absolute inset-0, z-0
 - 그 위 **글리프 텍스처** 레이어 (§5) z-1, `pointer-events: none`
 - 콘텐츠 z-2
-- 하단 페이드: `height: 30vh; background: linear-gradient(to bottom, transparent, #0C0C0C)`
+- 하단 페이드: `height: 34vh`, 3단 정지점(`0 → 0.7 → 1`)으로 떨어뜨린다.
+  2단 그라디언트는 중간이 회색으로 떠 이음매가 보였다
+- 글이 놓이는 세로 구간(48% 중심)에 방사형 스크림을 깔아 파도 위상과 무관하게 흰 글씨가 읽히게 한다
 - 헤드라인 2줄, 줄마다 `headlineFade 0.85s cubic-bezier(0.22,1,0.36,1)`, delay `0.12s` / `0.3s`
 - 스탯 4개: 카운트업(easeOutCubic, `1500 + i*80`ms, 시작 `480 + i*90`ms), IntersectionObserver threshold 0.25, 1회만
 
@@ -184,8 +221,19 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
 ### 4.6 APPLY
 
 - 다크 배경, 폼 컨테이너 `max-w-2xl`
+- 마감까지 남은 일수 · 시작 시기 · 예상 기간을 알약 배지로 먼저 보여준다.
+  남은 일수는 **노션에서 읽은 마감일**로 계산한다(`getDeadline()`)
 - 포지션 선택 → 해당 포지션 전용 질문 노출 (§site-plan)
 - 제출 중 CTA 비활성 + 스피너, 완료 시 접수 번호 + 안내
+- `overflow-x: clip`을 쓴다. `hidden`은 스크롤 컨테이너를 만들어 안쪽 진행률 바의
+  `sticky`를 무력화한다
+- 폼 아래에 **Q&A 맛보기**(`QnaPreview`)가 붙는다. 최근 문답 몇 개를 보여주고 `/qna`로 보낸다
+
+### 4.7 QNA (`/qna`)
+
+- 질문 목록 + 작성 폼. 답변은 노션에서 달린다(§site-plan 8.5)
+- 목록 아래 패널은 **터미널 애니메이션**(Magic UI `Terminal`)이다.
+  답변을 기다리는 동안 빈 칸을 두지 않으려고 넣었고, 문구는 문장 단위로 끊어 타이핑된다
 
 ---
 
@@ -239,8 +287,9 @@ About 섹션 양옆이 비어 허전해 보이는 문제를 채우는 장식. �
 
 ### 5.4 그레인
 
-`feTurbulence`를 data URI 배경 이미지로 구워 `mix-blend-mode: overlay`, opacity 0.38로
-전면에 깐다. **이 레이어가 없으면 CSS 그라디언트 티가 난다.**
+`feTurbulence`(fractalNoise, baseFrequency 0.85, 4옥타브)를 data URI 배경 이미지로 구워
+`mix-blend-mode: overlay`, `opacity: 0.3`으로 전면에 깐다.
+**이 레이어가 없으면 CSS 그라디언트 티가 난다.**
 
 ---
 

@@ -9,34 +9,52 @@
 | 모션 | `motion` (framer-motion 후속) | sticky 스택, 스크롤 리빌 |
 | 히어로 배경 | `@paper-design/shaders-react` MeshGradient | Apache 2.0 |
 | 아이콘 | `lucide-react` | |
-| DB | **Notion Database** (공식 API) | 어드민 = 노션 자체 |
-| 메일 | **Gmail SMTP** (기본) / **Resend** (도메인 확보 후) | 접수 확인 + 수정 링크 |
-| 배포 | Vercel | 커스텀 도메인 `builditship.kro.kr` (내도메인.한국, 무료) |
+| DB | **Notion Database** (공식 API) | 어드민 = 노션 자체. 지원자 / Q&A / 사이트 설정 세 개 |
+| 메일 | **Gmail SMTP** (기본) / **Resend** (도메인 검증 후) | 접수 확인 + 수정 링크 |
+| 배포 | Vercel | 커스텀 도메인 **`builditship.kro.kr` 확정** (내도메인.한국, 무료) |
 
 > Notion 통합 토큰은 **서버 전용**. 클라이언트 번들에 절대 노출 금지 → 모든 접근은 Route Handler 경유.
-> 통합은 **지원자 DB 페이지 하나에만** 공유한다(워크스페이스 전체 연결 금지).
+> 통합은 **연동에 쓰는 DB 페이지에만** 개별 공유한다(워크스페이스 전체 연결 금지).
+> 세 DB 모두 통합 연결 완료.
 
 ---
 
 ## 2. 라우트
 
+### 화면
+
+| 경로 | 색인 | 설명 |
+|---|---|---|
+| `/` | O | 랜딩 (히어로 → 마퀴 → 어바웃 → 포지션 → 프로세스 → 지원 폼 + Q&A 맛보기 → 푸터). **300초 ISR** — 랜딩에 얹힌 Q&A 맛보기가 노션을 읽기 때문 |
+| `/apply/[id]?t=<token>` | O | 지원 내역 **조회 + 수정** (매직 링크) |
+| `/privacy` | O | 개인정보 수집·이용 동의 안내 |
+| `/qna` | O | Q&A 게시판 — 질문 목록 + 작성 폼 (**60초 ISR**) |
+| `/links` | **X** | 채널별 홍보 링크 복사판. 운영자 전용이라 어디에서도 링크하지 않는다 (§4.5) |
+| `/lab` | **X** | 히어로 배경 셰이더 실험실. 실서비스 히어로를 건드리지 않고 후보를 비교한다 |
+
+> `/links`·`/lab`은 각자의 `layout.tsx`에서 `robots: { index: false, follow: false }`로 색인을 막는다.
+
+### API
+
+모든 Route Handler는 `runtime = "nodejs"`, `dynamic = "force-dynamic"`이다.
+
 | 경로 | 설명 |
 |---|---|
-| `/` | 랜딩 (히어로 → 마퀴 → 어바웃 → 포지션 → 프로세스 → 지원 폼) |
-| `/apply/[id]?t=<token>` | 지원 내역 **조회 + 수정** (매직 링크) |
-| `/privacy` | 개인정보 수집·이용 동의 안내 |
-| `/qna` | Q&A 게시판 — 질문 목록 + 작성 폼 (60초 ISR) |
-| `POST /api/apply` | 지원서 접수 |
-| `POST /api/qna` | 게시판 질문 등록 |
-| `GET /api/applications/[id]?t=` | 내 지원서 조회 |
-| `PATCH /api/applications/[id]` | 내 지원서 수정 |
-| `GET /api/stats` | 지원자 수 등 공개 지표 (60초 캐시) |
+| `POST /api/apply` | 지원서 접수. 마감 이후에는 `410` |
+| `POST /api/qna` | 게시판 질문 등록. 성공 시 `revalidatePath("/qna")` |
+| `GET /api/applications/[id]?t=` | 내 지원서 조회 (토큰 검증) |
+| `PATCH /api/applications/[id]` | 내 지원서 수정. 마감 이후에는 잠김 |
+| `GET /api/stats` | 지원자 수 · 남은 일수 · 마감 여부 · 모집 중 포지션 수 (60초 캐시) |
 
 ---
 
 ## 3. Notion 데이터베이스 스키마
 
-DB 이름: **지원자 관리** — 생성 완료
+연동에 쓰는 DB는 **지원자 관리 · Q&A 문의 게시판(§8.5) · 사이트 설정(§3.2)** 세 개다.
+
+### 3.1 지원자 관리
+
+DB 이름: **지원자 관리** — 생성 완료, 통합 연결 완료
 
 | 항목 | 값 |
 |---|---|
@@ -69,6 +87,29 @@ DB 이름: **지원자 관리** — 생성 완료
 
 > 노션에는 유니크 제약이 없다. **중복 제출 검사는 서버에서 이메일로 query 후 판단**한다.
 > 노션 API 레이트리밋(평균 3 req/s) 때문에 `/api/stats` 같은 읽기는 60초 캐시 필수.
+
+### 3.2 사이트 설정 — 마감일
+
+DB 이름: **사이트 설정** — 생성 완료, 통합 연결 완료
+
+| 속성 | 타입 | 용도 |
+|---|---|---|
+| `항목` | Title | 설정 이름. 현재는 `모집 마감일` 한 줄만 쓴다 |
+| `값(날짜)` | Date | 마감 시각 |
+
+읽는 쪽은 `src/lib/settings.ts`의 `getDeadline()`이다.
+
+- **왜 노션인가** — 마감일을 코드나 `NEXT_PUBLIC_*`에 두면 바꿀 때마다 재배포해야 한다.
+  `NEXT_PUBLIC_*`은 빌드 시점에 번들에 박히고 Vercel 환경변수도 배포에 묶인다.
+  노션에 두면 운영진이 날짜 칸만 고치면 되고, 최대 60초 뒤 사이트에 반영된다
+- **날짜만 고른 경우** 시간이 빠지므로 서버가 `T23:59:59+09:00`을 붙인다. 그날 하루는 열어둔다
+- **60초 캐시.** 노션 API는 평균 초당 3요청 제한이 있어 매 요청마다 부를 수 없다
+- **실패해도 멈추지 않는다.** 노션이 죽거나 값이 비어 있으면 `site.deadline`(코드 기본값)으로
+  되돌아가고, 실패 사실도 60초 기억해 매 요청마다 재시도하지 않는다
+- 서버에서만 읽는다. 클라이언트는 이미 60초마다 `/api/stats`를 다시 부르므로 그쪽으로 흘러간다
+
+마감일을 쓰는 곳은 네 군데다 — 히어로 D-day, 지원 섹션, `POST /api/apply`(마감 후 `410`),
+`PATCH /api/applications/[id]`(마감 후 수정 잠금).
 
 ---
 
@@ -184,7 +225,7 @@ https://builditship.kro.kr/?ref=okky&position=frontend#apply
 
 ## 5.4 도메인
 
-`builditship.kro.kr` — 내도메인.한국에서 받은 무료 도메인. 비용·갱신 부담이 없다.
+`builditship.kro.kr` — **확정.** 내도메인.한국에서 받은 무료 도메인이라 비용·갱신 부담이 없다.
 
 `kro.kr`은 **공용 서픽스(Public Suffix)** 라서 `builditship.kro.kr`이 최상위처럼
 취급된다. 그래서 CNAME이 아니라 **A 레코드**로 연결하고, Vercel이 소유권 확인을
@@ -231,9 +272,10 @@ DB는 만들어졌지만, 앱은 **자체 통합 토큰**으로 접근한다. MC
    - 권한: **콘텐츠 읽기 / 콘텐츠 업데이트 / 콘텐츠 삽입** 세 개면 충분하다.
      사용자 정보 읽기는 필요 없다
 2. 발급된 시크릿(`ntn_`으로 시작)을 복사
-3. **지원자 관리 DB 페이지 우측 상단 `⋯` → 연결(Connections) → 1번에서 만든 통합 추가**
+3. **DB 페이지 우측 상단 `⋯` → 연결(Connections) → 1번에서 만든 통합 추가**
+   - **지원자 관리 · Q&A 문의 게시판 · 사이트 설정 세 곳 모두** 해줘야 한다
    - 이 단계를 건너뛰면 토큰이 맞아도 404가 난다
-   - 통합은 **이 DB 하나에만** 공유한다. 워크스페이스 전체를 열지 않는다
+   - 통합은 **이 세 DB에만** 공유한다. 워크스페이스 전체를 열지 않는다
 4. 시크릿을 `.env.local`의 `NOTION_TOKEN`과 Vercel 환경변수에 넣는다
 
 ```bash
@@ -242,23 +284,36 @@ vercel env add NOTION_TOKEN production
 vercel env add NOTION_TOKEN development
 ```
 
-`NOTION_DATABASE_ID`와 `NOTION_DATA_SOURCE_ID`는 이미 Vercel에 등록되어 있다.
+노션 DB id 계열 변수(`NOTION_*_DATABASE_ID` / `NOTION_*_DATA_SOURCE_ID`)는 이미 Vercel에 등록되어 있다.
 
 ---
 
 ## 7. 환경 변수
 
-```
-NOTION_TOKEN=                 # 노션 내부 통합 시크릿 (서버 전용)
-NOTION_DATABASE_ID=           # 지원자 관리 DB id
-NOTION_DATA_SOURCE_ID=        # 〃 data source id (있으면 조회 1회를 아낀다)
-NOTION_QNA_DATABASE_ID=       # Q&A 문의 게시판 DB id
-NOTION_QNA_DATA_SOURCE_ID=    # 〃 data source id
-RESEND_API_KEY=            # 서버 전용
-MAIL_FROM="팀 프로젝트 <noreply@도메인>"
-APP_URL=https://...        # 매직 링크 절대 URL 생성용
-TOKEN_PEPPER=              # 수정 토큰 해시용 시크릿 (32바이트 랜덤)
-```
+전체 목록과 주석은 `.env.example`에 있다. 아래는 그 요약이다.
+
+| 변수 | 필수 | 용도 |
+|---|---|---|
+| `NOTION_TOKEN` | O | 노션 내부 통합 시크릿. **서버 전용** |
+| `NOTION_DATABASE_ID` | O | 지원자 관리 DB id |
+| `NOTION_DATA_SOURCE_ID` | | 〃 data source id. 주면 조회 1회를 아낀다 |
+| `NOTION_QNA_DATABASE_ID` | O | Q&A 문의 게시판 DB id |
+| `NOTION_QNA_DATA_SOURCE_ID` | | 〃 data source id |
+| `NOTION_SETTINGS_DATABASE_ID` | O | 사이트 설정 DB id (마감일) |
+| `NOTION_SETTINGS_DATA_SOURCE_ID` | | 〃 data source id |
+| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | △ | Gmail SMTP 발송용. 앱 비밀번호가 필요하다 |
+| `MAIL_FROM_NAME` | | 발신 표시 이름. 비우면 `site.name` |
+| `RESEND_API_KEY` | △ | 있으면 Gmail보다 우선한다 |
+| `MAIL_FROM` | | Resend 발신 주소. 비우면 `onboarding@resend.dev` |
+| `APP_URL` | | 매직 링크 절대 URL. 비우면 Vercel 배포 URL을 쓴다 |
+| `TOKEN_PEPPER` | O | 수정 토큰 해시용 시크릿 (`openssl rand -base64 32`) |
+| `NEXT_PUBLIC_DEADLINE` | | 마감일 **최후 기본값**. 노션을 못 읽을 때만 쓰인다 (§3.2) |
+
+△ = Gmail 쌍과 Resend 키 중 **한쪽은 있어야** 접수 메일이 나간다. 둘 다 없으면 접수는
+정상 처리되고 수정 링크만 콘솔에 남는다.
+
+`*_DATA_SOURCE_ID`를 주지 않으면 첫 요청에서 `databases.retrieve`로 한 번 조회해
+프로세스 수명 동안 캐시한다(`src/lib/notion.ts`).
 
 `.env.local`은 커밋하지 않는다. Vercel 프로젝트 환경변수에 동일하게 등록.
 
@@ -268,25 +323,34 @@ TOKEN_PEPPER=              # 수정 토큰 해시용 시크릿 (32바이트 랜�
 
 자주 바뀌는 값은 코드 곳곳에 흩지 않고 여기 한 곳에서 관리한다.
 
-- 모집 마감일 (D-day 카운트 기준)
-- 포지션별 모집 인원 / 모집 완료 여부
-- 프로젝트 시작 예정일, 예상 기간
-- 협업 툴 · 기술 스택 배지 목록
+- 포지션 정의 — 모집 인원 / 모집 완료 여부 / 소개 문구 / 분기 질문
+- 프로젝트 시작 예정일, 예상 기간, 진행 상황 문구
+- 협업 툴 · 기술 스택 배지 목록, 프로세스 · 얻어갈 것 · 리크루팅 절차
+- 개인정보 안내 문구 (`privacyNotice` / `privacyRetention` / `privacyPurpose`) —
+  메일 · 지원 폼 · `/privacy`가 모두 이 문장 하나를 쓴다
+- `site.deadline` — 마감일 **기본값**. 실제 마감일은 노션에서 온다(§3.2).
+  이 값은 노션을 못 읽을 때만 쓰이는 최후 방어선이다
+
+`daysLeft()` / `isClosed()`가 날짜를 **인자로 받는** 이유가 이것이다. 호출부가
+노션에서 읽은 값을 넘기고, 생략하면 `site.deadline`으로 떨어진다.
 
 ---
 
 ## 8.5 Q&A 게시판
 
-DB 이름: **Q&A 문의 게시판** — 생성 완료
+DB 이름: **Q&A 문의 게시판** — 생성 완료, 통합 연결 완료
 
 | 속성 | 타입 | 용도 |
 |---|---|---|
 | 질문 | title | 방문자가 남긴 질문 원문 |
 | 닉네임 | rich_text | 작성자 표시 이름 (이메일은 받지 않는다) |
 | 답변 | rich_text | **운영진이 여기에 적으면 그게 사이트의 답변이 된다** |
-| 답변자 | rich_text | 표시할 답변자 이름. 비우면 `운영진` |
 | 공개 | checkbox | 체크 해제 시 사이트에서 즉시 사라짐 (스팸 처리용) |
-| 작성일 | created_time | 정렬·표시용 |
+
+> 답변자 이름은 받지 않는다. 답변은 **팀 공동 명의(`운영진`)로 통일**한다 — 개인 이름을
+> 공개 게시판에 노출할 이유가 없다. 작성 시각과 답변 시각도 속성으로 두지 않고 노션이
+> 기본 제공하는 `created_time` / `last_edited_time`을 쓴다(답변이 있으면 마지막 수정
+> 시각이 곧 답변 시각이다). 목록은 `created_time` 내림차순, 최대 100건.
 
 ### 왜 별도 관리자 화면을 만들지 않았나
 
@@ -318,14 +382,27 @@ DB 이름: **Q&A 문의 게시판** — 생성 완료
 
 ---
 
-## 9. 남은 결정 사항
+## 9. 진행 상황
 
-- [ ] **모집 마감일** — 현재 `2026-09-14` 임시값. D-day 카운트와 접수 차단에 직결.
-      코드를 고치지 않고 `NEXT_PUBLIC_DEADLINE` 환경변수로 바꿀 수 있다
-- [ ] **포지션별 모집 인원** — 네 포지션 모두 `n명` 자리
-      (프론트엔드·백엔드는 각 1명이 합류했을 뿐 모집은 계속 열려 있다)
-- [ ] **Q&A DB 통합 연결** — 노션에서 `Q&A 문의 게시판` ⋯ → 연결 → `Recruitment Site` 추가.
-      이걸 하기 전까지 `/qna`는 "목록을 불러오지 못했습니다"만 보여준다
-- [ ] 도메인 확정 → Resend DNS 등록 (SPF/DKIM)
-- [ ] 로고 / 파비콘
-- [ ] 개인정보 보유기간 문구 (예: 모집 종료 후 6개월 뒤 파기)
+### 결정 완료
+
+- [x] **모집 마감일** — 노션 `사이트 설정` DB에서 읽는다(§3.2). 운영진이 날짜 칸만 고치면
+      재배포 없이 최대 60초 안에 반영된다. 코드의 `site.deadline`은 노션을 못 읽을 때의
+      기본값으로만 남는다
+- [x] **포지션별 모집 인원** — 네 포지션 모두 `n명` 표기로 **확정**. 숫자를 박지 않는다.
+      필요한 인원이 상황에 따라 달라지고, 숫자를 적으면 그 자리가 찼는지부터 묻게 된다.
+      프론트엔드·백엔드는 각 1명이 합류했지만 모집은 계속 열려 있다(`note`로 표시)
+- [x] **Q&A DB 통합 연결** — 완료. `/qna` 목록이 정상 조회된다
+- [x] **도메인** — `builditship.kro.kr` 확정, DNS 연결 완료(§5.4)
+- [x] **개인정보 보유기간** — "리크루팅 종료와 즉시 파기"(`site.privacyRetention`).
+      메일 · 지원 폼 · `/privacy`가 모두 이 문장 하나를 쓴다
+
+### 남은 항목
+
+- [ ] **Resend 도메인 검증** — `builditship.kro.kr`에 SPF/DKIM 레코드를 등록하고
+      `RESEND_API_KEY` · `MAIL_FROM`을 채우면 발신 주소가 개인 Gmail에서 프로젝트 도메인으로
+      바뀐다. 그 전까지는 Gmail SMTP로 나간다(§5.5)
+- [ ] **로고 · OG 이미지** — `layout.tsx`의 `openGraph`에 이미지가 없어, 링크를 공유해도
+      썸네일이 뜨지 않는다. 커뮤니티에 링크를 뿌리는 사이트라 체감 차이가 크다
+- [ ] **레이트리밋 저장소** — 현재는 인메모리라 서버리스 인스턴스별로만 동작한다.
+      트래픽이 커지면 Upstash 같은 외부 저장소로 교체한다(`src/lib/ratelimit.ts`)

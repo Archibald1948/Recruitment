@@ -1,0 +1,137 @@
+Copyright (c) 2026 Archibald1948. All Rights Reserved.
+
+독점 라이선스 (PROPRIETARY LICENSE)
+
+================================================================================
+한국어
+================================================================================
+
+1. 저작권 귀속
+
+   이 저장소에 포함된 모든 소스 코드, 문서, 디자인, 이미지, 텍스트, 설정 파일 및
+   그로부터 생성된 산출물(이하 "본 저작물")에 대한 저작권 및 그 밖의 모든 지식재산권은
+   저작권자(Archibald1948, 이하 "저작권자")에게 귀속됩니다.
+
+2. 권리 유보
+
+   저작권자는 본 저작물에 관한 모든 권리를 유보합니다(All Rights Reserved).
+   본 저장소가 공개되어 있다는 사실은 어떠한 형태의 이용 허락으로도 해석되지 않습니다.
+
+3. 금지 행위
+
+   저작권자의 사전 서면 동의 없이 다음 행위를 할 수 없습니다.
+
+   (a) 본 저작물의 전부 또는 일부를 복제, 다운로드, 저장, 배포, 전송, 전시, 공중송신하는 행위
+   (b) 본 저작물을 수정, 번안, 편집하거나 이를 이용해 2차적저작물을 작성하는 행위
+   (c) 본 저작물의 전부 또는 일부를 개인적·상업적 프로젝트에 사용하거나 통합하는 행위
+   (d) 본 저작물을 재라이선스, 판매, 대여, 양도하거나 서비스 형태로 제공하는 행위
+   (e) 저작권 표시, 라이선스 고지 또는 저작자 표시를 제거하거나 변경하는 행위
+   (f) 본 저작물의 구조, 디자인, 코드를 실질적으로 유사하게 모방한 결과물을 배포하는 행위
+
+4. 예외적으로 허용되는 범위
+
+   저작권법이 명시적으로 허용하는 범위(예: 인용, 사적 이용을 위한 복제 등)의 이용은
+   본 라이선스에 의해 제한되지 않습니다. GitHub 등 호스팅 플랫폼의 이용약관에 따라
+   해당 플랫폼 내에서 기술적으로 발생하는 행위(예: 저장소 열람) 또한 마찬가지입니다.
+   그 밖의 모든 이용은 저작권자의 사전 서면 허락을 받아야 합니다.
+
+5. 권리 침해에 대한 조치
+
+   본 라이선스를 위반한 이용은 저작권 침해에 해당하며, 저작권자는 침해 행위의 중지 청구,
+   손해배상 청구, 명예회복 조치 청구를 포함한 민사상 구제 수단을 취할 수 있고,
+   저작권법에 따른 형사 고소를 제기할 수 있습니다.
+
+   저작권자는 위반 사실을 인지한 경우 사전 통지 없이 위 조치를 취할 수 있으며,
+   권리 행사를 즉시 하지 않았다는 사정이 권리의 포기를 의미하지 않습니다.
+
+6. 이용 허락 문의
+
+   본 저작물의 이용을 원하는 경우 저작권자에게 문의하여 사전 서면 허락을 받아야 합니다.
+   문의처: https://github.com/Archibald1948
+
+7. 서드파티 구성요소
+
+   본 저작물이 의존하거나 포함하는 제3자 소프트웨어(패키지 의존성, 오픈소스 컴포넌트,
+   폰트 등)에는 본 라이선스가 적용되지 않으며, 각각의 원 라이선스가 그대로 적용됩니다.
+
+8. 보증의 부인 및 책임의 제한
+
+   본 저작물은 "있는 그대로(AS IS)" 제공되며, 저작권자는 상품성, 특정 목적에의 적합성,
+   비침해에 대한 보증을 포함하여 명시적이든 묵시적이든 어떠한 보증도 하지 않습니다.
+   저작권자는 본 저작물의 이용 또는 이용 불능으로 인해 발생하는 어떠한 손해에 대해서도
+   책임을 지지 않습니다.
+
+9. 준거법 및 관할
+
+   본 라이선스는 대한민국 법률에 따라 해석되며, 본 라이선스와 관련한 분쟁은
+   대한민국 법원을 관할 법원으로 합니다.
+
+================================================================================
+ENGLISH
+================================================================================
+
+1. Ownership
+
+   All source code, documentation, designs, images, text, configuration files, and
+   any artifacts generated therefrom contained in this repository (the "Work") are
+   the exclusive property of the copyright holder, Archibald1948 (the "Owner"),
+   who retains all copyright and other intellectual property rights therein.
+
+2. Reservation of Rights
+
+   All rights are reserved. The public visibility of this repository does not
+   constitute a grant of any license or permission of any kind.
+
+3. Prohibited Acts
+
+   Without the Owner's prior written consent, you may NOT:
+
+   (a) copy, download, store, distribute, transmit, display, or publicly communicate
+       the Work in whole or in part;
+   (b) modify, adapt, translate, or create derivative works based on the Work;
+   (c) use or incorporate the Work, in whole or in part, in any personal or
+       commercial project;
+   (d) sublicense, sell, rent, lease, assign, or provide the Work as a service;
+   (e) remove or alter any copyright notice, license notice, or attribution; or
+   (f) distribute any product that substantially reproduces the structure, design,
+       or code of the Work.
+
+4. Permitted Exceptions
+
+   Uses expressly permitted by applicable copyright law (such as quotation or
+   private reproduction), and acts occurring within a hosting platform as a
+   technical consequence of that platform's terms of service (such as viewing this
+   repository on GitHub), are not restricted by this License. All other uses
+   require the Owner's prior written permission.
+
+5. Enforcement
+
+   Any use in violation of this License constitutes copyright infringement. The
+   Owner may pursue all available civil remedies, including injunctive relief and
+   damages, and may file a criminal complaint under applicable law. Failure to
+   enforce any provision immediately does not constitute a waiver of that provision.
+
+6. Permission Requests
+
+   To request permission to use the Work, contact the Owner at
+   https://github.com/Archibald1948
+
+7. Third-Party Components
+
+   Third-party software on which the Work depends or which it includes (package
+   dependencies, open-source components, fonts, and the like) is not covered by
+   this License and remains subject to its own original license terms.
+
+8. Disclaimer of Warranty and Limitation of Liability
+
+   THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+   PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE OWNER BE LIABLE
+   FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN
+   CONNECTION WITH THE WORK OR THE USE OR OTHER DEALINGS IN THE WORK.
+
+9. Governing Law and Jurisdiction
+
+   This License is governed by the laws of the Republic of Korea, and any dispute
+   arising in connection with it shall be subject to the jurisdiction of the courts
+   of the Republic of Korea.
