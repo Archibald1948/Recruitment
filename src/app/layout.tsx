@@ -46,6 +46,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: "#0C0C0C",
   colorScheme: "dark",
+  /*
+   * 모바일 키보드가 올라올 때 레이아웃 뷰포트까지 같이 줄인다.
+   *
+   * 기본값(resizes-visual)에서는 보이는 영역만 줄고 레이아웃 뷰포트는 그대로다.
+   * sticky/fixed는 레이아웃 뷰포트를 기준으로 붙으므로, 지원 폼에서 입력창을
+   * 누르면 진행률 바가 화면 위쪽 밖에 붙어 사라진다.
+   */
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({
