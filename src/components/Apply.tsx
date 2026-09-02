@@ -1,6 +1,6 @@
 import ApplyForm from "@/components/ApplyForm";
 import QnaPreview from "@/components/QnaPreview";
-import Link from "next/link";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import FadeIn from "@/components/ui/FadeIn";
 import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
 import { PixelOrbit, PixelSphere } from "@/components/decor/PixelOrnaments";
@@ -99,9 +99,13 @@ export default function Apply() {
           <p className="mt-2 text-xs text-[var(--muted)]">
             게시판에 남기시면 답변해 드립니다. 다른 분들의 질문과 답변도 함께 볼 수 있습니다.
           </p>
-          <Link href="/qna" className="btn-ghost mt-5 inline-block px-7 py-3 text-xs">
+          {/* 아이콘은 벤더 기본이 24px이라 이 크기의 버튼에는 커서 여기서 줄인다. */}
+          <InteractiveHoverButton
+            href="/qna"
+            className="mt-5 border-2 border-[var(--text-dim)] px-7 py-3 text-xs font-normal text-[var(--text-dim)] [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0"
+          >
             문의하기
-          </Link>
+          </InteractiveHoverButton>
         </div>
       </div>
     </section>
