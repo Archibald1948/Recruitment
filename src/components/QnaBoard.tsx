@@ -3,14 +3,20 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { WarpBackground } from "@/components/magicui/warp-background";
+import { AnimatedSpan, Terminal, TypingAnimation } from "@/components/magicui/terminal";
 import QuestionForm from "@/components/QuestionForm";
 import { ANSWERER, type QnaEntry } from "@/lib/qna";
 
 type Filter = "all" | "answered" | "waiting";
 
-/** 빔 색. 원본의 무작위 무지개색 대신 히어로 팔레트를 쓴다. */
-const BEAM_COLORS = ["#c98a94", "#e3c8bd", "#a8a6c1", "#efcadd"];
+/**
+ * 터미널 한 줄이 차지할 높이.
+ *
+ * TypingAnimation은 빈 문자열로 시작해 글자가 채워질수록 줄이 생긴다.
+ * 그대로 두면 타이핑될 때마다 터미널이 아래로 늘어난다. 미리 한 줄 높이를
+ * 잡아두면 글자만 채워지고 상자는 처음 크기 그대로다.
+ */
+const LINE = "min-h-6 leading-6";
 
 /** 목록에 붙일 글 번호. 필터를 바꿔도 번호가 흔들리지 않게 전체 기준으로 매긴다. */
 interface NumberedEntry extends QnaEntry {
@@ -229,29 +235,39 @@ export default function QnaBoard({
           )}
 
           {/*
-            글이 적으면 목록 아래가 통째로 비었다. 마무리 CTA를 두어 그 공간을
-            채우고, 다 읽고 내려온 사람에게 질문할 곳을 한 번 더 보여준다.
-          */}
-          {!failed && (
-            <WarpBackground
-              className="mt-14 flex min-h-56 items-center justify-center rounded-[24px] border-[var(--line)] p-8 sm:p-12"
-              gridColor="rgba(255,255,255,0.055)"
-              beamColors={BEAM_COLORS}
-              beamsPerSide={2}
-              beamSize={6}
-              beamDuration={6}
-              beamDelayMax={5}
-            >
-              <div className="text-center">
-                <p className="font-display text-xs tracking-widest text-[var(--muted)] uppercase">
-                  Still Curious?
-                </p>
-                <p className="body-copy mx-auto mt-3 max-w-sm break-keep text-white">
-                  아직 궁금한 점이 남아 있다면 편하게 남겨주세요.
-                </p>
-              </div>
-            </WarpBackground>
-          )}
+          글이 적으면 목록 아래가 통째로 비었다. 프로젝트 성격에 맞는 터미널로
+          그 공간을 채우고, 이 게시판이 어떻게 굴러가는지도 함께 알린다.
+
+          높이를 h-64로 못박고 overflow-hidden을 건다. 줄이 채워질 때 상자가
+          늘어나면 아래 여백이 출렁이기 때문이다.
+        */}
+        {!failed && (
+          <div className="mt-14 flex justify-center">
+            <Terminal className="h-64 max-w-lg overflow-hidden border-[var(--line)] bg-[#080808]">
+              <TypingAnimation className={`${LINE} text-white`}>
+                &gt; qna --how-it-works
+              </TypingAnimation>
+
+              <AnimatedSpan className={`${LINE} text-[#8fbf9f]`}>
+                ✔ 이 게시판에 질문을 남깁니다.
+              </AnimatedSpan>
+              <AnimatedSpan className={`${LINE} text-[#8fbf9f]`}>
+                ✔ 운영진이 노션에서 확인합니다.
+              </AnimatedSpan>
+              <AnimatedSpan className={`${LINE} text-[#8fbf9f]`}>
+                ✔ 답변이 이 자리에 그대로 올라옵니다.
+              </AnimatedSpan>
+
+              <AnimatedSpan className={`${LINE} text-[#a8a6c1]`}>
+                ℹ 질문과 답변은 모두에게 공개됩니다.
+              </AnimatedSpan>
+
+              <TypingAnimation className={`${LINE} text-[var(--muted)]`}>
+                궁금한 점이 남아 있다면 편하게 남겨주세요.
+              </TypingAnimation>
+            </Terminal>
+          </div>
+        )}
           </div>
       </div>
 
