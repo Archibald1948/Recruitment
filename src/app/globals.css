@@ -126,6 +126,24 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* ── 커서 ────────────────────────────────────────────────────── */
+/*
+ * Tailwind v4 Preflight는 버튼에 cursor: pointer를 더 이상 넣지 않고
+ * 브라우저 기본값(default)을 따른다. 누를 수 있는 것은 누를 수 있게
+ * 보여야 하므로, 컴포넌트마다 붙이지 않고 여기서 한 번에 되돌린다.
+ */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
 /* ── 버튼 ────────────────────────────────────────────────────── */
 /* 레퍼런스의 Get Started — 검은 글씨의 흰 알약에 은은한 흰 글로우 */
 .btn-cta {
