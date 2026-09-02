@@ -57,3 +57,33 @@ export function formatMeetingAt(iso: string): string {
     ...(dateOnly ? {} : { hour: "numeric", minute: "2-digit" }),
   }).format(d);
 }
+
+/**
+ * 노션 날짜 ↔ <input type="datetime-local"> 값 변환.
+ *
+ * 브라우저의 표준 시간대를 따르지 않고 언제나 한국 시간으로 읽고 쓴다.
+ * 운영자가 해외에서 열어도 노션에 적힌 시각과 화면의 시각이 같아야 한다.
+ */
+export function toDateTimeLocalKst(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  // sv-SE는 "2026-09-10 19:00" 꼴로 나와 그대로 자르기 좋다.
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+    .format(d)
+    .replace(" ", "T");
+}
+
+/** 비었으면 null — 노션에서 날짜를 지우겠다는 뜻이다. */
+export function fromDateTimeLocalKst(value: string): string | null {
+  const v = value.trim();
+  if (!v) return null;
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v) ? `${v}:00+09:00` : null;
+}

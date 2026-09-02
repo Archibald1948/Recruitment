@@ -201,6 +201,33 @@ export async function updateApplication(pageId: string, input: ApplicationInput)
   await notion().pages.update({ page_id: pageId, properties: props as any });
 }
 
+/** 운영자 화면에서 고치는 심사 항목. 지원자가 쓴 값은 건드리지 않는다. */
+export interface ReviewInput {
+  status: string;
+  meetingAt: string | null;
+  zoomUrl: string;
+  notice: string;
+}
+
+/**
+ * 심사 항목만 덮어쓴다.
+ *
+ * 이름·이메일·지원 내용은 지원자의 것이므로 여기서 손대지 않는다. 운영자가
+ * 실수로 지원서를 고쳐버리는 길을 아예 만들지 않는 편이 안전하다.
+ */
+export async function updateReview(pageId: string, input: ReviewInput) {
+  await notion().pages.update({
+    page_id: pageId,
+    properties: {
+      // 빈 값이면 셀렉트를 비운다. 상태를 되돌리는 길도 있어야 한다.
+      [PROP.status]: input.status ? { select: { name: input.status } } : { select: null },
+      [PROP.meetingAt]: { date: input.meetingAt ? { start: input.meetingAt } : null },
+      [PROP.zoomUrl]: { url: input.zoomUrl || null },
+      [PROP.notice]: { rich_text: text(input.notice) },
+    } as any,
+  });
+}
+
 /** 수정 이력을 페이지 본문에 누적한다. */
 export async function appendHistory(pageId: string, line: string) {
   try {
