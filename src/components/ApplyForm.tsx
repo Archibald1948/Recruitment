@@ -6,7 +6,7 @@ import { openPositions, positionById, positions, site } from "@/config/site";
 import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
 import { captureRef, readRef } from "@/lib/ref";
-import { validateApplication } from "@/lib/validation";
+import { ANSWER_MAX, validateApplication } from "@/lib/validation";
 
 const DRAFT_KEY = "recruit:draft:v1";
 
@@ -455,9 +455,11 @@ export default function ApplyForm({
                 name={`answers.${q.id}`}
                 required={q.required}
                 error={errors[`answers.${q.id}`]}
+                hint={`${(values.answers[q.id] ?? "").length} / ${ANSWER_MAX}자`}
               >
                 <textarea
                   className="field min-h-28 resize-y"
+                  maxLength={ANSWER_MAX}
                   value={values.answers[q.id] ?? ""}
                   onChange={(e) => setAnswer(q.id, e.target.value)}
                   aria-invalid={!!errors[`answers.${q.id}`]}

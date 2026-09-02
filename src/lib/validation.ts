@@ -21,7 +21,13 @@ export interface ApplicationInput {
 export type Errors = Partial<Record<keyof ApplicationInput | string, string>>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX = { name: 40, oneLiner: 60, text: 2000, url: 300 };
+/**
+ * 노션 rich_text 속성은 **한 칸에 총 2000자**까지만 저장된다.
+ * 포지션별 답변은 여러 질문을 한 칸에 모아 넣으므로, 질문 수(최대 4개)와
+ * 질문 라벨 길이를 감안해 답변 하나를 400자로 제한한다.
+ * 이 한도를 넘기면 저장 시점에 조용히 잘려 답변이 사라진다.
+ */
+const MAX = { name: 40, oneLiner: 60, text: 2000, answer: 400, url: 300 };
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
@@ -92,7 +98,8 @@ export function validateApplication(
     for (const q of target.questions) {
       const a = str(rawAnswers[q.id]);
       if (q.required && !a) errors[`answers.${q.id}`] = "이 항목은 필수입니다.";
-      if (a.length > MAX.text) errors[`answers.${q.id}`] = "너무 깁니다. 2000자 이내로 줄여주세요.";
+      else if (a.length > MAX.answer)
+        errors[`answers.${q.id}`] = `${MAX.answer}자 이내로 줄여주세요. (현재 ${a.length}자)`;
       if (a) value.answers[q.id] = a;
     }
   }
@@ -101,6 +108,8 @@ export function validateApplication(
 }
 
 /** 포지션별 답변을 노션 rich_text 한 덩어리로 직렬화 */
+export const ANSWER_MAX = MAX.answer;
+
 export function serializeAnswers(positionId: string, answers: Record<string, string>): string {
   const p = positionById(positionId);
   if (!p) return "";
