@@ -162,6 +162,13 @@ export const positions: Position[] = [
         placeholder: "어떤 문제를 다루는 서비스에 관심이 있는지, 왜 그런지",
         required: false,
       },
+      {
+        id: "successMetric",
+        label:
+          "서비스를 출시한 뒤, 잘 되고 있는지를 무엇으로 판단하시겠어요?",
+        placeholder: "보고 싶은 지표나 확인하고 싶은 사용자 반응을 적어주세요.",
+        required: false,
+      },
     ],
   },
   {
@@ -246,6 +253,13 @@ export const positions: Position[] = [
         placeholder: "예: Java / Spring Boot, Node.js / Express …",
         required: false,
       },
+      {
+        id: "deployOps",
+        label:
+          "서버를 직접 배포하거나 운영해 본 경험이 있다면 알려주세요.",
+        placeholder: "사용한 환경과, 배포하면서 겪은 문제가 있었다면 함께 적어주세요.",
+        required: false,
+      },
     ],
   },
   {
@@ -282,6 +296,13 @@ export const positions: Position[] = [
         label:
           "와이어프레임에서 최종 UI 디자인으로 발전시키는 과정에서 가장 중요하게 생각하는 부분은 무엇인가요?",
         placeholder: "없으면 비워두셔도 됩니다.",
+        required: false,
+      },
+      {
+        id: "designSystem",
+        label:
+          "화면이 여러 개로 늘어나도 스타일을 일관되게 유지하려면 무엇이 필요하다고 생각하시나요?",
+        placeholder: "컬러·타이포·컴포넌트를 어떻게 정리해 두실지 적어주세요.",
         required: false,
       },
     ],
