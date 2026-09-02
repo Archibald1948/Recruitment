@@ -33,7 +33,7 @@ export default function Hero() {
 
         <a
           href="#apply"
-          className="anim-reveal btn-cta mt-8 inline-block px-8 py-3.5 text-xs sm:px-10 sm:text-sm"
+          className="anim-reveal btn-cta btn-pulse mt-8 inline-block px-8 py-3.5 text-xs sm:px-10 sm:text-sm"
           style={{ ["--d" as string]: "0.4s" }}
         >
           지원하기
