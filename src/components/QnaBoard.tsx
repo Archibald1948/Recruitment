@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import QuestionForm from "@/components/QuestionForm";
@@ -240,25 +240,15 @@ export default function QnaBoard({
         aria-label="질문 남기기"
         className="m-auto w-[calc(100%-2rem)] max-w-xl bg-transparent p-0 text-[var(--text-dim)] backdrop:bg-black/55 backdrop:backdrop-blur-md"
       >
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setFormOpen(false)}
-            aria-label="닫기"
-            className="absolute top-4 right-4 z-10 grid h-8 w-8 place-items-center rounded-full border border-[var(--line)] bg-[#0c0c0c] text-[var(--muted)] transition-colors hover:text-white"
-          >
-            <X className="h-4 w-4" />
-          </button>
-
-          <QuestionForm
-            key={openCount}
-            onPosted={(id) => {
-              // 새 글은 언제나 "답변 대기"다. 답변 완료 탭에 있으면 안 보인다.
-              setFilter("all");
-              setPostedId(id);
-            }}
-          />
-        </div>
+        <QuestionForm
+          key={openCount}
+          onClose={() => setFormOpen(false)}
+          onPosted={(id) => {
+            // 새 글은 언제나 "답변 대기"다. 답변 완료 탭에 있으면 안 보인다.
+            setFilter("all");
+            setPostedId(id);
+          }}
+        />
       </dialog>
     </>
   );

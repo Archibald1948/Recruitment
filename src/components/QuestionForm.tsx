@@ -1,8 +1,9 @@
 "use client";
 
-import { AlertCircle, Check, Loader2 } from "lucide-react";
+import { AlertCircle, Check, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { useUnsavedGuard } from "@/lib/useUnsavedGuard";
 import { QNA_MAX_NICKNAME, QNA_MAX_QUESTION, validateQuestion } from "@/lib/validation";
 
 /**
@@ -11,11 +12,19 @@ import { QNA_MAX_NICKNAME, QNA_MAX_QUESTION, validateQuestion } from "@/lib/vali
  * 등록에 성공하면 서버가 /qna를 재검증하므로 router.refresh()로 목록을
  * 다시 받아 방금 쓴 글이 바로 보이게 한다.
  */
+const LEAVE_MESSAGE = "작성 중인 질문이 있습니다. 지금 닫으면 내용이 사라집니다. 닫으시겠습니까?";
+
 export default function QuestionForm({
   onPosted,
+  onClose,
 }: {
   /** 등록된 글의 id. 부모가 목록에서 그 글로 이동시킨다. */
   onPosted?: (id: string) => void;
+  /**
+   * 닫기 버튼을 붙인다. 쓰던 내용을 잃는 경로라 확인은 이 컴포넌트가 한다 —
+   * 무엇이 얼마나 쓰였는지는 여기만 안다.
+   */
+  onClose?: () => void;
 }) {
   const router = useRouter();
   const [values, setValues] = useState({ nickname: "", question: "" });
@@ -24,6 +33,15 @@ export default function QuestionForm({
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const honeypot = useRef<HTMLInputElement>(null);
+
+  // 닉네임만 적힌 상태는 잃을 게 없다. 질문 본문이 있을 때만 붙잡는다.
+  const dirty = !done && values.question.trim().length > 0;
+  useUnsavedGuard(dirty, LEAVE_MESSAGE);
+
+  function requestClose() {
+    if (dirty && !window.confirm(LEAVE_MESSAGE)) return;
+    onClose?.();
+  }
 
   const set = (key: keyof typeof values, v: string) => {
     setValues((prev) => ({ ...prev, [key]: v }));
@@ -83,8 +101,19 @@ export default function QuestionForm({
     <form
       onSubmit={submit}
       noValidate
-      className="rounded-[24px] border border-[var(--line)] bg-white/[0.03] p-5 sm:p-6"
+      className="relative rounded-[24px] border border-[var(--line)] bg-white/[0.03] p-5 pr-14 sm:p-6 sm:pr-16"
     >
+      {onClose && (
+        <button
+          type="button"
+          onClick={requestClose}
+          aria-label="닫기"
+          className="absolute top-4 right-4 grid h-8 w-8 place-items-center rounded-full border border-[var(--line)] text-[var(--muted)] transition-colors hover:text-white"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      )}
+
       <h2 className="text-sm font-medium text-white">질문 남기기</h2>
       <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
         남긴 질문과 답변은 이 페이지에 공개됩니다. 개인정보는 적지 말아주세요.
@@ -107,7 +136,9 @@ export default function QuestionForm({
           className="mt-5 flex items-start gap-2.5 rounded-2xl border border-[var(--line)] bg-white/[0.05] px-4 py-3 text-sm text-white"
         >
           <Check className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={3} />
-          <span>질문이 등록되었습니다. 답변이 달리면 이 페이지에 표시됩니다.</span>
+          <span>
+            질문이 등록되었습니다. 닫으면 목록에서 방금 남긴 글을 확인할 수 있습니다.
+          </span>
         </div>
       )}
 
