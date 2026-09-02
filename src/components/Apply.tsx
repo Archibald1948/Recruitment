@@ -1,4 +1,5 @@
 import ApplyForm from "@/components/ApplyForm";
+import ContactForm from "@/components/ContactForm";
 import FadeIn from "@/components/ui/FadeIn";
 import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
 import { PixelOrbit, PixelSphere } from "@/components/decor/PixelOrnaments";
@@ -53,6 +54,24 @@ export default function Apply() {
         </div>
       </FadeIn>
 
+      {/* 지원 전에 절차를 먼저 보여준다. 얼마나 걸리는지 모르는 게 지원을 망설이게 한다. */}
+      <FadeIn delay={0.1}>
+        <ol className="mx-auto mb-16 grid max-w-3xl gap-4 sm:grid-cols-3">
+          {site.recruitingSteps.map((s) => (
+            <li
+              key={s.step}
+              className="relative z-10 rounded-[20px] border border-[var(--line)] bg-white/[0.03] p-5"
+            >
+              <span className="font-display text-xs tracking-widest text-[var(--muted)]">
+                {s.step}
+              </span>
+              <h3 className="mt-2 text-sm font-medium text-white">{s.title}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-[var(--text-dim)]/60">{s.desc}</p>
+            </li>
+          ))}
+        </ol>
+      </FadeIn>
+
       {closed ? (
         <p className="mx-auto max-w-xl rounded-[28px] border border-[var(--line)] bg-white/[0.03] px-6 py-10 text-center text-[var(--text-dim)]/80">
           모집이 마감되었습니다. 관심 가져주셔서 감사합니다.
@@ -64,6 +83,11 @@ export default function Apply() {
       ) : (
         <ApplyForm />
       )}
+
+      {/* 지원서를 쓰다 막히는 순간 바로 물어볼 수 있게 폼 바로 아래에 둔다. */}
+      <div className="relative z-10 mt-20 border-t border-[var(--line)] pt-14">
+        <ContactForm />
+      </div>
     </section>
   );
 }
