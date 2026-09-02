@@ -3,7 +3,7 @@
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { openPositions, positionById, positions, site } from "@/config/site";
-import { formatSlot, openSlotDays, slotToIso } from "@/lib/meeting-slots";
+import { formatSlot, openSlotDays, slotToIso, type SlotDay } from "@/lib/meeting-slots";
 import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
 import { captureRef, readRef } from "@/lib/ref";
@@ -541,6 +541,7 @@ export default function ApplyForm({
 
         <MeetingSlotField
           value={values.meetingSlot}
+          initialSlot={initial?.meetingSlot}
           error={errors.meetingSlot}
           onChange={(v) => set("meetingSlot", v)}
         />
@@ -706,20 +707,40 @@ function focusFirstError(errors: Errors) {
  */
 function MeetingSlotField({
   value,
+  initialSlot,
   error,
   onChange,
 }: {
   value: string;
+  /** 수정 모드에서 본인이 이미 잡아둔 시각. 남의 것과 달리 잠그면 안 된다. */
+  initialSlot?: string;
   error?: string;
   onChange: (v: string) => void;
 }) {
   // 지난 시간을 빼려면 현재 시각이 필요한데, 서버와 클라이언트의 "지금"이
   // 달라 하이드레이션이 어긋난다. 마운트 후에 만든다.
-  const [days, setDays] = useState<ReturnType<typeof openSlotDays>>([]);
+  const [days, setDays] = useState<SlotDay[]>([]);
+  // 남이 이미 찜한 시각. 최종 판단은 서버가 하지만, 고르기 전에 잠가두면
+  // 제출하고 나서야 안 된다는 말을 듣는 일이 없다.
+  const [taken, setTaken] = useState<Set<number>>(new Set());
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setDays(openSlotDays());
+    let alive = true;
+    // 서버가 만든 목록을 쓴다. 폼과 검증이 같은 규칙을 보게 하려는 것이다.
+    fetch("/api/slots")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!alive) return;
+        setDays((d.days as SlotDay[]) ?? openSlotDays());
+        setTaken(new Set((d.taken as string[]).map((t) => new Date(t).getTime())));
+      })
+      .catch(() => alive && setDays(openSlotDays()));
+    return () => {
+      alive = false;
+    };
   }, []);
+
+  const isTaken = (v: string) => taken.has(new Date(slotToIso(v)).getTime()) && v !== initialSlot;
 
   const selectedDate = value ? value.split("T")[0] : "";
   const day = days.find((d) => d.date === selectedDate);
@@ -745,7 +766,10 @@ function MeetingSlotField({
                 key={d.date}
                 type="button"
                 aria-pressed={d.date === selectedDate}
-                onClick={() => onChange(`${d.date}T${d.times[0]}`)}
+                onClick={() => {
+                  const first = d.times.find((t) => !isTaken(`${d.date}T${t}`)) ?? d.times[0];
+                  onChange(`${d.date}T${first}`);
+                }}
                 className={`rounded-full border px-4 py-2.5 text-sm transition ${
                   d.date === selectedDate
                     ? "border-white/70 bg-white/10 text-white"
@@ -761,16 +785,21 @@ function MeetingSlotField({
             <div className="flex flex-wrap gap-2">
               {day.times.map((t) => {
                 const v = `${day.date}T${t}`;
+                const full = isTaken(v);
                 return (
                   <button
                     key={t}
                     type="button"
+                    disabled={full}
                     aria-pressed={v === value}
+                    title={full ? "이미 선택된 시간입니다" : undefined}
                     onClick={() => onChange(v)}
                     className={`rounded-xl border px-3 py-2 text-sm tabular transition ${
-                      v === value
-                        ? "border-white/70 bg-white/10 text-white"
-                        : "border-[var(--line)] text-[var(--text-dim)]/70 hover:border-white/30"
+                      full
+                        ? "border-[var(--line)] text-[var(--muted)]/40 line-through"
+                        : v === value
+                          ? "border-white/70 bg-white/10 text-white"
+                          : "border-[var(--line)] text-[var(--text-dim)]/70 hover:border-white/30"
                     }`}
                   >
                     {t}
