@@ -5,6 +5,7 @@ import FadeIn from "@/components/ui/FadeIn";
 import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
 import { PixelOrbit, PixelSphere } from "@/components/decor/PixelOrnaments";
 import { daysLeft, isClosed, openPositions, site } from "@/config/site";
+import { getDeadline } from "@/lib/settings";
 
 const ORNAMENTS: DecorItem[] = [
   {
@@ -23,9 +24,10 @@ const ORNAMENTS: DecorItem[] = [
   },
 ];
 
-export default function Apply() {
-  const closed = isClosed();
-  const remaining = daysLeft();
+export default async function Apply() {
+  const deadline = await getDeadline();
+  const closed = isClosed(deadline);
+  const remaining = daysLeft(deadline);
 
   // overflow는 clip이어야 한다. hidden은 스크롤 컨테이너를 만들어 안쪽
   // 진행률 바의 sticky를 무력화한다. clip은 스크롤포트를 만들지 않고

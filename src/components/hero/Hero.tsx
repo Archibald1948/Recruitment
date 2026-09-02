@@ -1,11 +1,12 @@
 import { daysLeft, positions, site } from "@/config/site";
+import { getDeadline } from "@/lib/settings";
 import DotMatrixHeadline from "./DotMatrixHeadline";
 import GlyphField from "./GlyphField";
 import LiveStats from "./LiveStats";
 import MeshBackdrop from "./MeshBackdrop";
 
-export default function Hero() {
-  const remaining = daysLeft();
+export default async function Hero() {
+  const remaining = daysLeft(await getDeadline());
 
   return (
     <section
