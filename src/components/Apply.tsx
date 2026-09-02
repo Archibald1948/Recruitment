@@ -26,8 +26,11 @@ export default function Apply() {
   const closed = isClosed();
   const remaining = daysLeft();
 
+  // overflow는 clip이어야 한다. hidden은 스크롤 컨테이너를 만들어 안쪽
+  // 진행률 바의 sticky를 무력화한다. clip은 스크롤포트를 만들지 않고
+  // 장식이 가로로 삐져나가는 것만 잘라낸다.
   return (
-    <section id="apply" className="relative z-10 overflow-hidden px-5 py-24 sm:px-8 md:px-10 md:py-32">
+    <section id="apply" className="relative z-10 overflow-x-clip px-5 py-24 sm:px-8 md:px-10 md:py-32">
       <SectionDecor items={ORNAMENTS} opacity="opacity-40" />
 
       <FadeIn>
