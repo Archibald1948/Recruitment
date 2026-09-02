@@ -16,19 +16,17 @@ export const QNA_PROP = {
   question: "질문",
   nickname: "닉네임",
   answer: "답변",
-  answeredBy: "답변자",
   published: "공개",
 } as const;
 
-/** 답변자 이름을 비워두면 이렇게 표시한다. */
-export const DEFAULT_ANSWERER = "운영진";
+/** 답변은 팀 공동 명의로 나간다. 개인 이름을 노출하지 않는다. */
+export const ANSWERER = "운영진";
 
 export interface QnaEntry {
   id: string;
   question: string;
   nickname: string;
   answer: string;
-  answeredBy: string;
   createdAt: string;
   answeredAt: string;
 }
@@ -54,7 +52,6 @@ function toEntry(page: any): QnaEntry {
     question: readText(p[QNA_PROP.question]),
     nickname: readText(p[QNA_PROP.nickname]),
     answer,
-    answeredBy: readText(p[QNA_PROP.answeredBy]).trim() || DEFAULT_ANSWERER,
     createdAt: page.created_time ?? "",
     // 답변이 달린 시각을 따로 기록하지 않는다. 마지막 수정 시각이 곧 답변 시각이다.
     answeredAt: answer ? (page.last_edited_time ?? "") : "",
