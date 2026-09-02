@@ -168,7 +168,7 @@ export default function QnaBoard({
           늘어놓으면 양옆이 비고, 목록을 읽는 동안 필터가 화면 밖으로 나간다.
           sticky로 붙여 스크롤 중에도 필터에 손이 닿게 한다.
         */}
-        <aside className="lg:sticky lg:top-16 lg:w-60 lg:shrink-0">
+        <aside className="lg:sticky lg:top-16 lg:w-64 lg:shrink-0">
           <Link
             href="/"
             className="font-display text-xs tracking-widest text-[var(--muted)] uppercase transition-colors hover:text-white"
@@ -177,8 +177,17 @@ export default function QnaBoard({
           </Link>
 
           <h1 className="mt-6 text-2xl font-medium text-white md:text-3xl">Q&amp;A</h1>
-          <p className="body-copy mt-4 break-keep text-[var(--text-dim)]/60">
-            지원 전 궁금한 점을 남겨주세요. {ANSWERER}이 확인하고 답변을 답니다.
+          {/*
+            문장 사이를 직접 끊는다. 그대로 두면 좁은 사이드바에서는 "답니다."만
+            홀로 떨어지고, 태블릿 폭에서는 두 문장이 한 줄에 붙어버린다.
+
+            body-copy(최대 18.4px)는 넓은 본문용이라 240px 남짓한 기둥에서는
+            한 문장도 한 줄에 못 담는다. 여기서는 text-sm으로 낮춘다.
+          */}
+          <p className="mt-4 text-sm leading-relaxed break-keep text-[var(--text-dim)]/60">
+            지원 전 궁금한 점을 남겨주세요.
+            <br />
+            {ANSWERER}이 확인하고 답변을 답니다.
           </p>
 
           <button
