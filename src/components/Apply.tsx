@@ -72,6 +72,7 @@ export default async function Apply() {
                 {s.step}
               </span>
               <h3 className="mt-2 text-sm font-medium text-white">{s.title}</h3>
+              <p className="mt-1 text-xs text-[#c98a94]">{s.period}</p>
               <p className="mt-2 text-xs leading-relaxed text-[var(--text-dim)]/60">{s.desc}</p>
             </li>
           ))}
