@@ -8,20 +8,21 @@
  * 않아야 하기 때문이다.
  */
 
-export const STATUS_FLOW = ["접수됨", "서류 검토", "줌 미팅", "합류", "보류"] as const;
+export const STATUS_FLOW = ["접수됨", "서류 검토", "줌 미팅", "합류", "불합격"] as const;
 export type ApplicationStatus = (typeof STATUS_FLOW)[number];
 
-/** 지원자 화면에 단계로 그려지는 값. 보류는 별도 문구로 빠진다. */
+/** 지원자 화면에 단계로 그려지는 값. 불합격은 단계가 아니라 별도 문구로 빠진다. */
 export const STEPS = ["접수됨", "서류 검토", "줌 미팅", "합류"] as const;
 
 /** 이름을 바꾸기 전에 저장된 값. 노션 옵션을 아직 안 고쳤어도 동작하게 한다. */
-const LEGACY: Record<string, ApplicationStatus> = { 커피챗: "줌 미팅" };
+const LEGACY: Record<string, ApplicationStatus> = { 커피챗: "줌 미팅", 보류: "불합격" };
 
 const squash = (v: string) => v.replace(/\s+/g, "");
 
 /**
  * 노션에서 읽은 값을 코드가 아는 상태값으로 맞춘다.
- * 띄어쓰기 차이("줌미팅")와 예전 이름("커피챗")을 흡수하고, 모르는 값이면 빈 문자열.
+ * 띄어쓰기 차이("줌미팅")와 예전 이름("커피챗", "보류")을 흡수하고,
+ * 모르는 값이면 빈 문자열.
  */
 export function canonicalStatus(raw: string): ApplicationStatus | "" {
   const trimmed = raw.trim();
@@ -30,12 +31,12 @@ export function canonicalStatus(raw: string): ApplicationStatus | "" {
   return STATUS_FLOW.find((s) => squash(s) === squash(trimmed)) ?? "";
 }
 
-/** 단계 인덱스. 보류거나 모르는 값이면 -1 */
+/** 단계 인덱스. 불합격이거나 모르는 값이면 -1 */
 export function stepIndex(raw: string): number {
   const s = canonicalStatus(raw);
   return s ? STEPS.indexOf(s as (typeof STEPS)[number]) : -1;
 }
 
-export function isHeld(raw: string): boolean {
-  return canonicalStatus(raw) === "보류";
+export function isRejected(raw: string): boolean {
+  return canonicalStatus(raw) === "불합격";
 }
