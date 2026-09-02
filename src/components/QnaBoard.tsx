@@ -252,7 +252,7 @@ export default function QnaBoard({
                 ✔ 이 게시판에 질문을 남깁니다.
               </AnimatedSpan>
               <AnimatedSpan className={`${LINE} text-[#8fbf9f]`}>
-                ✔ 운영진이 노션에서 확인합니다.
+                ✔ 운영진이 확인합니다.
               </AnimatedSpan>
               <AnimatedSpan className={`${LINE} text-[#8fbf9f]`}>
                 ✔ 답변이 이 자리에 그대로 올라옵니다.
