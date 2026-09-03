@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ApplyForm, { type FormValues } from "@/components/ApplyForm";
 import { positionById } from "@/config/site";
+import { isoToSlot, isSelectableSlot } from "@/lib/meeting-slots";
 import { isRejected, STEPS, stepIndex } from "@/lib/status";
 
 const FLOW = STEPS;
@@ -23,6 +24,7 @@ interface Record_ {
   answersRaw: string;
   portfolio: string;
   availability: string;
+  preferredSlot: string;
   createdAt: string;
   updatedAt: string;
   editable: boolean;
@@ -130,6 +132,13 @@ export default function ApplicationView({ id, token }: { id: string; token: stri
     }
   }
 
+  /*
+    이미 고른 미팅 시간을 폼에 되돌려 놓는다.
+    비워두면 본인 시각이 "남이 찜한 칸"으로 보여 다시 고를 수 없다.
+    다만 그 사이 지나버린 시각은 후보에 없으므로 비운 채 새로 고르게 한다.
+  */
+  const slot = isoToSlot(record.preferredSlot);
+
   const initial: Partial<FormValues> = {
     name: record.name,
     email: record.email,
@@ -140,6 +149,7 @@ export default function ApplicationView({ id, token }: { id: string; token: stri
     experience: record.experience,
     portfolio: record.portfolio,
     availability: record.availability,
+    meetingSlot: slot && isSelectableSlot(slot) ? slot : "",
     agree: true,
     answers,
   };
