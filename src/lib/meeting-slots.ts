@@ -97,6 +97,30 @@ export function slotToIso(value: string): string {
   return `${value}:00+09:00`;
 }
 
+/**
+ * 저장된 ISO → 슬롯 값. slotToIso의 반대다.
+ *
+ * 수정 화면에서 본인이 이미 잡아둔 시각을 폼에 되돌려 놓으려면 필요하다.
+ * 문자열을 잘라 쓰면 안 된다 — 노션이 같은 시각을 다른 오프셋으로 돌려줄 수
+ * 있어, 앞 16자를 떼면 엉뚱한 시각이 된다. 항상 한국 시간으로 다시 읽는다.
+ */
+export function isoToSlot(iso: string): string {
+  const d = new Date(iso);
+  if (!iso || Number.isNaN(d.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    // 자정을 24시로 적는 표기를 피한다.
+    hourCycle: "h23",
+  }).formatToParts(d);
+  const at = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${at("year")}-${at("month")}-${at("day")}T${at("hour")}:${at("minute")}`;
+}
+
 const SLOT_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
 /**
