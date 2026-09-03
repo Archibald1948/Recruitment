@@ -767,8 +767,19 @@ function MeetingSlotField({
                 type="button"
                 aria-pressed={d.date === selectedDate}
                 onClick={() => {
-                  const first = d.times.find((t) => !isTaken(`${d.date}T${t}`)) ?? d.times[0];
-                  onChange(`${d.date}T${first}`);
+                  // 이미 고른 날을 다시 눌렀다고 시각까지 되돌리면 안 된다.
+                  if (d.date === selectedDate) return;
+                  // 본인이 원래 잡아둔 날이면 그 시각으로 돌아간다. 수정 화면에서
+                  // 다른 날을 눌러봤다가 되돌아왔을 때 엉뚱한 시각이 잡히면
+                  // 고른 적 없는 시간으로 제출하게 된다.
+                  const own = initialSlot?.startsWith(`${d.date}T`)
+                    ? initialSlot.slice(d.date.length + 1)
+                    : undefined;
+                  const pick =
+                    (own && d.times.includes(own) ? own : undefined) ??
+                    d.times.find((t) => !isTaken(`${d.date}T${t}`)) ??
+                    d.times[0];
+                  onChange(`${d.date}T${pick}`);
                 }}
                 className={`rounded-full border px-4 py-2.5 text-sm transition ${
                   d.date === selectedDate
