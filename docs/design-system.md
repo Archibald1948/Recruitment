@@ -152,7 +152,7 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
    SiteLightRays ─────── 화면 고정(fixed) 광선 레이어, z-1
 ┌─ HERO ──────────────────────────────── 100dvh
 │   GrainGradient(wave) + 글리프 텍스처
-│   헤드라인 2줄 / 서브 / CTA / 스탯 4
+│   헤드라인 2줄 / 서브 / CTA / 스탯 3
 │   ▼ 하단 34vh #0C0C0C 페이드
 ├─ MARQUEE ───────────── 협업툴·스택 배지 2줄 (역방향)
 ├─ ABOUT ─────────────── 팀장 소개 (문자 리빌 1문단)
@@ -187,7 +187,12 @@ font-size: clamp(3rem, 10vw, 140px); font-weight: 900;
   2단 그라디언트는 중간이 회색으로 떠 이음매가 보였다
 - 글이 놓이는 세로 구간(48% 중심)에 방사형 스크림을 깔아 파도 위상과 무관하게 흰 글씨가 읽히게 한다
 - 헤드라인 2줄, 줄마다 `headlineFade 0.85s cubic-bezier(0.22,1,0.36,1)`, delay `0.12s` / `0.3s`
-- 스탯 4개: 카운트업(easeOutCubic, `1500 + i*80`ms, 시작 `480 + i*90`ms), IntersectionObserver threshold 0.25, 1회만
+- 스탯 3개(마감까지 / 함께할 파트 / 예상 기간): 카운트업(easeOutCubic, `1500 + i*80`ms,
+  시작 `480 + i*90`ms), IntersectionObserver threshold 0.25, 1회만.
+  **지원자 수는 넣지 않는다** — 적으면 인기 없어 보이고 많으면 경쟁률로 읽혀,
+  어느 쪽이든 지원을 망설이게 한다. 집계는 `/api/stats`에 그대로 살아 있다
+- 열 수는 지표 개수에서 나온다(`Stats.columns()`). 4열로 고정하면 지표를 하나 뺄 때
+  마지막 칸이 비어 전체가 왼쪽으로 쏠린다
 
 ### 4.2 MARQUEE
 
@@ -300,7 +305,7 @@ easing   cubic-bezier(0.22, 1, 0.36, 1)   히어로 계열
          cubic-bezier(0.25, 0.1, 0.25, 1) FadeIn 기본
 FadeIn   opacity 0 → 1, y 30 → 0, duration 0.7s, viewport { once: true }
 히어로   헤드라인 줄별 0.12s·0.3s / 서브 0.28s / CTA 0.4s
-스탯     0.5s, 0.58s, 0.66s, 0.74s
+스탯     0.5s, 0.58s, 0.66s (지표당 +0.08s)
 ```
 
 `prefers-reduced-motion: reduce`: 모든 애니메이션 제거, 최종 상태로 즉시 표시, 카운트업은 최종값 표기, MeshGradient는 정지 프레임.
@@ -311,7 +316,7 @@ FadeIn   opacity 0 → 1, y 30 → 0, duration 0.7s, viewport { once: true }
 
 Tailwind 기본 브레이크포인트(sm 640 / md 768 / lg 1024), 모바일 퍼스트, 유동 타이포는 `clamp()`.
 
-- **≤720px**: 스탯 4열 → 2열
+- **≤720px**: 스탯 4개일 때 4열 → 2열. 3개면 화면 폭과 무관하게 3열
 - **≤420px**: 헤드라인 letter-spacing `-0.08em`, 스탯 라벨 축소
 
 ## 8. 접근성

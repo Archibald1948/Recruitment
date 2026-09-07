@@ -164,6 +164,19 @@ function StatItem({ stat, index, active }: { stat: Stat; index: number; active: 
   );
 }
 
+/**
+ * 지표 개수에 맞는 열 수.
+ *
+ * 4열로 고정하면 지표를 하나 빼는 순간 마지막 칸이 비어 전체가 왼쪽으로 쏠린다.
+ * Tailwind는 클래스 이름을 정적으로 훑으므로 문자열을 조립하지 않고 나열한다.
+ */
+function columns(count: number): string {
+  if (count >= 4) return "grid-cols-2 md:grid-cols-4";
+  if (count === 3) return "grid-cols-3";
+  if (count === 2) return "grid-cols-2";
+  return "grid-cols-1";
+}
+
 export default function Stats({ stats }: { stats: Stat[] }) {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
@@ -187,7 +200,7 @@ export default function Stats({ stats }: { stats: Stat[] }) {
   return (
     <div
       ref={ref}
-      className="mx-auto grid w-full max-w-[920px] grid-cols-2 gap-y-8 md:grid-cols-4"
+      className={`mx-auto grid w-full max-w-[920px] gap-x-4 gap-y-8 ${columns(stats.length)}`}
     >
       {stats.map((s, i) => (
         <StatItem key={s.label} stat={s} index={i} active={active} />
