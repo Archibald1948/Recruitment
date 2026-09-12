@@ -12,7 +12,7 @@
 export const MEETING = {
   /** 미팅 진행 기간 (양 끝 포함) */
   from: "2026-09-12",
-  to: "2026-09-18",
+  to: "2026-09-20",
   /** 미팅은 20분 남짓, 앞뒤 여유를 두고 30분 간격으로 끊는다. */
   stepMinutes: 30,
   /**
@@ -35,6 +35,7 @@ const OVERRIDES: Record<string, { open?: string; blocked?: [string, string][] }>
   "2026-09-16": { open: "18:00" },
   "2026-09-17": { open: "14:00" },
   "2026-09-18": { open: "14:00" },
+  // 19일(토)·20일(일)은 예외를 두지 않는다. 12일 토요일과 같이 종일 연다.
 };
 
 const toMin = (hhmm: string) => {
