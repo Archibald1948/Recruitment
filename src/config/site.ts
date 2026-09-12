@@ -101,7 +101,7 @@ export const site = {
   recruitingSteps: [
     {
       step: "01",
-      title: "서류 접수",
+      title: "추가 서류 접수",
       period: "~ 9월 15일",
       desc: "지원서를 검토합니다. 접수 확인 메일이 바로 발송됩니다.",
     },
