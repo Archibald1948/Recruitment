@@ -37,7 +37,7 @@ export const site = {
    * NEXT_PUBLIC_DEADLINE 환경변수로 덮어쓸 수 있어, 마감일만 바꿀 때는
    * 코드를 고치지 않고 Vercel 환경변수만 수정하면 된다.
    */
-  deadline: process.env.NEXT_PUBLIC_DEADLINE || "2026-09-14T23:59:59+09:00",
+  deadline: process.env.NEXT_PUBLIC_DEADLINE || "2026-09-15T23:59:59+09:00",
   startsAt: "2026년 9월",
   duration: "3개월 이상",
   meeting: "주 1회",
@@ -102,19 +102,19 @@ export const site = {
     {
       step: "01",
       title: "서류 접수",
-      period: "~ 9월 11일",
+      period: "~ 9월 15일",
       desc: "지원서를 검토합니다. 접수 확인 메일이 바로 발송됩니다.",
     },
     {
       step: "02",
       title: "구글 미트",
-      period: "9월 12일 ~ 18일",
+      period: "9월 12일 ~ 20일",
       desc: "서류 통과 시 온라인으로 짧게 이야기 나눕니다.",
     },
     {
       step: "03",
       title: "최종 결과",
-      period: "9월 19일 ~ 20일",
+      period: "9월 21일",
       desc: "합류 여부를 메일로 안내드립니다.",
     },
   ],
