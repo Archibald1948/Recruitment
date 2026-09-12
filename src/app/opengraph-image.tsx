@@ -139,7 +139,7 @@ export default async function Image() {
                 marginLeft: 8,
               }}
             >
-              마감 9월 11일
+              마감 9월 15일
             </div>
           </div>
         </div>
