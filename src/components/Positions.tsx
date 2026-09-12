@@ -71,11 +71,6 @@ export default function Positions() {
                   >
                     {p.open ? `모집 중 · ${p.headcount}` : p.headcount}
                   </span>
-                  {p.note && (
-                    <span className="rounded-full border border-[var(--line-ink)] px-3 py-1 text-xs text-[#0c0c0c]/60">
-                      {p.note}
-                    </span>
-                  )}
                 </div>
 
                 <p className="mt-3 max-w-2xl text-[clamp(0.85rem,1.6vw,1.05rem)] leading-relaxed font-light text-[#0c0c0c]/70">
