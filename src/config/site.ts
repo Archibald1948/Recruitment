@@ -16,8 +16,6 @@ export interface Position {
   open: boolean;
   /** 모집 인원 문구. 미정이면 'n명' */
   headcount: string;
-  /** 이미 합류한 인원처럼, 모집 상태와 별개로 알릴 내용 */
-  note?: string;
   summary: string;
   /** 주요 역할 / 예상 스택 */
   points: string[];
@@ -139,7 +137,7 @@ export const positions: Position[] = [
     title: "기획 / PM",
     label: "Product / Planning",
     open: true,
-    headcount: "n명",
+    headcount: "1명",
     summary:
       "서비스 방향을 잡고, 아이디어를 기능으로 옮기고, 출시 이후 사용자까지 데려오는 자리입니다.",
     points: [
@@ -191,8 +189,7 @@ export const positions: Position[] = [
     title: "Front-End",
     label: "Front-End",
     open: true,
-    headcount: "n명",
-    note: "1명 합류 완료",
+    headcount: "1명",
     summary: "React / Next.js로 사용자가 실제로 만지는 화면을 만듭니다.",
     points: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Git / GitHub"],
     wants: [
@@ -237,8 +234,7 @@ export const positions: Position[] = [
     title: "Back-End",
     label: "Back-End",
     open: true,
-    headcount: "n명",
-    note: "1명 합류 완료",
+    headcount: "1명",
     summary: "API와 DB를 설계하고, 서비스를 배포하고 운영합니다.",
     points: ["Spring Boot / Node.js / FastAPI", "PostgreSQL", "REST API", "AWS 등 Cloud", "Git / GitHub"],
     wants: [
@@ -282,7 +278,7 @@ export const positions: Position[] = [
     title: "UI/UX Designer",
     label: "Design",
     open: true,
-    headcount: "n명",
+    headcount: "2명",
     summary: "화면 뒤의 흐름부터 설계하고, 개발자가 실제로 구현할 수 있는 디자인을 만듭니다.",
     points: ["Figma", "디자인 시스템", "개발자와의 핸드오프"],
     wants: [
