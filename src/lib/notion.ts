@@ -28,7 +28,7 @@ export const PROP = {
 
   /* 아래 넷은 운영진이 노션에서 직접 채우는 칸이다. 지원 폼은 건드리지 않는다. */
   meetingAt: "미팅 일시",
-  zoomUrl: "미트 링크",
+  zoomUrl: "미팅 링크",
   notice: "안내 메시지",
   notifiedLog: "안내 발송",
   preferredSlot: "희망 미팅 시간",
