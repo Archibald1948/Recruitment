@@ -494,7 +494,7 @@ export default function ApplyForm({
                     {locked && (
                       // disabled만으로는 "왜 못 고르는지"가 안 보인다. 이유를 적어 준다.
                       <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium text-[var(--muted)]">
-                        모집 완료
+                        모집 마감
                       </span>
                     )}
                   </span>

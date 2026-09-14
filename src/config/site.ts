@@ -12,7 +12,7 @@ export interface Position {
   title: string;
   /** 영문 보조 라벨 */
   label: string;
-  /** 모집 중이면 true. false면 '모집 완료' 배지가 붙고 지원 폼 선택지에서 빠진다. */
+  /** 모집 중이면 true. false면 '모집 마감' 배지가 붙고 지원 폼에서 잠긴 채로 표시된다. */
   open: boolean;
   /** 모집 인원 문구. 미정이면 'n명' */
   headcount: string;

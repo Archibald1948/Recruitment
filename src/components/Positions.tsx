@@ -56,7 +56,7 @@ export default function Positions() {
               className={`flex flex-col gap-4 border-t border-[var(--line-ink)] py-8 sm:flex-row sm:gap-8 sm:py-10 md:py-12 ${
                 i === positions.length - 1 ? "border-b" : ""
               }`}
-              aria-label={p.open ? undefined : `${p.title} — 모집 완료`}
+              aria-label={p.open ? undefined : `${p.title} — 모집 마감`}
             >
               <div
                 className={`item-no font-display shrink-0 sm:w-[22%] ${
@@ -82,7 +82,7 @@ export default function Positions() {
                         : "border border-[var(--line-ink)] text-[#0c0c0c]/70"
                     }`}
                   >
-                    {p.open ? `모집 중 · ${p.headcount}` : "모집 완료"}
+                    {p.open ? `모집 중 · ${p.headcount}` : "모집 마감"}
                   </span>
                 </div>
 
