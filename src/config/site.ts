@@ -233,7 +233,7 @@ export const positions: Position[] = [
     no: "03",
     title: "Back-End",
     label: "Back-End",
-    open: true,
+    open: false,
     headcount: "1명",
     summary: "API와 DB를 설계하고, 서비스를 배포하고 운영합니다.",
     points: ["Spring Boot / Node.js / FastAPI", "PostgreSQL", "REST API", "AWS 등 Cloud", "Git / GitHub"],

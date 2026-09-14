@@ -67,7 +67,13 @@ export async function PATCH(req: Request, ctx: Ctx) {
   }
 
   // 이메일은 계정 키라 기존 값을 강제한다.
-  const { ok, errors, value } = validateApplication({ ...raw, email: auth.record.email });
+  // 모집을 닫은 포지션이라도 이미 그 포지션으로 접수한 본인은 계속 수정할 수 있어야
+  // 한다. 닫힌 포지션으로 새로 갈아타는 것만 막는다.
+  const current = positions.find((p) => p.title === auth.record.position);
+  const { ok, errors, value } = validateApplication(
+    { ...raw, email: auth.record.email },
+    { allowPositionId: current?.id },
+  );
   if (!ok) return NextResponse.json({ errors }, { status: 422 });
 
   try {

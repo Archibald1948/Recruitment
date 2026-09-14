@@ -89,6 +89,13 @@ export default function ApplyForm({
   const selectable = mode === "create" ? openPositions : positions;
   const position = positionById(values.position);
 
+  /*
+   * 수정 화면에서는 이미 접수한 포지션이 그 사이 마감됐더라도 그대로 둘 수 있어야
+   * 한다(서버도 같은 규칙으로 통과시킨다). 다른 마감 포지션으로 갈아타는 것만 막는다.
+   */
+  const ownPosition = mode === "edit" ? initial?.position : undefined;
+  const isLocked = (p: (typeof positions)[number]) => !p.open && p.id !== ownPosition;
+
   /* ── 임시저장 (신규 작성일 때만) ───────────────────────────── */
   useEffect(() => {
     if (mode !== "create") return;
@@ -456,7 +463,7 @@ export default function ApplyForm({
           <div className="grid gap-2 sm:grid-cols-2">
             {selectable.map((p) => {
               const active = values.position === p.id;
-              const locked = mode === "create" && !p.open;
+              const locked = isLocked(p);
               return (
                 <button
                   key={p.id}

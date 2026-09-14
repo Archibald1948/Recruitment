@@ -36,7 +36,18 @@ const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
 export function validateApplication(
   raw: unknown,
-  { requirePosition = true }: { requirePosition?: boolean } = {},
+  {
+    requirePosition = true,
+    allowPositionId,
+  }: {
+    requirePosition?: boolean;
+    /**
+     * 이미 접수된 지원자가 계속 들고 있어도 되는 포지션 id.
+     * 모집을 닫은 포지션이라도 그 포지션으로 이미 넣은 사람은 자기 지원서를
+     * 계속 수정할 수 있어야 한다. 새로 그 포지션으로 갈아타는 것만 막는다.
+     */
+    allowPositionId?: string;
+  } = {},
 ): { ok: boolean; errors: Errors; value: ApplicationInput } {
   const body = (raw ?? {}) as Record<string, unknown>;
   const errors: Errors = {};
@@ -67,7 +78,8 @@ export function validateApplication(
   const position = positionById(value.position);
   if (requirePosition) {
     if (!position) errors.position = "지원 포지션을 선택해 주세요.";
-    else if (!position.open) errors.position = "현재 모집이 마감된 포지션입니다.";
+    else if (!position.open && position.id !== allowPositionId)
+      errors.position = "현재 모집이 마감된 포지션입니다.";
   }
 
   if (!value.oneLiner) errors.oneLiner = "한 줄 소개를 입력해 주세요.";
