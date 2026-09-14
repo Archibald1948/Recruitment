@@ -2,7 +2,7 @@ import FadeIn from "@/components/ui/FadeIn";
 import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
 import { PixelDiamond, PixelGrid } from "@/components/decor/PixelOrnaments";
 import PositionApplyButton from "@/components/PositionApplyButton";
-import { positions, site } from "@/config/site";
+import { positions } from "@/config/site";
 
 const ORNAMENTS: DecorItem[] = [
   {
@@ -36,15 +36,10 @@ export default function Positions() {
       </FadeIn>
 
       <FadeIn delay={0.05}>
-        <div className="mx-auto mt-6 flex max-w-xl flex-col items-center gap-5">
-          <p className="text-center text-sm leading-relaxed text-[#0c0c0c]/65">
-            개발 실력이 가장 뛰어난 사람보다, 끝까지 함께하며 적극적으로 참여할 수 있는 분을
-            찾고 있습니다. 현재 실력이 완벽하지 않아도 괜찮습니다.
-          </p>
-          <span className="rounded-full border border-[var(--line-ink)] px-4 py-2 text-xs text-[#0c0c0c]/70">
-            {site.stage}
-          </span>
-        </div>
+        <p className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-[#0c0c0c]/65">
+          개발 실력이 가장 뛰어난 사람보다, 끝까지 함께하며 적극적으로 참여할 수 있는 분을
+          찾고 있습니다. 현재 실력이 완벽하지 않아도 괜찮습니다.
+        </p>
       </FadeIn>
 
       <div className="mx-auto mt-16 max-w-5xl sm:mt-20 md:mt-24">
