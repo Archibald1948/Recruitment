@@ -2,7 +2,7 @@
 
 import { AlertCircle, Check, Loader2 } from "lucide-react";
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { openPositions, positionById, positions, site } from "@/config/site";
+import { positionById, positions, site } from "@/config/site";
 import { formatSlot, openSlotDays, slotToIso, type SlotDay } from "@/lib/meeting-slots";
 import { SELECT_POSITION_EVENT } from "@/components/PositionApplyButton";
 import { formatPhone, normalizeUrl } from "@/lib/format";
@@ -86,7 +86,11 @@ export default function ApplyForm({
       : "작성 중인 지원서가 있습니다. 이 브라우저에는 임시 저장되지만 다른 기기에서는 이어서 쓸 수 없습니다. 나가시겠습니까?",
   );
 
-  const selectable = mode === "create" ? openPositions : positions;
+  /*
+   * 마감된 포지션도 목록에 남긴다. 그냥 빼버리면 그 포지션을 보고 온 사람에게는
+   * "왜 없지?"로 읽힐 뿐, 마감됐다는 사실이 전달되지 않는다. 잠근 채로 보여 준다.
+   */
+  const selectable = positions;
   const position = positionById(values.position);
 
   /*
@@ -105,6 +109,12 @@ export default function ApplyForm({
       // 마운트 후 복원이 유일하게 안전한 방법이라 이 규칙만 예외로 둔다.
       if (raw) {
         const restored: FormValues = { ...EMPTY, ...JSON.parse(raw) };
+        // 임시저장은 마감 전에 쓴 것일 수 있다. 그 사이 닫힌 포지션을 그대로
+        // 되살리면 고를 수 없는 값이 선택된 채로 남아 저장이 막힌다.
+        if (restored.position && !positionById(restored.position)?.open) {
+          restored.position = "";
+          restored.answers = {};
+        }
         /* eslint-disable react-hooks/set-state-in-effect */
         setBaseline(JSON.stringify(restored));
         setValues(restored);
@@ -476,10 +486,18 @@ export default function ApplyForm({
                     active
                       ? "border-white/70 bg-white/10"
                       : "border-[var(--line)] bg-white/[0.03] hover:border-white/30"
-                  } ${locked ? "cursor-not-allowed opacity-40" : ""}`}
+                  } ${locked ? "cursor-not-allowed opacity-55" : ""}`}
                 >
                   <span className="font-display block text-xs text-[var(--muted)]">{p.no}</span>
-                  <span className="mt-1 block text-sm text-white">{p.title}</span>
+                  <span className="mt-1 flex items-center gap-2 text-sm text-white">
+                    {p.title}
+                    {locked && (
+                      // disabled만으로는 "왜 못 고르는지"가 안 보인다. 이유를 적어 준다.
+                      <span className="rounded-full border border-[var(--line)] px-2 py-0.5 text-[11px] font-medium text-[var(--muted)]">
+                        모집 완료
+                      </span>
+                    )}
+                  </span>
                 </button>
               );
             })}

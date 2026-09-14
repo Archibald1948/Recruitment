@@ -51,17 +51,30 @@ export default function Positions() {
         {positions.map((p, i) => (
           <FadeIn key={p.id} delay={i * 0.1}>
             <article
+              // 마감 포지션은 번호·이름만 흐리게 한다. 카드 전체를 흐리게 하면
+              // 본문 대비가 규칙(디자인 시스템 §8) 아래로 떨어져 읽을 수 없게 된다.
               className={`flex flex-col gap-4 border-t border-[var(--line-ink)] py-8 sm:flex-row sm:gap-8 sm:py-10 md:py-12 ${
-                p.open ? "" : "opacity-45"
-              } ${i === positions.length - 1 ? "border-b" : ""}`}
+                i === positions.length - 1 ? "border-b" : ""
+              }`}
+              aria-label={p.open ? undefined : `${p.title} — 모집 완료`}
             >
-              <div className="item-no font-display shrink-0 text-[#0c0c0c] sm:w-[22%]">
+              <div
+                className={`item-no font-display shrink-0 sm:w-[22%] ${
+                  p.open ? "text-[#0c0c0c]" : "text-[#0c0c0c]/35"
+                }`}
+              >
                 {p.no}
               </div>
 
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h3 className="item-name font-medium text-[#0c0c0c] uppercase">{p.title}</h3>
+                  <h3
+                    className={`item-name font-medium uppercase ${
+                      p.open ? "text-[#0c0c0c]" : "text-[#0c0c0c]/45"
+                    }`}
+                  >
+                    {p.title}
+                  </h3>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-medium ${
                       p.open
@@ -69,7 +82,7 @@ export default function Positions() {
                         : "border border-[var(--line-ink)] text-[#0c0c0c]/70"
                     }`}
                   >
-                    {p.open ? `모집 중 · ${p.headcount}` : p.headcount}
+                    {p.open ? `모집 중 · ${p.headcount}` : "모집 완료"}
                   </span>
                 </div>
 
@@ -102,11 +115,19 @@ export default function Positions() {
                   ))}
                 </ul>
 
-                {p.open && (
+                {p.open ? (
                   <PositionApplyButton
                     positionId={p.id}
                     className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#0c0c0c] px-6 py-3 text-xs font-medium tracking-widest text-white uppercase transition hover:-translate-y-px"
                   />
+                ) : (
+                  /*
+                   * 버튼만 빼면 "왜 여기만 지원 버튼이 없지"로 읽힌다.
+                   * 자리를 비우지 말고 마감이라고 적어 준다.
+                   */
+                  <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-dashed border-[var(--line-ink)] px-6 py-3 text-xs text-[#0c0c0c]/60">
+                    모집이 마감되어 지원을 받지 않습니다
+                  </p>
                 )}
               </div>
             </article>
