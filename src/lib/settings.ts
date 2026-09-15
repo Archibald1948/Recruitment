@@ -51,8 +51,8 @@ async function fetchDeadline(): Promise<string | null> {
 /**
  * 모집 마감일(ISO 문자열).
  *
- * 서버에서만 쓴다. 클라이언트는 이미 60초마다 /api/stats를 다시 부르므로
- * 그쪽으로 흘러간다.
+ * 서버에서만 쓴다. 화면의 남은 시간은 서버가 이 값을 넘기면 브라우저가
+ * 직접 센다(useNow). 그래서 페이지 캐시가 묵어도 카운트다운은 흐른다.
  */
 export async function getDeadline(): Promise<string> {
   const now = Date.now();
@@ -68,4 +68,15 @@ export async function getDeadline(): Promise<string> {
     cached = { value: site.deadline, at: now };
     return site.deadline;
   }
+}
+
+/**
+ * 마감일과, 그 값을 읽은 서버 시각.
+ *
+ * 남은 시간은 브라우저가 센다. 다만 서버 HTML과 하이드레이션 첫 화면이 같아야
+ * 하므로 서버가 그린 시각을 함께 넘긴다. 컴포넌트 본문에서 시각을 읽으면
+ * 렌더가 입력만으로 결정되지 않는다. 데이터를 읽는 이 자리에서 한 번만 잡는다.
+ */
+export async function getDeadlineSnapshot(): Promise<{ deadline: string; now: number }> {
+  return { deadline: await getDeadline(), now: Date.now() };
 }
