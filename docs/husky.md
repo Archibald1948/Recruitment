@@ -3,8 +3,6 @@
 > 커밋 메시지가 **Conventional Commits** 형식이 아니면 커밋 자체를 막는다.
 > 설정 파일: `.husky/commit-msg`, `commitlint.config.js`
 
----
-
 ## 1. 구성
 
 | 도구 | 역할 |
