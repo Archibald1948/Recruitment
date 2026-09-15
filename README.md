@@ -110,6 +110,8 @@ DB 속성 이름은 코드에 그대로 박혀 있습니다. 노션에서 속성
 | [`docs/site-plan.md`](docs/site-plan.md) | 정보구조 · 라우트 · 노션 스키마 · API · 배포 · 진행 상황 |
 | [`docs/design-system.md`](docs/design-system.md) | 컬러 토큰 · 타이포 · 섹션 구성 · 자체 제작 그래픽 · 모션 규칙 |
 | [`docs/recruitment-notice.md`](docs/recruitment-notice.md) | 커뮤니티에 올리는 모집 공고 원문 |
+| [`docs/ci.md`](docs/ci.md) | GitHub Actions CI — 실행 시점 · 검사 단계 · 로컬에서 같은 검사 돌리기 |
+| [`docs/husky.md`](docs/husky.md) | 커밋 컨벤션 — husky + commitlint 동작 · 허용 type · 예시 |
 
 ---
 
