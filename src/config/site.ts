@@ -330,11 +330,61 @@ function deadlineMs(deadline: string = site.deadline): number {
   return Number.isNaN(t) ? Number.POSITIVE_INFINITY : t;
 }
 
-/** 남은 일수. 마감일이 지났으면 0 */
+/** 한국 시간 기준 날짜. "2026-09-15" */
+function kstDate(ms: number): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(ms);
+}
+
+/**
+ * 남은 일수. 한국 달력으로 센다. 마감 당일과 그 이후는 0.
+ *
+ * 남은 시간을 24시간으로 나눠 올리면 마감이 23:59일 때 마지막 하루가 통째로
+ * 하루로 잡힌다. 그러면 마감 당일에도 "1일"이 뜨고 전날에는 "2일"이 뜬다.
+ * 달력으로 세야 전날이 1일, 당일이 0일이 된다.
+ */
 export function daysLeft(deadline?: string, now: Date = new Date()): number {
   const ms = deadlineMs(deadline);
-  if (!Number.isFinite(ms)) return 0;
-  return Math.max(0, Math.ceil((ms - now.getTime()) / 86_400_000));
+  if (!Number.isFinite(ms) || ms <= now.getTime()) return 0;
+  const midnight = (date: string) => Date.parse(`${date}T00:00:00Z`);
+  return Math.round((midnight(kstDate(ms)) - midnight(kstDate(now.getTime()))) / 86_400_000);
+}
+
+export type TimeLeft =
+  | { kind: "closed" }
+  | { kind: "days"; days: number }
+  | { kind: "today"; hours: number; minutes: number };
+
+/**
+ * 마감까지 남은 시간.
+ *
+ * 전날까지는 날짜로, 당일에는 시간과 분으로 준다. 당일에 "0일"이나 "1일"은
+ * 오늘 밤까지라는 사실을 전하지 못한다.
+ */
+export function timeLeft(deadline?: string, now: Date = new Date()): TimeLeft {
+  const ms = deadlineMs(deadline);
+  // 마감일을 못 읽은 경우. 마감이 없는 것으로 보되 숫자는 예전처럼 0으로 둔다.
+  if (!Number.isFinite(ms)) return { kind: "days", days: 0 };
+  if (ms <= now.getTime()) return { kind: "closed" };
+
+  const days = daysLeft(deadline, now);
+  if (days > 0) return { kind: "days", days };
+
+  // 분은 올린다. 30초 남았을 때 "0분"이 뜨면 이미 끝난 것처럼 읽힌다.
+  const total = Math.ceil((ms - now.getTime()) / 60_000);
+  return { kind: "today", hours: Math.floor(total / 60), minutes: total % 60 };
+}
+
+/** "3일" · "3시간 29분" · "3시간" · "29분" · "마감" */
+export function formatTimeLeft(t: TimeLeft): string {
+  if (t.kind === "closed") return "마감";
+  if (t.kind === "days") return `${t.days}일`;
+  if (t.hours === 0) return `${t.minutes}분`;
+  return t.minutes === 0 ? `${t.hours}시간` : `${t.hours}시간 ${t.minutes}분`;
 }
 
 export function isClosed(deadline?: string, now: Date = new Date()): boolean {
