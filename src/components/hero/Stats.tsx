@@ -14,6 +14,11 @@ export interface Stat {
    * 파트 이름처럼 "몇 개"보다 "무엇"이 중요한 항목에 쓴다.
    */
   values?: string[];
+  /**
+   * 세어 올라가는 숫자 대신 그대로 보여줄 문구.
+   * "3시간 29분"처럼 숫자 하나로 담기지 않고 계속 바뀌는 값에 쓴다.
+   */
+  text?: string;
 }
 
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -119,7 +124,10 @@ function StatItem({ stat, index, active }: { stat: Stat; index: number; active: 
         className="tabular font-medium text-white"
         style={{ fontSize: "clamp(18px, 2.2vw, 26px)", letterSpacing: "-0.025em" }}
       >
-        {tw !== null ? (
+        {stat.text !== undefined ? (
+          // 줄이 바뀌면 옆 지표와 높이가 어긋난다. 좁은 화면에서도 한 줄로 둔다.
+          <span className="whitespace-nowrap">{stat.text}</span>
+        ) : tw !== null ? (
           // 상자를 두 겹으로 둔다.
           // 바깥: 가장 긴 값으로 열 폭을 고정한다. 단어가 바뀌어도 옆 지표가 밀리지 않는다.
           // 안쪽: 지금 단어 폭만큼만 잡고 왼쪽 정렬한다. 글자가 늘어도 이미 쓴 글자가
