@@ -1,12 +1,12 @@
-import { daysLeft, positions, site } from "@/config/site";
-import { getDeadline } from "@/lib/settings";
+import { positions, site } from "@/config/site";
+import { getDeadlineSnapshot } from "@/lib/settings";
 import DotMatrixHeadline from "./DotMatrixHeadline";
 import GlyphField from "./GlyphField";
 import LiveStats from "./LiveStats";
 import MeshBackdrop from "./MeshBackdrop";
 
 export default async function Hero() {
-  const remaining = daysLeft(await getDeadline());
+  const { deadline, now } = await getDeadlineSnapshot();
 
   return (
     <section
@@ -42,7 +42,12 @@ export default async function Hero() {
       </div>
 
       <div className="relative z-10 w-full shrink-0 px-5 pb-8 md:pb-12">
-        <LiveStats remaining={remaining} partCount={positions.length} months={3} />
+        <LiveStats
+          deadline={deadline}
+          serverNow={now}
+          partCount={positions.length}
+          months={3}
+        />
       </div>
     </section>
   );
