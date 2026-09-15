@@ -6,7 +6,7 @@ import DotMatrixHeadline from "@/components/hero/DotMatrixHeadline";
 import GlyphField from "@/components/hero/GlyphField";
 import LiveStats from "@/components/hero/LiveStats";
 import MeshBackdrop from "@/components/hero/MeshBackdrop";
-import { daysLeft, positions, site } from "@/config/site";
+import { positions, site } from "@/config/site";
 
 /**
  * 히어로 배경 실험실.
@@ -195,7 +195,11 @@ export default function LabPage() {
         </div>
 
         <div className="relative z-10 w-full shrink-0 px-5 pb-8 md:pb-12">
-          <LiveStats remaining={daysLeft()} partCount={positions.length} months={3} />
+          <LiveStats
+            deadline={site.deadline}
+            partCount={positions.length}
+            months={3}
+          />
         </div>
       </section>
 
