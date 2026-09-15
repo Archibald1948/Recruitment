@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "prepare": "husky"
+    "prepare": "husky",
+    "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {
     "@notionhq/client": "^5.26.0",
