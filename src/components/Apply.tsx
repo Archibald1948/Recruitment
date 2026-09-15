@@ -1,11 +1,12 @@
 import ApplyForm from "@/components/ApplyForm";
+import DeadlineChip from "@/components/DeadlineChip";
 import QnaPreview from "@/components/QnaPreview";
 import Link from "next/link";
 import FadeIn from "@/components/ui/FadeIn";
 import SectionDecor, { type DecorItem } from "@/components/decor/SectionDecor";
 import { PixelOrbit, PixelSphere } from "@/components/decor/PixelOrnaments";
-import { daysLeft, isClosed, openPositions, site } from "@/config/site";
-import { getDeadline } from "@/lib/settings";
+import { isClosed, openPositions, site } from "@/config/site";
+import { getDeadlineSnapshot } from "@/lib/settings";
 
 const ORNAMENTS: DecorItem[] = [
   {
@@ -25,9 +26,8 @@ const ORNAMENTS: DecorItem[] = [
 ];
 
 export default async function Apply() {
-  const deadline = await getDeadline();
-  const closed = isClosed(deadline);
-  const remaining = daysLeft(deadline);
+  const { deadline, now } = await getDeadlineSnapshot();
+  const closed = isClosed(deadline, new Date(now));
 
   // overflow는 clip이어야 한다. hidden은 스크롤 컨테이너를 만들어 안쪽
   // 진행률 바의 sticky를 무력화한다. clip은 스크롤포트를 만들지 않고
@@ -47,9 +47,11 @@ export default async function Apply() {
             사람들이 사용하는 서비스를 운영해 보는 것이 목표입니다.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--text-dim)]/70">
-              {closed ? "모집 마감" : `마감까지 ${remaining}일`}
-            </span>
+            <DeadlineChip
+              deadline={deadline}
+              serverNow={now}
+              className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--text-dim)]/70"
+            />
             <span className="rounded-full border border-[var(--line)] px-3 py-1.5 text-[var(--text-dim)]/70">
               시작 {site.startsAt}
             </span>
