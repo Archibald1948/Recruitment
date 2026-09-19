@@ -33,11 +33,12 @@ export const site = {
     "기획부터 개발, 배포, 그리고 실제 사용자를 만나는 운영까지.\n하나의 서비스를 끝까지 완성할 팀원을 찾습니다.",
 
   /**
-   * 모집 마감. D-day 카운트와 접수 차단의 기준값.
-   * NEXT_PUBLIC_DEADLINE 환경변수로 덮어쓸 수 있어, 마감일만 바꿀 때는
-   * 코드를 고치지 않고 Vercel 환경변수만 수정하면 된다.
+   * 모집 마감의 기본값. 실제 값은 노션 `사이트 설정`의 모집 마감일에서 읽는다.
+   *
+   * null이면 상시 모집이다. 접수가 막히지 않고 카운트다운 대신 모집 인원을 보여준다.
+   * 노션에 날짜를 넣으면 그때부터 다시 마감이 생긴다.
    */
-  deadline: process.env.NEXT_PUBLIC_DEADLINE || "2026-09-15T23:59:59+09:00",
+  deadline: (process.env.NEXT_PUBLIC_DEADLINE || null) as string | null,
   startsAt: "2026년 9월",
   duration: "3개월 이상",
   meeting: "주 1회",
@@ -320,10 +321,25 @@ export const openPositions = positions.filter((p) => p.open);
 export const positionById = (id: string) => positions.find((p) => p.id === id);
 
 /**
- * 마감일은 노션에서 읽어온다(src/lib/settings.ts). 아래 함수들이 문자열을
- * 인자로 받는 이유가 이것이다. 생략하면 site.deadline(기본값)을 쓴다.
+ * 열린 포지션의 모집 인원 합계. 상시 모집일 때 히어로가 카운트다운 대신 보여준다.
+ * 인원이 "n명"처럼 미정인 포지션이 하나라도 있으면 합계를 말할 수 없으므로 null.
  */
-function deadlineMs(deadline: string = site.deadline): number {
+export function recruitCount(): number | null {
+  let total = 0;
+  for (const p of openPositions) {
+    const n = Number.parseInt(p.headcount, 10);
+    if (Number.isNaN(n)) return null;
+    total += n;
+  }
+  return total;
+}
+
+/**
+ * 마감일은 노션에서 읽어온다(src/lib/settings.ts). 아래 함수들이 값을 인자로
+ * 받는 이유가 이것이다. null이면 상시 모집, 곧 마감이 없다.
+ */
+function deadlineMs(deadline: string | null): number {
+  if (deadline === null) return Number.POSITIVE_INFINITY;
   const t = new Date(deadline).getTime();
   // 날짜 문자열이 잘못되면 NaN이 되고, 모든 비교가 false가 되어
   // 마감 판정이 조용히 깨진다. 그때는 마감이 없는 것으로 본다.
@@ -347,7 +363,7 @@ function kstDate(ms: number): string {
  * 하루로 잡힌다. 그러면 마감 당일에도 "1일"이 뜨고 전날에는 "2일"이 뜬다.
  * 달력으로 세야 전날이 1일, 당일이 0일이 된다.
  */
-export function daysLeft(deadline?: string, now: Date = new Date()): number {
+export function daysLeft(deadline: string | null, now: Date = new Date()): number {
   const ms = deadlineMs(deadline);
   if (!Number.isFinite(ms) || ms <= now.getTime()) return 0;
   const midnight = (date: string) => Date.parse(`${date}T00:00:00Z`);
@@ -355,6 +371,7 @@ export function daysLeft(deadline?: string, now: Date = new Date()): number {
 }
 
 export type TimeLeft =
+  | { kind: "rolling" }
   | { kind: "closed" }
   | { kind: "days"; days: number }
   | { kind: "today"; hours: number; minutes: number };
@@ -365,10 +382,10 @@ export type TimeLeft =
  * 전날까지는 날짜로, 당일에는 시간과 분으로 준다. 당일에 "0일"이나 "1일"은
  * 오늘 밤까지라는 사실을 전하지 못한다.
  */
-export function timeLeft(deadline?: string, now: Date = new Date()): TimeLeft {
+export function timeLeft(deadline: string | null, now: Date = new Date()): TimeLeft {
   const ms = deadlineMs(deadline);
-  // 마감일을 못 읽은 경우. 마감이 없는 것으로 보되 숫자는 예전처럼 0으로 둔다.
-  if (!Number.isFinite(ms)) return { kind: "days", days: 0 };
+  // 마감일이 없거나 읽을 수 없으면 상시 모집이다.
+  if (!Number.isFinite(ms)) return { kind: "rolling" };
   if (ms <= now.getTime()) return { kind: "closed" };
 
   const days = daysLeft(deadline, now);
@@ -379,14 +396,15 @@ export function timeLeft(deadline?: string, now: Date = new Date()): TimeLeft {
   return { kind: "today", hours: Math.floor(total / 60), minutes: total % 60 };
 }
 
-/** "3일" · "3시간 29분" · "3시간" · "29분" · "마감" */
+/** "3일" · "3시간 29분" · "3시간" · "29분" · "마감" · "상시" */
 export function formatTimeLeft(t: TimeLeft): string {
+  if (t.kind === "rolling") return "상시";
   if (t.kind === "closed") return "마감";
   if (t.kind === "days") return `${t.days}일`;
   if (t.hours === 0) return `${t.minutes}분`;
   return t.minutes === 0 ? `${t.hours}시간` : `${t.hours}시간 ${t.minutes}분`;
 }
 
-export function isClosed(deadline?: string, now: Date = new Date()): boolean {
+export function isClosed(deadline: string | null, now: Date = new Date()): boolean {
   return deadlineMs(deadline) < now.getTime();
 }
