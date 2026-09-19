@@ -1,4 +1,4 @@
-import { positions, site } from "@/config/site";
+import { site } from "@/config/site";
 import { getDeadlineSnapshot } from "@/lib/settings";
 import DotMatrixHeadline from "./DotMatrixHeadline";
 import GlyphField from "./GlyphField";
@@ -42,12 +42,7 @@ export default async function Hero() {
       </div>
 
       <div className="relative z-10 w-full shrink-0 px-5 pb-8 md:pb-12">
-        <LiveStats
-          deadline={deadline}
-          serverNow={now}
-          partCount={positions.length}
-          months={3}
-        />
+        <LiveStats deadline={deadline} serverNow={now} months={3} />
       </div>
     </section>
   );
