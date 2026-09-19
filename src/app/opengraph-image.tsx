@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { positions, site } from "@/config/site";
+import { openPositions, site } from "@/config/site";
 
 /**
  * 커뮤니티에 링크를 뿌릴 때 뜨는 카드.
@@ -113,10 +113,10 @@ export default async function Image() {
 
         <div style={{ display: "flex", flexDirection: "column", position: "relative", gap: 22 }}>
           <div style={{ fontFamily: "Korean", fontSize: 30, color: "rgba(215,226,234,0.85)" }}>
-            기획부터 개발, 배포, 운영까지 하나의 서비스를 끝까지 완성할 팀원을 모집합니다
+            UI/UX 디자이너와 프론트엔드 개발자를 찾습니다
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            {positions.map((p) => (
+            {openPositions.map((p) => (
               <div
                 key={p.id}
                 style={{
@@ -139,7 +139,7 @@ export default async function Image() {
                 marginLeft: 8,
               }}
             >
-              마감 9월 15일
+              상시 모집
             </div>
           </div>
         </div>
