@@ -1,6 +1,5 @@
 import { Client } from "@notionhq/client";
 import type { ApplicationInput } from "./validation";
-import { slotToIso } from "./meeting-slots";
 import { serializeAnswers } from "./validation";
 import { positionById } from "@/config/site";
 
@@ -162,9 +161,9 @@ function buildProperties(input: ApplicationInput): Record<string, any> {
     [PROP.experience]: { rich_text: text(input.experience) },
     [PROP.answers]: { rich_text: text(serializeAnswers(input.position, input.answers)) },
     [PROP.availability]: { select: { name: input.availability } },
-    [PROP.preferredSlot]: {
-      date: input.meetingSlot ? { start: slotToIso(input.meetingSlot) } : null,
-    },
+    // 희망 미팅 시간은 쓰지 않는다. 상시 모집으로 바뀌며 폼에서 빠졌고, 미팅은
+    // 서류 통과 뒤 메일로 맞춘다. 비워서 덮어쓰면 이전 모집에서 받은 시간이
+    // 지원자가 수정하는 순간 지워지므로 칸 자체를 건드리지 않는다.
     [PROP.agree]: { checkbox: input.agree },
   };
 
