@@ -120,7 +120,9 @@ export default async function Image() {
               <div
                 key={p.id}
                 style={{
-                  fontFamily: "Korean",
+                  // 칩은 영문뿐이라 픽셀 폰트로 못 박는다. 한글 폰트를 먼저 두면
+                  // 그 서브셋에 든 글자(P, /)만 본문 서체로 나와 한 칩 안에서 섞인다.
+                  fontFamily: "Pixel",
                   fontSize: 24,
                   color: "#0c0c0c",
                   background: "#ffffff",
