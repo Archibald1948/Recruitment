@@ -37,8 +37,8 @@ export default function Positions() {
 
       <FadeIn delay={0.05}>
         <p className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-[#0c0c0c]/65">
-          개발 실력이 가장 뛰어난 사람보다, 끝까지 함께하며 적극적으로 참여할 수 있는 분을
-          찾고 있습니다. 현재 실력이 완벽하지 않아도 괜찮습니다.
+          가장 뛰어난 사람보다, 끝까지 함께하며 적극적으로 참여할 수 있는 분을 찾고
+          있습니다. 지금 실력이 완벽하지 않아도 괜찮습니다.
         </p>
       </FadeIn>
 
