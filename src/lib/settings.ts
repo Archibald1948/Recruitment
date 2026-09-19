@@ -9,8 +9,8 @@ import { notion, resolveDataSourceId } from "./notion";
  * Vercel 환경변수도 배포에 묶이기 때문이다. 노션에 두면 운영진이 날짜만
  * 고치면 된다.
  *
- * 노션이 죽거나 값이 비어 있으면 코드의 기본값으로 되돌아간다. 마감일을
- * 못 읽는다고 지원 폼 전체가 멈추면 안 된다.
+ * 마감일 칸을 비워두면 상시 모집이다. 노션을 못 읽을 때는 코드의 기본값
+ * (site.deadline)을 쓴다. 마감일을 못 읽는다고 지원 폼 전체가 멈추면 안 된다.
  */
 
 const SETTING = {
@@ -25,7 +25,7 @@ const PROP = {
 /** 노션 호출을 매 요청마다 하지 않는다. API 한도(초당 3회)에 걸린다. */
 const CACHE_MS = 60_000;
 
-let cached: { value: string; at: number } | null = null;
+let cached: { value: string | null; at: number } | null = null;
 
 function settingsDataSourceId(): Promise<string> {
   return resolveDataSourceId("NOTION_SETTINGS_DATA_SOURCE_ID", "NOTION_SETTINGS_DATABASE_ID");
@@ -49,17 +49,18 @@ async function fetchDeadline(): Promise<string | null> {
 }
 
 /**
- * 모집 마감일(ISO 문자열).
+ * 모집 마감일(ISO 문자열). null이면 상시 모집.
  *
  * 서버에서만 쓴다. 화면의 남은 시간은 서버가 이 값을 넘기면 브라우저가
  * 직접 센다(useNow). 그래서 페이지 캐시가 묵어도 카운트다운은 흐른다.
  */
-export async function getDeadline(): Promise<string> {
+export async function getDeadline(): Promise<string | null> {
   const now = Date.now();
   if (cached && now - cached.at < CACHE_MS) return cached.value;
 
   try {
-    const value = (await fetchDeadline()) ?? site.deadline;
+    // 칸이 비어 있으면 상시 모집이다. 기본값으로 메우지 않는다.
+    const value = await fetchDeadline();
     cached = { value, at: now };
     return value;
   } catch (e) {
@@ -77,6 +78,6 @@ export async function getDeadline(): Promise<string> {
  * 하므로 서버가 그린 시각을 함께 넘긴다. 컴포넌트 본문에서 시각을 읽으면
  * 렌더가 입력만으로 결정되지 않는다. 데이터를 읽는 이 자리에서 한 번만 잡는다.
  */
-export async function getDeadlineSnapshot(): Promise<{ deadline: string; now: number }> {
+export async function getDeadlineSnapshot(): Promise<{ deadline: string | null; now: number }> {
   return { deadline: await getDeadline(), now: Date.now() };
 }
