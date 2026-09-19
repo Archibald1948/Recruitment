@@ -12,6 +12,11 @@ export interface Position {
   title: string;
   /** 영문 보조 라벨 */
   label: string;
+  /**
+   * 한 단어짜리 영문 이름. 히어로 지표가 타자기처럼 돌린다.
+   * label("Product / Planning")은 좁은 화면의 지표 한 칸을 넘친다.
+   */
+  short: string;
   /** 모집 중이면 true. false면 '모집 마감' 배지가 붙고 지원 폼에서 잠긴 채로 표시된다. */
   open: boolean;
   /** 모집 인원 문구. 미정이면 'n명' */
@@ -138,6 +143,7 @@ export const positions: Position[] = [
     no: "01",
     title: "UI/UX Designer",
     label: "Design",
+    short: "Design",
     open: true,
     headcount: "2명",
     summary: "화면 뒤의 흐름부터 설계하고, 개발자가 실제로 구현할 수 있는 디자인을 만듭니다.",
@@ -183,6 +189,7 @@ export const positions: Position[] = [
     no: "02",
     title: "Front-End",
     label: "Front-End",
+    short: "Frontend",
     open: true,
     headcount: "1명",
     summary: "React / Next.js로 사용자가 실제로 만지는 화면을 만듭니다.",
@@ -228,6 +235,7 @@ export const positions: Position[] = [
     no: "03",
     title: "기획 / PM",
     label: "Product / Planning",
+    short: "Planning",
     open: false,
     headcount: "1명",
     summary:
@@ -280,6 +288,7 @@ export const positions: Position[] = [
     no: "04",
     title: "Back-End",
     label: "Back-End",
+    short: "Backend",
     open: false,
     headcount: "1명",
     summary: "API와 DB를 설계하고, 서비스를 배포하고 운영합니다.",
