@@ -236,7 +236,7 @@ export const positions: Position[] = [
     title: "기획 / PM",
     label: "Product / Planning",
     short: "Planning",
-    open: false,
+    open: true,
     headcount: "1명",
     summary:
       "서비스 방향을 잡고, 아이디어를 기능으로 옮기고, 출시 이후 사용자까지 데려오는 자리입니다.",
