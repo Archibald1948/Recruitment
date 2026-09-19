@@ -13,7 +13,7 @@ import Stats, { type Stat } from "./Stats";
 // 지금 뽑는 파트만 돌린다. 마감된 파트까지 돌리면 무엇을 뽑는지가 흐려진다.
 // 컴포넌트 밖에 둔다. 시계가 매초 다시 그리는데, 배열을 안에서 새로 만들면
 // 타자기 효과가 매초 처음부터 다시 시작한다.
-const PART_NAMES = openPositions.map((p) => p.label);
+const PART_NAMES = openPositions.map((p) => p.short);
 const RECRUIT_COUNT = recruitCount();
 
 /**
