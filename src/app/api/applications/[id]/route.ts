@@ -24,7 +24,7 @@ async function authorize(id: string, token: string | null) {
 
 function present(
   record: NonNullable<Awaited<ReturnType<typeof getApplication>>>,
-  deadline: string,
+  deadline: string | null,
 ) {
   const { tokenHash: _drop, ...safe } = record;
   void _drop;
