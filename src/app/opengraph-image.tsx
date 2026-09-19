@@ -113,7 +113,7 @@ export default async function Image() {
 
         <div style={{ display: "flex", flexDirection: "column", position: "relative", gap: 22 }}>
           <div style={{ fontFamily: "Korean", fontSize: 30, color: "rgba(215,226,234,0.85)" }}>
-            UI/UX 디자이너와 프론트엔드 개발자를 찾습니다
+            기획자, UI/UX 디자이너, 프론트엔드 개발자를 찾습니다
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             {openPositions.map((p) => (
