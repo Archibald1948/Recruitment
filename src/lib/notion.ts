@@ -302,37 +302,6 @@ export async function markNotified(pageId: string, line: string) {
   await appendHistory(pageId, line);
 }
 
-/**
- * 이미 찜한 희망 시간 목록.
- *
- * 불합격 처리된 지원자의 자리는 비워준다. 떨어진 사람이 자리를 붙들고 있으면
- * 남은 지원자가 고를 칸만 줄어든다.
- */
-export async function takenSlots(excludeId?: string): Promise<string[]> {
-  const data_source_id = await getDataSourceId();
-  const out: string[] = [];
-  let cursor: string | undefined;
-
-  do {
-    const res = (await notion().dataSources.query({
-      data_source_id,
-      page_size: 100,
-      start_cursor: cursor,
-    })) as any;
-
-    for (const page of res.results ?? []) {
-      if (excludeId && page.id === excludeId) continue;
-      const p = page.properties ?? {};
-      if (readSelect(p[PROP.status]) === "불합격") continue;
-      const slot = p[PROP.preferredSlot]?.date?.start;
-      if (slot) out.push(slot);
-    }
-    cursor = res.has_more ? res.next_cursor : undefined;
-  } while (cursor);
-
-  return out;
-}
-
 export async function countApplications(): Promise<number> {
   const data_source_id = await getDataSourceId();
   let count = 0;
