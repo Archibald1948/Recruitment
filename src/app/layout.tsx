@@ -15,11 +15,13 @@ export const metadata: Metadata = {
     template: "%s · 같이 개발해요.",
   },
   description:
-    "기획부터 개발, 배포, 그리고 실제 사용자를 만나는 운영까지. 하나의 서비스를 끝까지 함께 완성할 UI/UX 디자이너와 프론트엔드 개발자를 상시 모집합니다.",
+    "기획부터 개발, 배포, 그리고 실제 사용자를 만나는 운영까지. 하나의 서비스를 끝까지 함께 완성할 기획자, UI/UX 디자이너, 프론트엔드 개발자를 상시 모집합니다.",
   keywords: [
     "팀원 모집",
     "상시 모집",
     "사이드 프로젝트",
+    "기획",
+    "PM",
     "UI/UX 디자이너",
     "디자이너 모집",
     "프론트엔드",
@@ -29,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Build It, Ship It Together",
     description:
-      "끝까지 만들어 보고, 배포하고, 사람들이 쓰는 서비스를 운영해 봅니다. 함께할 UI/UX 디자이너와 프론트엔드 개발자를 모집합니다.",
+      "끝까지 만들어 보고, 배포하고, 사람들이 쓰는 서비스를 운영해 봅니다. 함께할 기획자, UI/UX 디자이너, 프론트엔드 개발자를 모집합니다.",
     type: "website",
     locale: "ko_KR",
     siteName: "Build It, Ship It Together",
@@ -37,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Build It, Ship It Together",
-    description: "하나의 서비스를 끝까지 함께 완성할 UI/UX 디자이너와 프론트엔드 개발자를 모집합니다.",
+    description: "하나의 서비스를 끝까지 함께 완성할 기획자, UI/UX 디자이너, 프론트엔드 개발자를 모집합니다.",
   },
   robots: { index: true, follow: true },
 };
