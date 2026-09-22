@@ -93,7 +93,7 @@ export default async function Image() {
               color: "rgba(215,226,234,0.65)",
             }}
           >
-            BUILDITSHIP.KRO.KR
+            BIST.KRO.KR
           </div>
           <div
             style={{
