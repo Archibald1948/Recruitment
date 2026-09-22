@@ -11,7 +11,7 @@
 | 아이콘 | `lucide-react` | |
 | DB | **Notion Database** (공식 API) | 어드민 = 노션 자체. 지원자 / Q&A / 사이트 설정 세 개 |
 | 메일 | **Gmail SMTP** (기본) / **Resend** (도메인 검증 후) | 접수 확인 + 수정 링크 |
-| 배포 | Vercel | 커스텀 도메인 **`builditship.kro.kr` 확정** (내도메인.한국, 무료) |
+| 배포 | Vercel | 커스텀 도메인 **`bist.kro.kr` 확정** (내도메인.한국, 무료) |
 
 > Notion 통합 토큰은 **서버 전용**. 클라이언트 번들에 절대 노출 금지 → 모든 접근은 Route Handler 경유.
 > 통합은 **연동에 쓰는 DB 페이지에만** 개별 공유한다(워크스페이스 전체 연결 금지).
@@ -156,10 +156,10 @@ DB 이름: **사이트 설정** — 생성 완료, 통합 연결 완료
 커뮤니티마다 링크를 다르게 뿌리고, 어디서 좋은 지원자가 오는지 데이터로 남긴다.
 
 ```
-https://builditship.kro.kr/?ref=everytime
-https://builditship.kro.kr/?ref=okky
-https://builditship.kro.kr/?ref=discord
-https://builditship.kro.kr/?ref=instagram
+https://bist.kro.kr/?ref=everytime
+https://bist.kro.kr/?ref=okky
+https://bist.kro.kr/?ref=discord
+https://bist.kro.kr/?ref=instagram
 ```
 
 - **대부분은 `?ref=` 를 붙일 필요가 없다.** 커뮤니티에서 링크를 타고 들어오면
@@ -178,7 +178,7 @@ https://builditship.kro.kr/?ref=instagram
 포지션 딥링크도 함께 쓸 수 있다. 프론트엔드 모집 글에는 이렇게 뿌린다:
 
 ```
-https://builditship.kro.kr/?ref=okky&position=frontend#apply
+https://bist.kro.kr/?ref=okky&position=frontend#apply
 ```
 
 포지션 카드의 "이 포지션 지원하기" 버튼도 같은 방식으로 폼의 포지션을 미리 채운다.
@@ -232,15 +232,17 @@ https://builditship.kro.kr/?ref=okky&position=frontend#apply
 
 ## 5.4 도메인
 
-`builditship.kro.kr` — **확정.** 내도메인.한국에서 받은 무료 도메인이라 비용·갱신 부담이 없다.
+`bist.kro.kr` — **확정.** 내도메인.한국에서 받은 무료 도메인이라 비용·갱신 부담이 없다.
+처음에는 `builditship.kro.kr`로 열었다가 짧은 주소로 옮겼다. 옛 주소는 끊지 않고
+새 주소로 넘겨준다. 이미 보낸 메일에 그 주소의 수정·입장 링크가 들어 있기 때문이다.
 
-`kro.kr`은 **공용 서픽스(Public Suffix)** 라서 `builditship.kro.kr`이 최상위처럼
+`kro.kr`은 **공용 서픽스(Public Suffix)** 라서 `bist.kro.kr`이 최상위처럼
 취급된다. 그래서 CNAME이 아니라 **A 레코드**로 연결하고, Vercel이 소유권 확인을
 위해 TXT 레코드를 요구한다.
 
 | 종류 | 이름 | 값 |
 |---|---|---|
-| TXT | `_vercel` | `vc-domain-verify=builditship.kro.kr,...` |
+| TXT | `_vercel` | `vc-domain-verify=bist.kro.kr,...` |
 | A | (비움) | `216.198.79.1` |
 | A | (비움) | `64.29.17.1` |
 
@@ -456,13 +458,13 @@ DB 이름: **Q&A 문의 게시판** — 생성 완료, 통합 연결 완료
       필요한 인원이 상황에 따라 달라지고, 숫자를 적으면 그 자리가 찼는지부터 묻게 된다.
       프론트엔드·백엔드는 각 1명이 합류했지만 모집은 계속 열려 있다(`note`로 표시)
 - [x] **Q&A DB 통합 연결** — 완료. `/qna` 목록이 정상 조회된다
-- [x] **도메인** — `builditship.kro.kr` 확정, DNS 연결 완료(§5.4)
+- [x] **도메인** — `bist.kro.kr` 확정, DNS 연결 완료(§5.4)
 - [x] **개인정보 보유기간** — "리크루팅 종료와 즉시 파기"(`site.privacyRetention`).
       메일 · 지원 폼 · `/privacy`가 모두 이 문장 하나를 쓴다
 
 ### 남은 항목
 
-- [ ] **Resend 도메인 검증** — `builditship.kro.kr`에 SPF/DKIM 레코드를 등록하고
+- [ ] **Resend 도메인 검증** — `bist.kro.kr`에 SPF/DKIM 레코드를 등록하고
       `RESEND_API_KEY` · `MAIL_FROM`을 채우면 발신 주소가 개인 Gmail에서 프로젝트 도메인으로
       바뀐다. 그 전까지는 Gmail SMTP로 나간다(§5.5)
 - [ ] **로고 · OG 이미지** — `layout.tsx`의 `openGraph`에 이미지가 없어, 링크를 공유해도
