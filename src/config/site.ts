@@ -185,54 +185,8 @@ export const positions: Position[] = [
     ],
   },
   {
-    id: "frontend",
-    no: "02",
-    title: "Front-End",
-    label: "Front-End",
-    short: "Frontend",
-    open: true,
-    headcount: "1명",
-    summary: "React / Next.js로 사용자가 실제로 만지는 화면을 만듭니다.",
-    points: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Git / GitHub"],
-    wants: [
-      "React 또는 Next.js 개발 경험이 있는 분",
-      "API 연동 경험이 있거나 경험해 보고 싶은 분",
-      "맡은 기능을 끝까지 구현하려는 책임감이 있는 분",
-    ],
-    questions: [
-      {
-        id: "handoff",
-        label:
-          "디자이너가 건넨 시안에 구현이 어려운 부분이 있다면, 어떻게 풀어가시겠어요?",
-        placeholder: "그대로 구현할지, 대안을 제안할지, 어떻게 이야기를 꺼낼지 적어주세요.",
-        required: true,
-      },
-      {
-        id: "apiFailure",
-        label:
-          "API 응답이 느리거나 실패하는 상황을 화면에서 어떻게 다루시겠어요?",
-        placeholder: "로딩·에러·재시도를 사용자에게 어떻게 보여줄지 생각을 적어주세요.",
-        required: true,
-      },
-      {
-        id: "memorableWork",
-        label:
-          "React 또는 Next.js로 만들어 본 것 중 가장 기억에 남는 화면과, 그때 어려웠던 점을 알려주세요.",
-        placeholder: "규모는 상관없습니다. 무엇이 어려웠고 어떻게 해결했는지가 궁금합니다.",
-        required: false,
-      },
-      {
-        id: "perfA11y",
-        label:
-          "성능이나 접근성 때문에 구현 방식을 바꿔본 경험이 있다면 알려주세요.",
-        placeholder: "없으면 비워두셔도 됩니다.",
-        required: false,
-      },
-    ],
-  },
-  {
     id: "pm",
-    no: "03",
+    no: "02",
     title: "기획 / PM",
     label: "Product / Planning",
     short: "Planning",
@@ -279,6 +233,52 @@ export const positions: Position[] = [
         label:
           "사용자의 문제나 니즈를 파악하기 위해 어떤 방식으로 조사해보고 싶나요?",
         placeholder: "설문·인터뷰·경쟁 서비스 관찰 등, 어떤 방법으로 무엇을 확인하고 싶은지 적어주세요.",
+        required: false,
+      },
+    ],
+  },
+  {
+    id: "frontend",
+    no: "03",
+    title: "Front-End",
+    label: "Front-End",
+    short: "Frontend",
+    open: false,
+    headcount: "1명",
+    summary: "React / Next.js로 사용자가 실제로 만지는 화면을 만듭니다.",
+    points: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Git / GitHub"],
+    wants: [
+      "React 또는 Next.js 개발 경험이 있는 분",
+      "API 연동 경험이 있거나 경험해 보고 싶은 분",
+      "맡은 기능을 끝까지 구현하려는 책임감이 있는 분",
+    ],
+    questions: [
+      {
+        id: "handoff",
+        label:
+          "디자이너가 건넨 시안에 구현이 어려운 부분이 있다면, 어떻게 풀어가시겠어요?",
+        placeholder: "그대로 구현할지, 대안을 제안할지, 어떻게 이야기를 꺼낼지 적어주세요.",
+        required: true,
+      },
+      {
+        id: "apiFailure",
+        label:
+          "API 응답이 느리거나 실패하는 상황을 화면에서 어떻게 다루시겠어요?",
+        placeholder: "로딩·에러·재시도를 사용자에게 어떻게 보여줄지 생각을 적어주세요.",
+        required: true,
+      },
+      {
+        id: "memorableWork",
+        label:
+          "React 또는 Next.js로 만들어 본 것 중 가장 기억에 남는 화면과, 그때 어려웠던 점을 알려주세요.",
+        placeholder: "규모는 상관없습니다. 무엇이 어려웠고 어떻게 해결했는지가 궁금합니다.",
+        required: false,
+      },
+      {
+        id: "perfA11y",
+        label:
+          "성능이나 접근성 때문에 구현 방식을 바꿔본 경험이 있다면 알려주세요.",
+        placeholder: "없으면 비워두셔도 됩니다.",
         required: false,
       },
     ],
