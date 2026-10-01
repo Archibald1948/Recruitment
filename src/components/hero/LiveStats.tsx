@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  formatTimeLeft,
-  openPositions,
-  recruitCount,
-  timeLeft,
-  type TimeLeft,
-} from "@/config/site";
+import { formatTimeLeft, openPositions, timeLeft, type TimeLeft } from "@/config/site";
 import { useNow } from "@/lib/useNow";
 import Stats, { type Stat } from "./Stats";
 
@@ -14,18 +8,13 @@ import Stats, { type Stat } from "./Stats";
 // 컴포넌트 밖에 둔다. 시계가 매초 다시 그리는데, 배열을 안에서 새로 만들면
 // 타자기 효과가 매초 처음부터 다시 시작한다.
 const PART_NAMES = openPositions.map((p) => p.short);
-const RECRUIT_COUNT = recruitCount();
 
 /**
- * 첫 번째 지표. 마감일이 있으면 남은 시간을, 상시 모집이면 모집 인원을 보여준다.
+ * 첫 번째 지표. 마감일이 있으면 남은 시간을 보여주고, 상시 모집이면 칸 자체를 뺀다.
  * 상시 모집에 카운트다운을 걸어두면 "0일"처럼 끝난 것으로 읽힌다.
  */
-function leadStat(left: TimeLeft | null): Stat {
-  if (left?.kind === "rolling") {
-    return RECRUIT_COUNT === null
-      ? { glyph: "<", value: 0, suffix: "", decimals: 0, label: "모집 중", text: "상시" }
-      : { glyph: "<", value: RECRUIT_COUNT, suffix: "명", decimals: 0, label: "모집 인원" };
-  }
+function leadStat(left: TimeLeft | null): Stat | null {
+  if (left?.kind === "rolling") return null;
   return {
     glyph: "<",
     value: left?.kind === "days" ? left.days : 0,
@@ -64,8 +53,9 @@ export default function LiveStats({
         ? null
         : timeLeft(deadline, new Date(now));
 
+  const lead = leadStat(left);
   const stats: Stat[] = [
-    leadStat(left),
+    ...(lead ? [lead] : []),
     {
       // *는 이 픽셀 폰트에서 작고 위로 붙어 나와 옆 글리프들과 무게가 안 맞았다.
       // +는 가운데 정렬이라 <, # 과 나란히 놓았을 때 균형이 잡힌다.
