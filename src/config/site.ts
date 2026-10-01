@@ -40,7 +40,7 @@ export const site = {
   /**
    * 모집 마감의 기본값. 실제 값은 노션 `사이트 설정`의 모집 마감일에서 읽는다.
    *
-   * null이면 상시 모집이다. 접수가 막히지 않고 카운트다운 대신 모집 인원을 보여준다.
+   * null이면 상시 모집이다. 접수가 막히지 않고 히어로에서 카운트다운 칸이 빠진다.
    * 노션에 날짜를 넣으면 그때부터 다시 마감이 생긴다.
    */
   deadline: (process.env.NEXT_PUBLIC_DEADLINE || null) as string | null,
@@ -332,20 +332,6 @@ export const positions: Position[] = [
 
 export const openPositions = positions.filter((p) => p.open);
 export const positionById = (id: string) => positions.find((p) => p.id === id);
-
-/**
- * 열린 포지션의 모집 인원 합계. 상시 모집일 때 히어로가 카운트다운 대신 보여준다.
- * 인원이 "n명"처럼 미정인 포지션이 하나라도 있으면 합계를 말할 수 없으므로 null.
- */
-export function recruitCount(): number | null {
-  let total = 0;
-  for (const p of openPositions) {
-    const n = Number.parseInt(p.headcount, 10);
-    if (Number.isNaN(n)) return null;
-    total += n;
-  }
-  return total;
-}
 
 /**
  * 마감일은 노션에서 읽어온다(src/lib/settings.ts). 아래 함수들이 값을 인자로
