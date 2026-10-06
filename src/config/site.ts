@@ -145,7 +145,7 @@ export const positions: Position[] = [
     label: "Design",
     short: "Design",
     open: true,
-    headcount: "2명",
+    headcount: "1명",
     summary: "화면 뒤의 흐름부터 설계하고, 개발자가 실제로 구현할 수 있는 디자인을 만듭니다.",
     points: ["Figma", "디자인 시스템", "개발자와의 핸드오프"],
     wants: [
